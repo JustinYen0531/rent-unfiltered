@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/JustinYen0531/rent-unfiltered/schemas/rhir-v0.1.schema.json",
+  "title": "RHIR v0.1 Rental Housing Record",
+  "description": "Machine-readable JSON Schema for RHIR v0.1. Human-readable documentation: ../docs/RHIR-v0.1-人類可讀規範.md",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "metadata"
+  ],
+  "properties": {
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    },
+    "listing": {
+      "$ref": "#/$defs/fieldGroup"
+    },
+    "property": {
+      "$ref": "#/$defs/fieldGroup"
+    },
+    "layoutAndStructure": {
+      "$ref": "#/$defs/fieldGroup"
+    },
+    "locationContext": {
+      "$ref": "#/$defs/fieldGroup"
+    },
+    "amenities": {
+      "$ref": "#/$defs/fieldGroup"
+    },
+    "leaseTerms": {
+      "$ref": "#/$defs/fieldGroup"
+    },
+    "cost": {
+      "$ref": "#/$defs/fieldGroup"
+    },
+    "management": {
+      "$ref": "#/$defs/fieldGroup"
+    },
+    "provider": {
+      "$ref": "#/$defs/fieldGroup"
+    },
+    "ownershipLegalStatus": {
+      "$ref": "#/$defs/fieldGroup"
+    },
+    "marketingClaims": {
+      "$ref": "#/$defs/fieldGroup"
+    },
+    "transparencyLayer": {
+      "$ref": "#/$defs/transparencyLayer"
+    }
+  },
+  "$defs": {
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "rhirRecordId": {
+          "$ref": "#/$defs/fieldValue"
+        },
+        "rhirVersion": {
+          "$ref": "#/$defs/fieldValue"
+        },
+        "createdAt": {
+          "$ref": "#/$defs/fieldValue"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/fieldValue"
+        },
+        "sourcePlatform": {
+          "$ref": "#/$defs/fieldValue"
+        },
+        "sourceUrl": {
+          "$ref": "#/$defs/fieldValue"
+        },
+        "platformListingId": {
+          "$ref": "#/$defs/fieldValue"
+        },
+        "listingStatus": {
+          "$ref": "#/$defs/fieldValue"
+        }
+      }
+    },
+    "fieldGroup": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/fieldValue"
+      }
+    },
+    "transparencyLayer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "disclosedFieldCount": {
+          "$ref": "#/$defs/fieldValue"
+        },
+        "partialFieldCount": {
+          "$ref": "#/$defs/fieldValue"
+        },
+        "missingFieldCount": {
+          "$ref": "#/$defs/fieldValue"
+        },
+        "conflictFieldCount": {
+          "$ref": "#/$defs/fieldValue"
+        },
+        "supplementedFieldCount": {
+          "$ref": "#/$defs/fieldValue"
+        },
+        "inferredFieldCount": {
+          "$ref": "#/$defs/fieldValue"
+        },
+        "unknownFieldCount": {
+          "$ref": "#/$defs/fieldValue"
+        },
+        "fieldsNeedingUserQuestion": {
+          "$ref": "#/$defs/fieldValue"
+        },
+        "notes": {
+          "$ref": "#/$defs/fieldValue"
+        }
+      }
+    },
+    "fieldValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "disclosureStatus",
+        "sourceType"
+      ],
+      "properties": {
+        "value": {
+          "description": "Actual value. Can be string, number, boolean, array, object, or null."
+        },
+        "disclosureStatus": {
+          "type": "string",
+          "enum": [
+            "disclosed",
+            "partial",
+            "missing",
+            "inferred",
+            "supplemented",
+            "conflict",
+            "unknown"
+          ]
+        },
+        "sourceType": {
+          "type": "string",
+          "enum": [
+            "platform",
+            "provider",
+            "publicData",
+            "systemInference",
+            "userReport",
+            "manualInput",
+            "unknown"
+          ]
+        },
+        "sourceText": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "updatedAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Recommended format: YYYY-MM-DD."
+        },
+        "conflicts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/conflict"
+          },
+          "default": []
+        }
+      }
+    },
+    "conflict": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sourceType": {
+          "type": "string",
+          "enum": [
+            "platform",
+            "provider",
+            "publicData",
+            "systemInference",
+            "userReport",
+            "manualInput",
+            "unknown"
+          ]
+        },
+        "sourceText": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "value": {},
+        "note": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}
