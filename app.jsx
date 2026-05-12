@@ -36,6 +36,7 @@ function App() {
       <TopBar route={route} setRoute={setRoute}/>
       <div className="main">
         {route.name === "home" && <window.HomePage setRoute={setRoute}/>}
+        {route.name === "rhir-spec" && <window.RHIRSpecPage setRoute={setRoute}/>}
         {route.name === "form" && <window.FormPage setRoute={setRoute} mode={route.mode}/>}
         {route.name === "detail" && <window.DetailPage setRoute={setRoute} recordId={route.id}/>}
       </div>

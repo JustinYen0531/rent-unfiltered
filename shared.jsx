@@ -68,9 +68,7 @@ function TopBar({ route, setRoute }) {
         </div>
         <nav className="topnav">
           <a className={route.name === "home" ? "active" : ""} onClick={() => setRoute({ name: "home" })}>租屋紀錄</a>
-          <a>RHIR 規格</a>
-          <a>透明度方法</a>
-          <a>開發者文件</a>
+          <a className={route.name === "rhir-spec" ? "active" : ""} onClick={() => setRoute({ name: "rhir-spec" })}>RHIR 規格</a>
         </nav>
         <div className="topbar-right">
           <div className="search">
