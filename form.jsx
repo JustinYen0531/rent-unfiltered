@@ -1,4 +1,4 @@
-// New rental form - create the initial version X
+﻿// New rental form - create the initial version X
 
 const { useState: useStateF } = React;
 
@@ -47,7 +47,6 @@ function buildRandomFormSeed() {
     managementFee,
     internetFee,
     eligibleForSubsidy: pick(["yes", "no", null]),
-    eligibleForTaxFiling: pick(["yes", "no", null]),
 
     hasWrittenContract: pick(["yes", "no"]),
     reviewPeriod,
@@ -83,7 +82,7 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X" }) {
 
   const SECTIONS = [
     { id: "property", title: "物件基本資訊", step: "01", filled: 6, total: 8 },
-    { id: "cost", title: "租金與費用", step: "02", filled: 4, total: 8 },
+    { id: "cost", title: "租金與費用", step: "02", filled: 4, total: 7 },
     { id: "lease", title: "契約與條款", step: "03", filled: 3, total: 6 },
     { id: "safety", title: "安全與屋況", step: "04", filled: 2, total: 6 },
     { id: "rights", title: "權益限制", step: "05", filled: 2, total: 4 },
@@ -281,7 +280,6 @@ function PropertySection({ seed }) {
 
 function CostSection({ seed }) {
   const [subsidy, setSubsidy] = useStateF(seed.eligibleForSubsidy);
-  const [taxFiling, setTaxFiling] = useStateF(seed.eligibleForTaxFiling);
 
   return (
     <>
@@ -291,19 +289,19 @@ function CostSection({ seed }) {
           <input defaultValue={seed.rent} />
         </div>
       </FieldInput>
-      <FieldInput label="押金" required schemaKey="cost.deposit" hint="通常為 1 到 2 個月房租">
+      <FieldInput label="押金" required schemaKey="cost.deposit" hint="通常為 1 到 2 個月租金">
         <div className="field-input with-prefix" style={{ margin: 0 }}>
           <span className="prefix mono">NT$</span>
           <input defaultValue={seed.deposit} />
         </div>
       </FieldInput>
-      <FieldInput label="電費單價" schemaKey="cost.electricityRate" hint="若不是台電計價，可直接填單價">
+      <FieldInput label="電費計價" schemaKey="cost.electricityRate" hint="若不是台電計價，請填每度單價">
         <input defaultValue={seed.electricityRate} />
       </FieldInput>
       <FieldInput label="水費" schemaKey="cost.waterFee">
         <input defaultValue={seed.waterFee} />
       </FieldInput>
-      <FieldInput label="管理費" schemaKey="cost.managementFee" hint="未填寫會被記錄為 missing">
+      <FieldInput label="管理費" schemaKey="cost.managementFee" hint="若尚未說明，先保留 missing">
         <input defaultValue={seed.managementFee} />
       </FieldInput>
       <FieldInput label="網路費" schemaKey="cost.internetFee">
@@ -313,14 +311,7 @@ function CostSection({ seed }) {
         <Seg value={subsidy} onChange={setSubsidy} options={[
           { v: "yes", l: "是" },
           { v: "no", l: "否" },
-          { v: null, l: "未確認" },
-        ]} />
-      </FieldInput>
-      <FieldInput label="是否可報稅" schemaKey="leaseTerms.taxRegistrationAllowed">
-        <Seg value={taxFiling} onChange={setTaxFiling} options={[
-          { v: "yes", l: "是" },
-          { v: "no", l: "否" },
-          { v: null, l: "未確認" },
+          { v: null, l: "尚未確認" },
         ]} />
       </FieldInput>
     </>
@@ -432,5 +423,7 @@ function RightsSection({ seed }) {
     </>
   );
 }
-
 window.FormPage = FormPage;
+
+
+

@@ -185,6 +185,8 @@ RHIR v0.1 第一層包含以下區塊：
 - `management`
 - `provider`
 - `ownershipLegalStatus`
+- `safety`
+- `rights`
 - `marketingClaims`
 - `transparencyLayer`
 
@@ -230,6 +232,7 @@ RHIR v0.1 第一層包含以下區塊：
 - `address`
 - `communityName`
 - `propertyType`
+- `buildingType`
 - `rentalType`
 - `legalUse`
 - `buildingAge`
@@ -238,6 +241,7 @@ RHIR v0.1 第一層包含以下區塊：
 - `totalFloors`
 - `isTopFloor`
 - `ownershipRegistered`
+- `hasFurniture`
 
 ### layoutAndStructure
 
@@ -321,11 +325,14 @@ RHIR v0.1 第一層包含以下區塊：
 - `identityRequirement`
 - `requiresWorkProof`
 - `landlordLivesTogether`
+- `hasWrittenContract`
+- `reviewPeriod`
 - `taxRegistrationAllowed`
 - `householdRegistrationAllowed`
 - `earlyTerminationClause`
 - `repairResponsibility`
 - `depositRefundTerms`
+- `notes`
 
 ### cost
 
@@ -338,6 +345,7 @@ RHIR v0.1 第一層包含以下區塊：
 - `depositMonths`
 - `managementFee`
 - `waterFee`
+- `electricityRate`
 - `electricityFee`
 - `gasFee`
 - `internetFee`
@@ -348,6 +356,7 @@ RHIR v0.1 第一層包含以下區塊：
 - `brokerServiceFee`
 - `parkingFee`
 - `otherFees`
+- `eligibleForSubsidy`
 
 ### management
 
@@ -393,6 +402,25 @@ RHIR v0.1 第一層包含以下區塊：
 - `isVerifiable`
 - `suspectedIllegalAddition`
 - `suspectedIndustrialResidentialUse`
+
+### safety
+
+關於看房時直接觀察到的安全與屋況資訊。
+欄位包含：
+- `rooftopAddition`
+- `illegalPartition`
+- `escapeRoute`
+- `fireEquipment`
+- `waterLeak`
+- `electricalSafety`
+- `doorLock`
+
+### rights
+
+關於租客權益與不合理條款風險。
+欄位包含：
+- `taxBurdenShift`
+- `unfairTerms`
 
 ### marketingClaims
 

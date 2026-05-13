@@ -1,4 +1,4 @@
-// Sample data + RHIR builder for Rent Unfiltered prototype
+﻿// Sample data + RHIR builder for Rent Unfiltered prototype
 
 const STATUS = {
   disclosed: { ko: "已揭露", label: "disclosed" },
@@ -130,10 +130,7 @@ function buildRecord0142() {
       internetFee: fv(null, "missing", "manualInput"),
       cleaningFee: fv(0, "disclosed", "manualInput"),
       eligibleForSubsidy: fv(null, "missing", "manualInput"),
-      eligibleForTaxFiling: fv(false, "disclosed", "manualInput", {
-        sourceText: "屋主表示不可報稅",
-      }),
-    },
+},
     leaseTerms: {
       hasWrittenContract: fv(true, "disclosed", "manualInput"),
       reviewPeriod: fv(null, "missing", "manualInput"),
@@ -149,6 +146,7 @@ function buildRecord0142() {
       }),
       earlyTerminationClause: fv(null, "missing", "manualInput"),
       depositRefundTerms: fv("退租後 30 日內", "disclosed", "manualInput"),
+      notes: fv("可先看房，需補完整契約條款細節", "partial", "manualInput"),
     },
     safety: {
       rooftopAddition: fv(false, "disclosed", "manualInput"),
@@ -234,6 +232,7 @@ const FIELD_GROUPS = [
       { key: "property.totalFloors", label: "總樓層", value: "12F", status: "disclosed", src: "manualInput" },
       { key: "property.areaPing", label: "坪數", value: "8 坪", status: "disclosed", src: "manualInput" },
       { key: "property.district", label: "行政區", value: "文山區", status: "disclosed", src: "manualInput" },
+      { key: "property.hasFurniture", label: "是否附家具", value: "是", status: "disclosed", src: "manualInput" },
       { key: "property.hasAppliances", label: "附設備清單", value: "冷氣、冰箱、洗衣機", status: "partial", src: "manualInput" },
       { key: "leaseTerms.petsAllowed", label: "是否可養寵物", value: null, status: "missing", src: "manualInput" },
     ],
@@ -263,6 +262,7 @@ const FIELD_GROUPS = [
       { key: "leaseTerms.repairResponsibility", label: "修繕責任", value: "房客負擔小型維修", status: "partial", src: "manualInput" },
       { key: "leaseTerms.earlyTerminationClause", label: "提前解約條件", value: null, status: "missing", src: "manualInput" },
       { key: "leaseTerms.depositRefundTerms", label: "押金退還方式", value: "退租後 30 日內", status: "disclosed", src: "manualInput" },
+      { key: "leaseTerms.notes", label: "其他契約備註", value: "可先看房，需補完整契約條款細節", status: "partial", src: "manualInput" },
     ],
   },
   {
@@ -328,3 +328,6 @@ window.RU_DATA = {
   REPORT_X2,
   RECORD_0142_RHIR: buildRecord0142(),
 };
+
+
+
