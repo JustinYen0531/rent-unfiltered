@@ -1,6 +1,35 @@
 // Shared chrome + small components
 
-const { useState, useMemo, useRef, useEffect, Fragment } = React;
+const { Fragment, useEffect, useMemo, useRef, useState } = React;
+
+const RU_SETTINGS_KEY = "ru_openrouter_api_key";
+
+function getStoredApiKey() {
+  try {
+    return window.localStorage.getItem(RU_SETTINGS_KEY) || "";
+  } catch (error) {
+    return "";
+  }
+}
+
+function setStoredApiKey(value) {
+  try {
+    if (value) {
+      window.localStorage.setItem(RU_SETTINGS_KEY, value);
+    } else {
+      window.localStorage.removeItem(RU_SETTINGS_KEY);
+    }
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+function maskApiKey(value) {
+  if (!value) return "未設定";
+  if (value.length <= 10) return "已設定";
+  return `${value.slice(0, 6)}...${value.slice(-4)}`;
+}
 
 function Icon({ name, size = 14, className = "" }) {
   const props = {
@@ -67,7 +96,105 @@ function RiskPill({ score, level }) {
   );
 }
 
+function SettingsModal({ onClose }) {
+  const inputRef = useRef(null);
+  const [draftKey, setDraftKey] = useState(getStoredApiKey());
+  const [savedMask, setSavedMask] = useState(maskApiKey(getStoredApiKey()));
+  const [status, setStatus] = useState("");
+  const hasValue = draftKey.trim().length > 0;
+
+  useEffect(() => {
+    inputRef.current?.focus();
+    inputRef.current?.select();
+  }, []);
+
+  const handleSave = () => {
+    const nextValue = draftKey.trim();
+    const ok = setStoredApiKey(nextValue);
+    if (!ok) {
+      setStatus("這個瀏覽器目前無法寫入本機設定。");
+      return;
+    }
+    setSavedMask(maskApiKey(nextValue));
+    setStatus(nextValue ? "API Key 已儲存在這個瀏覽器。" : "API Key 已清除。");
+  };
+
+  const handleClear = () => {
+    const ok = setStoredApiKey("");
+    if (!ok) {
+      setStatus("這個瀏覽器目前無法清除本機設定。");
+      return;
+    }
+    setDraftKey("");
+    setSavedMask("未設定");
+    setStatus("API Key 已清除。");
+    inputRef.current?.focus();
+  };
+
+  return (
+    <div className="modal-back" onClick={onClose}>
+      <div className="modal settings-modal" onClick={(event) => event.stopPropagation()}>
+        <div className="modal-head">
+          <h3>設定</h3>
+        </div>
+        <div className="modal-body">
+          <div className="settings-summary">
+            <div>
+              <div className="settings-label">目前狀態</div>
+              <div className="settings-value mono">{savedMask}</div>
+            </div>
+            <span className={`settings-chip ${savedMask === "未設定" ? "is-empty" : "is-ready"}`}>
+              {savedMask === "未設定" ? "未設定" : "已設定"}
+            </span>
+          </div>
+
+          <div className="field-input" style={{ marginTop: 16 }}>
+            <label>
+              OpenRouter API Key
+              <span className="key mono">localStorage</span>
+            </label>
+            <input
+              ref={inputRef}
+              type="password"
+              autoComplete="off"
+              spellCheck="false"
+              value={draftKey}
+              onChange={(event) => setDraftKey(event.target.value)}
+              placeholder="貼上你的 API Key"
+              className="mono settings-secret"
+            />
+            <div className="hint">
+              只會儲存在你目前這台裝置的瀏覽器，不會自動寫進 repo，也不會跟著 commit。
+            </div>
+          </div>
+
+          <div className="callout settings-note">
+            <span className="ic"><Icon name="alert" size={14} /></span>
+            <div>
+              不要把真實 API Key 直接寫進前端原始碼。任何被 commit 的 key 都應視為外洩並立即撤換。
+            </div>
+          </div>
+
+          {status && <div className="settings-status">{status}</div>}
+        </div>
+        <div className="modal-foot settings-actions">
+          <button className="btn btn-danger" onClick={handleClear} disabled={!hasValue && savedMask === "未設定"}>
+            清除
+          </button>
+          <button className="btn" onClick={onClose}>關閉</button>
+          <button className="btn btn-primary" onClick={handleSave}>
+            <Icon name="check" size={14} />
+            儲存設定
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function TopBar({ route, setRoute }) {
+  const [showSettings, setShowSettings] = useState(false);
+
   return (
     <div>
       <div className="gov-strip" />
@@ -88,12 +215,17 @@ function TopBar({ route, setRoute }) {
             <input placeholder="搜尋頁面或紀錄" />
             <span className="kbd mono">/</span>
           </div>
+          <button className="btn btn-ghost" title="設定" onClick={() => setShowSettings(true)}>
+            <Icon name="sliders" size={16} />
+          </button>
           <button className="btn btn-ghost" title="通知">
             <Icon name="bell" size={16} />
           </button>
           <div className="avatar">CY</div>
         </div>
       </header>
+
+      {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
     </div>
   );
 }
@@ -145,5 +277,7 @@ window.RU = Object.assign(window.RU || {}, {
   TopBar,
   Crumbs,
   GovFoot,
+  getStoredApiKey,
+  setStoredApiKey,
   highlightJSON,
 });
