@@ -141,6 +141,9 @@ function buildRecord0142() {
       taxRegistrationAllowed: fv(false, "disclosed", "manualInput", {
         sourceText: "????????????",
       }),
+      householdRegistrationAllowed: fv(false, "disclosed", "manualInput", {
+        sourceText: "屋主表示不可遷戶籍",
+      }),
       repairResponsibility: fv("房客負擔小型維修", "partial", "manualInput", {
         sourceText: "界線定義不清",
       }),
@@ -157,10 +160,6 @@ function buildRecord0142() {
       doorLock: fv("獨立門禁 + 房門鎖", "disclosed", "manualInput"),
     },
     rights: {
-      forbidsTaxFiling: fv(true, "disclosed", "manualInput"),
-      forbidsHouseholdRegistration: fv(true, "disclosed", "manualInput", {
-        sourceText: "屋主表示不可遷戶籍",
-      }),
       taxBurdenShift: fv(null, "missing", "manualInput"),
       unfairTerms: fv(null, "missing", "manualInput"),
     },
@@ -250,7 +249,6 @@ const FIELD_GROUPS = [
       { key: "cost.managementFee", label: "管理費", value: null, status: "missing", src: "manualInput" },
       { key: "cost.internetFee", label: "網路費", value: null, status: "missing", src: "manualInput" },
       { key: "cost.eligibleForSubsidy", label: "是否可申請租補", value: null, status: "missing", src: "manualInput" },
-      { key: "leaseTerms.taxRegistrationAllowed", label: "是否可報稅", value: "否", status: "disclosed", src: "manualInput" },
     ],
   },
   {
@@ -259,6 +257,9 @@ const FIELD_GROUPS = [
     fields: [
       { key: "leaseTerms.hasWrittenContract", label: "是否有書面契約", value: "是", status: "disclosed", src: "manualInput" },
       { key: "leaseTerms.reviewPeriod", label: "是否有審閱期", value: null, status: "missing", src: "manualInput" },
+      { key: "leaseTerms.petsAllowed", label: "是否可養寵物", value: null, status: "missing", src: "manualInput" },
+      { key: "leaseTerms.taxRegistrationAllowed", label: "是否可報稅", value: "否", status: "disclosed", src: "manualInput" },
+      { key: "leaseTerms.householdRegistrationAllowed", label: "是否可遷戶籍", value: "否", status: "disclosed", src: "manualInput" },
       { key: "leaseTerms.repairResponsibility", label: "修繕責任", value: "房客負擔小型維修", status: "partial", src: "manualInput" },
       { key: "leaseTerms.earlyTerminationClause", label: "提前解約條件", value: null, status: "missing", src: "manualInput" },
       { key: "leaseTerms.depositRefundTerms", label: "押金退還方式", value: "退租後 30 日內", status: "disclosed", src: "manualInput" },
@@ -280,8 +281,6 @@ const FIELD_GROUPS = [
     id: "rights",
     title: "租客權益",
     fields: [
-      { key: "rights.forbidsTaxFiling", label: "是否禁止報稅", value: "是（屋主明示）", status: "disclosed", src: "manualInput" },
-      { key: "rights.forbidsHouseholdRegistration", label: "是否禁止遷戶籍", value: "是", status: "disclosed", src: "manualInput" },
       { key: "rights.taxBurdenShift", label: "是否有稅負轉嫁", value: null, status: "missing", src: "manualInput" },
       { key: "rights.unfairTerms", label: "是否存在不合理條款", value: null, status: "missing", src: "manualInput" },
     ],

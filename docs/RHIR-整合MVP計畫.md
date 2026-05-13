@@ -74,17 +74,25 @@
 - 把目前用負向語意的欄位，改成 RHIR 正式的正向語意欄位
 - 同步處理欄位名稱、值、顯示文案
 
-預計處理項目：
+本次已完成：
 
 - `rights.forbidsTaxFiling` → `leaseTerms.taxRegistrationAllowed`
 - `rights.forbidsHouseholdRegistration` → `leaseTerms.householdRegistrationAllowed`
 
-第二批要特別注意：
+這一批同步處理了：
 
-- 不是只改欄位名
-- 布林值也要反向
-- UI 顯示文字也要一起改
-- demo RHIR 與報告文案引用也要一起同步
+- 表單欄位名稱
+- 表單顯示文案
+- 隨機測試 seed 欄位
+- demo RHIR 結構
+- demo 欄位檢視
+
+第二批處理原則：
+
+- 不只改欄位名
+- 布林值同步反向
+- UI 顯示文字改成正向語意
+- 既有風險文案可暫時保留自然語句，不強制同步改寫
 
 ### 第三批：top-level block 與正式欄位字典收斂
 

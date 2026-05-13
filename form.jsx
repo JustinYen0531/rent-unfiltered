@@ -68,8 +68,8 @@ function buildRandomFormSeed() {
     waterLeak: pick(["目前未見漏水", "浴室牆角疑似有水痕", "實地看房時確認"]),
     doorLock: pick(["獨立門禁 + 房門鎖", "磁扣門禁 + 電子鎖", "傳統門鎖 + 公共大門感應"]),
 
-    forbidsTaxFiling: pick(["yes", "no"]),
-    forbidsHouseholdRegistration: pick(["yes", "no"]),
+    taxRegistrationAllowed: pick(["yes", "no"]),
+    householdRegistrationAllowed: pick(["yes", "no"]),
     taxBurdenShift: pick(["yes", "no", null]),
     unfairTerms: pick(["yes", "no", null]),
   };
@@ -396,21 +396,21 @@ function SafetySection({ seed }) {
 }
 
 function RightsSection({ seed }) {
-  const [forbidsTaxFiling, setForbidsTaxFiling] = useStateF(seed.forbidsTaxFiling);
-  const [forbidsHouseholdRegistration, setForbidsHouseholdRegistration] = useStateF(seed.forbidsHouseholdRegistration);
+  const [taxRegistrationAllowed, setTaxRegistrationAllowed] = useStateF(seed.taxRegistrationAllowed);
+  const [householdRegistrationAllowed, setHouseholdRegistrationAllowed] = useStateF(seed.householdRegistrationAllowed);
   const [taxBurdenShift, setTaxBurdenShift] = useStateF(seed.taxBurdenShift);
   const [unfairTerms, setUnfairTerms] = useStateF(seed.unfairTerms);
 
   return (
     <>
-      <FieldInput label="是否禁止報稅" required schemaKey="rights.forbidsTaxFiling">
-        <Seg value={forbidsTaxFiling} onChange={setForbidsTaxFiling} options={[
+      <FieldInput label="是否可報稅" required schemaKey="leaseTerms.taxRegistrationAllowed">
+        <Seg value={taxRegistrationAllowed} onChange={setTaxRegistrationAllowed} options={[
           { v: "yes", l: "是" },
           { v: "no", l: "否" },
         ]} />
       </FieldInput>
-      <FieldInput label="是否禁止遷戶籍" required schemaKey="rights.forbidsHouseholdRegistration">
-        <Seg value={forbidsHouseholdRegistration} onChange={setForbidsHouseholdRegistration} options={[
+      <FieldInput label="是否可遷戶籍" required schemaKey="leaseTerms.householdRegistrationAllowed">
+        <Seg value={householdRegistrationAllowed} onChange={setHouseholdRegistrationAllowed} options={[
           { v: "yes", l: "是" },
           { v: "no", l: "否" },
         ]} />
