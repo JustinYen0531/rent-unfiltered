@@ -98,13 +98,13 @@ function buildRecord0142() {
       propertyType: fv("套房", "disclosed", "manualInput", { sourceText: "表單填寫：房型 = 套房" }),
       buildingType: fv("電梯大樓", "disclosed", "manualInput"),
       floor: fv(5, "disclosed", "manualInput"),
-      totalFloor: fv(12, "disclosed", "manualInput"),
-      sizePing: fv(8, "disclosed", "manualInput"),
+      totalFloors: fv(12, "disclosed", "manualInput"),
+      areaPing: fv(8, "disclosed", "manualInput"),
       hasFurniture: fv(true, "disclosed", "manualInput"),
       hasAppliances: fv("冷氣、冰箱、洗衣機", "partial", "manualInput", {
         sourceText: "提供品項列表不完整，未指明是否為共用",
       }),
-      petAllowed: fv(null, "missing", "manualInput"),
+      district: fv("?????", "disclosed", "manualInput"),
       cookingAllowed: fv(false, "disclosed", "manualInput"),
     },
     locationContext: {
@@ -116,7 +116,7 @@ function buildRecord0142() {
       nearbyCampus: fv("政治大學", "disclosed", "manualInput"),
     },
     cost: {
-      rent: fv(13500, "disclosed", "manualInput"),
+      monthlyRent: fv(13500, "disclosed", "manualInput"),
       deposit: fv(27000, "disclosed", "manualInput", { sourceText: "兩個月押金" }),
       utilities: fv("自付", "disclosed", "manualInput"),
       electricityRate: fv("5 元 / 度", "conflict", "manualInput", {
@@ -126,7 +126,7 @@ function buildRecord0142() {
         ],
       }),
       waterFee: fv("包含", "disclosed", "manualInput"),
-      mgmtFee: fv(null, "missing", "manualInput"),
+      managementFee: fv(null, "missing", "manualInput"),
       internetFee: fv(null, "missing", "manualInput"),
       cleaningFee: fv(0, "disclosed", "manualInput"),
       eligibleForSubsidy: fv(null, "missing", "manualInput"),
@@ -137,11 +137,15 @@ function buildRecord0142() {
     leaseTerms: {
       hasWrittenContract: fv(true, "disclosed", "manualInput"),
       reviewPeriod: fv(null, "missing", "manualInput"),
+      petsAllowed: fv(null, "missing", "manualInput"),
+      taxRegistrationAllowed: fv(false, "disclosed", "manualInput", {
+        sourceText: "????????????",
+      }),
       repairResponsibility: fv("房客負擔小型維修", "partial", "manualInput", {
         sourceText: "界線定義不清",
       }),
-      earlyTerminationTerms: fv(null, "missing", "manualInput"),
-      depositReturnTerms: fv("退租後 30 日內", "disclosed", "manualInput"),
+      earlyTerminationClause: fv(null, "missing", "manualInput"),
+      depositRefundTerms: fv("退租後 30 日內", "disclosed", "manualInput"),
     },
     safety: {
       rooftopAddition: fv(false, "disclosed", "manualInput"),
@@ -167,7 +171,7 @@ function buildRecord0142() {
       conflictFieldCount: fv(1, "disclosed", "systemInference"),
       inferredFieldCount: fv(1, "disclosed", "systemInference"),
       fieldsNeedingUserQuestion: fv(
-        ["cost.mgmtFee", "safety.illegalPartition", "leaseTerms.reviewPeriod"],
+        ["cost.managementFee", "safety.illegalPartition", "leaseTerms.reviewPeriod"],
         "disclosed",
         "systemInference"
       ),
@@ -228,25 +232,25 @@ const FIELD_GROUPS = [
       { key: "property.propertyType", label: "房型", value: "套房", status: "disclosed", src: "manualInput" },
       { key: "property.buildingType", label: "物件類型", value: "電梯大樓", status: "disclosed", src: "manualInput" },
       { key: "property.floor", label: "樓層", value: "5F", status: "disclosed", src: "manualInput" },
-      { key: "property.totalFloor", label: "總樓層", value: "12F", status: "disclosed", src: "manualInput" },
-      { key: "property.sizePing", label: "坪數", value: "8 坪", status: "disclosed", src: "manualInput" },
-      { key: "locationContext.district", label: "行政區", value: "文山區", status: "disclosed", src: "manualInput" },
+      { key: "property.totalFloors", label: "總樓層", value: "12F", status: "disclosed", src: "manualInput" },
+      { key: "property.areaPing", label: "坪數", value: "8 坪", status: "disclosed", src: "manualInput" },
+      { key: "property.district", label: "行政區", value: "文山區", status: "disclosed", src: "manualInput" },
       { key: "property.hasAppliances", label: "附設備清單", value: "冷氣、冰箱、洗衣機", status: "partial", src: "manualInput" },
-      { key: "property.petAllowed", label: "是否可養寵物", value: null, status: "missing", src: "manualInput" },
+      { key: "leaseTerms.petsAllowed", label: "是否可養寵物", value: null, status: "missing", src: "manualInput" },
     ],
   },
   {
     id: "cost",
     title: "房屋與費用",
     fields: [
-      { key: "cost.rent", label: "租金", value: "NT$ 13,500 / 月", status: "disclosed", src: "manualInput" },
+      { key: "cost.monthlyRent", label: "租金", value: "NT$ 13,500 / 月", status: "disclosed", src: "manualInput" },
       { key: "cost.deposit", label: "押金", value: "NT$ 27,000（2 個月）", status: "disclosed", src: "manualInput" },
       { key: "cost.electricityRate", label: "電費單價", value: "5 元 / 度", status: "conflict", src: "manualInput" },
       { key: "cost.waterFee", label: "水費", value: "包含於租金", status: "disclosed", src: "manualInput" },
-      { key: "cost.mgmtFee", label: "管理費", value: null, status: "missing", src: "manualInput" },
+      { key: "cost.managementFee", label: "管理費", value: null, status: "missing", src: "manualInput" },
       { key: "cost.internetFee", label: "網路費", value: null, status: "missing", src: "manualInput" },
       { key: "cost.eligibleForSubsidy", label: "是否可申請租補", value: null, status: "missing", src: "manualInput" },
-      { key: "cost.eligibleForTaxFiling", label: "是否可報稅", value: "否", status: "disclosed", src: "manualInput" },
+      { key: "leaseTerms.taxRegistrationAllowed", label: "是否可報稅", value: "否", status: "disclosed", src: "manualInput" },
     ],
   },
   {
@@ -256,8 +260,8 @@ const FIELD_GROUPS = [
       { key: "leaseTerms.hasWrittenContract", label: "是否有書面契約", value: "是", status: "disclosed", src: "manualInput" },
       { key: "leaseTerms.reviewPeriod", label: "是否有審閱期", value: null, status: "missing", src: "manualInput" },
       { key: "leaseTerms.repairResponsibility", label: "修繕責任", value: "房客負擔小型維修", status: "partial", src: "manualInput" },
-      { key: "leaseTerms.earlyTerminationTerms", label: "提前解約條件", value: null, status: "missing", src: "manualInput" },
-      { key: "leaseTerms.depositReturnTerms", label: "押金退還方式", value: "退租後 30 日內", status: "disclosed", src: "manualInput" },
+      { key: "leaseTerms.earlyTerminationClause", label: "提前解約條件", value: null, status: "missing", src: "manualInput" },
+      { key: "leaseTerms.depositRefundTerms", label: "押金退還方式", value: "退租後 30 日內", status: "disclosed", src: "manualInput" },
     ],
   },
   {
@@ -310,9 +314,9 @@ const REPORT_X2 = {
     "若無法報稅、遷戶籍，請房東於契約備註明示，避免之後爭議",
   ],
   followups: [
-    { q: "管理費每月實際金額？", field: "cost.mgmtFee" },
+    { q: "管理費每月實際金額？", field: "cost.managementFee" },
     { q: "是否有審閱期？通常為 3 日。", field: "leaseTerms.reviewPeriod" },
-    { q: "提前解約是否需付違約金？倍率？", field: "leaseTerms.earlyTerminationTerms" },
+    { q: "提前解約是否需付違約金？倍率？", field: "leaseTerms.earlyTerminationClause" },
     { q: "牆面是否為輕隔間？建材為？", field: "safety.illegalPartition" },
   ],
 };

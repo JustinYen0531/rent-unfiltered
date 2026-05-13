@@ -250,13 +250,13 @@ function PropertySection({ seed }) {
       <FieldInput label="樓層" required schemaKey="property.floor">
         <input defaultValue={seed.floor} />
       </FieldInput>
-      <FieldInput label="總樓層" required schemaKey="property.totalFloor">
+      <FieldInput label="總樓層" required schemaKey="property.totalFloors">
         <input defaultValue={seed.totalFloor} />
       </FieldInput>
-      <FieldInput label="坪數" required schemaKey="property.sizePing" hint="室內實際坪數，不含公設">
+      <FieldInput label="坪數" required schemaKey="property.areaPing" hint="室內實際坪數，不含公設">
         <input defaultValue={seed.sizePing} />
       </FieldInput>
-      <FieldInput label="行政區" required schemaKey="locationContext.district">
+      <FieldInput label="行政區" required schemaKey="property.district">
         <select defaultValue={seed.district}>
           {["文山區", "大安區", "信義區", "中山區", "板橋區", "永和區"].map((d) => <option key={d}>{d}</option>)}
         </select>
@@ -268,7 +268,7 @@ function PropertySection({ seed }) {
           { v: "partial", l: "部分" },
         ]} />
       </FieldInput>
-      <FieldInput label="是否可養寵物" schemaKey="property.petAllowed" hint="若未確認，會被記錄為 missing">
+      <FieldInput label="是否可養寵物" schemaKey="leaseTerms.petsAllowed" hint="若未確認，會被記錄為 missing">
         <Seg value={pet} onChange={setPet} options={[
           { v: "yes", l: "是" },
           { v: "no", l: "否" },
@@ -285,7 +285,7 @@ function CostSection({ seed }) {
 
   return (
     <>
-      <FieldInput label="租金" required schemaKey="cost.rent">
+      <FieldInput label="租金" required schemaKey="cost.monthlyRent">
         <div className="field-input with-prefix" style={{ margin: 0 }}>
           <span className="prefix mono">NT$</span>
           <input defaultValue={seed.rent} />
@@ -303,7 +303,7 @@ function CostSection({ seed }) {
       <FieldInput label="水費" schemaKey="cost.waterFee">
         <input defaultValue={seed.waterFee} />
       </FieldInput>
-      <FieldInput label="管理費" schemaKey="cost.mgmtFee" hint="未填寫會被記錄為 missing">
+      <FieldInput label="管理費" schemaKey="cost.managementFee" hint="未填寫會被記錄為 missing">
         <input defaultValue={seed.managementFee} />
       </FieldInput>
       <FieldInput label="網路費" schemaKey="cost.internetFee">
@@ -316,7 +316,7 @@ function CostSection({ seed }) {
           { v: null, l: "未確認" },
         ]} />
       </FieldInput>
-      <FieldInput label="是否可報稅" schemaKey="cost.eligibleForTaxFiling">
+      <FieldInput label="是否可報稅" schemaKey="leaseTerms.taxRegistrationAllowed">
         <Seg value={taxFiling} onChange={setTaxFiling} options={[
           { v: "yes", l: "是" },
           { v: "no", l: "否" },
@@ -344,10 +344,10 @@ function LeaseSection({ seed }) {
       <FieldInput label="修繕責任" schemaKey="leaseTerms.repairResponsibility" hint="若界線模糊，會被記為 partial">
         <input defaultValue={seed.repairResponsibility} />
       </FieldInput>
-      <FieldInput label="提前解約條件" schemaKey="leaseTerms.earlyTerminationTerms">
+      <FieldInput label="提前解約條件" schemaKey="leaseTerms.earlyTerminationClause">
         <input defaultValue={seed.earlyTermination} />
       </FieldInput>
-      <FieldInput label="押金退還方式" schemaKey="leaseTerms.depositReturnTerms">
+      <FieldInput label="押金退還方式" schemaKey="leaseTerms.depositRefundTerms">
         <input defaultValue={seed.depositReturnTerms} />
       </FieldInput>
       <div className="full">
