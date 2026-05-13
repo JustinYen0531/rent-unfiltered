@@ -1,6 +1,260 @@
 ﻿// New rental form - create the initial version X
 
-const { useState: useStateF } = React;
+const { useMemo: useMemoF, useRef: useRefF, useState: useStateF } = React;
+
+const FORM_FIELD_SPECS = [
+  { key: "property.propertyType", label: "房型", group: "property", type: "text" },
+  { key: "property.buildingType", label: "物件類型", group: "property", type: "text" },
+  { key: "property.floor", label: "樓層", group: "property", type: "number" },
+  { key: "property.totalFloors", label: "總樓層", group: "property", type: "number" },
+  { key: "property.areaPing", label: "坪數", group: "property", type: "number" },
+  { key: "property.district", label: "行政區", group: "property", type: "text" },
+  { key: "property.hasFurniture", label: "是否附家具", group: "property", type: "enum" },
+  { key: "leaseTerms.petsAllowed", label: "是否可養寵物", group: "lease", type: "boolean" },
+  { key: "cost.monthlyRent", label: "租金", group: "cost", type: "number" },
+  { key: "cost.deposit", label: "押金", group: "cost", type: "number" },
+  { key: "cost.electricityRate", label: "電費計價", group: "cost", type: "text" },
+  { key: "cost.waterFee", label: "水費", group: "cost", type: "text" },
+  { key: "cost.managementFee", label: "管理費", group: "cost", type: "text" },
+  { key: "cost.internetFee", label: "網路費", group: "cost", type: "text" },
+  { key: "cost.eligibleForSubsidy", label: "是否可申請租補", group: "cost", type: "boolean" },
+  { key: "leaseTerms.hasWrittenContract", label: "是否有書面契約", group: "lease", type: "boolean" },
+  { key: "leaseTerms.reviewPeriod", label: "是否有審閱期", group: "lease", type: "text" },
+  { key: "leaseTerms.repairResponsibility", label: "修繕責任", group: "lease", type: "text" },
+  { key: "leaseTerms.earlyTerminationClause", label: "提前解約條件", group: "lease", type: "text" },
+  { key: "leaseTerms.depositRefundTerms", label: "押金退還方式", group: "lease", type: "text" },
+  { key: "leaseTerms.notes", label: "其他契約備註", group: "lease", type: "text" },
+  { key: "safety.rooftopAddition", label: "是否頂樓加蓋", group: "safety", type: "boolean" },
+  { key: "safety.illegalPartition", label: "是否違法隔間", group: "safety", type: "boolean" },
+  { key: "safety.escapeRoute", label: "逃生動線", group: "safety", type: "text" },
+  { key: "safety.fireEquipment", label: "消防設備", group: "safety", type: "text" },
+  { key: "safety.waterLeak", label: "漏水狀況", group: "safety", type: "text" },
+  { key: "safety.doorLock", label: "門鎖與出入安全", group: "safety", type: "text" },
+  { key: "leaseTerms.taxRegistrationAllowed", label: "是否可報稅", group: "lease", type: "boolean" },
+  { key: "leaseTerms.householdRegistrationAllowed", label: "是否可遷戶籍", group: "lease", type: "boolean" },
+  { key: "rights.taxBurdenShift", label: "是否有稅負轉嫁條款", group: "rights", type: "boolean" },
+  { key: "rights.unfairTerms", label: "是否存在不合理條款", group: "rights", type: "boolean" },
+];
+
+const FIELD_GROUP_TITLES = {
+  property: "物件基本資訊",
+  cost: "租金與費用",
+  lease: "契約條件",
+  safety: "居住安全",
+  rights: "權益限制",
+};
+
+function formFieldValue(value, disclosureStatus = "disclosed", sourceType = "manualInput", extra = {}) {
+  return {
+    value,
+    disclosureStatus,
+    sourceType,
+    ...extra,
+  };
+}
+
+function coerceFieldValue(rawValue, type) {
+  if (rawValue == null || rawValue === "") return null;
+  if (rawValue === "null") return null;
+  if (type === "boolean") {
+    if (rawValue === "yes") return true;
+    if (rawValue === "no") return false;
+    return null;
+  }
+  if (type === "enum") {
+    return rawValue;
+  }
+  if (type === "number") {
+    const normalized = Number(String(rawValue).replace(/[^\d.-]/g, ""));
+    return Number.isFinite(normalized) ? normalized : null;
+  }
+  return rawValue;
+}
+
+function getDisclosureStatus(rawValue, type) {
+  if (rawValue == null || rawValue === "" || rawValue === "null") return "missing";
+  if (rawValue === "partial") return "partial";
+  if (type === "text" && String(rawValue).includes("尚未確認")) return "missing";
+  return "disclosed";
+}
+
+function formatFieldGroupValue(value) {
+  if (value == null) return null;
+  if (typeof value === "boolean") return value ? "是" : "否";
+  if (value === "yes") return "是";
+  if (value === "no") return "否";
+  if (value === "partial") return "部分";
+  return String(value);
+}
+
+function setRhirGroupField(root, key, fieldValue) {
+  const [group, leaf] = key.split(".");
+  if (!root[group]) root[group] = {};
+  root[group][leaf] = fieldValue;
+}
+
+function readFormValues(formEl) {
+  const values = {};
+  formEl.querySelectorAll("[data-schema-key]").forEach((node) => {
+    const schemaKey = node.getAttribute("data-schema-key");
+    const activeSeg = node.querySelector(".seg button.active");
+    if (activeSeg) {
+      values[schemaKey] = activeSeg.getAttribute("data-seg-value");
+      return;
+    }
+    const input = node.querySelector("input, select, textarea");
+    values[schemaKey] = input ? input.value.trim() : null;
+  });
+  return values;
+}
+
+function buildFormRhirBundle({ values, versionLabel = "X" }) {
+  const now = new Date();
+  const isoDate = now.toISOString().slice(0, 10);
+  const isoMinute = `${isoDate} ${now.toTimeString().slice(0, 5)}`;
+  const recordId = `RHIR-FORM-${now.getTime()}`;
+  const propertyType = values["property.propertyType"] || "租屋物件";
+  const district = values["property.district"] || "未標示行政區";
+  const buildingType = values["property.buildingType"] || "";
+  const rentNumber = Number(values["cost.monthlyRent"] || 0);
+
+  const rhir = {
+    metadata: {
+      rhirRecordId: formFieldValue(recordId, "disclosed", "platform"),
+      rhirVersion: formFieldValue("0.1", "disclosed", "platform"),
+      createdAt: formFieldValue(isoDate, "disclosed", "platform"),
+      updatedAt: formFieldValue(isoDate, "disclosed", "platform"),
+      sourcePlatform: formFieldValue("user-form", "disclosed", "manualInput"),
+      listingStatus: formFieldValue("draft", "disclosed", "manualInput"),
+    },
+    property: {},
+    cost: {},
+    leaseTerms: {},
+    safety: {},
+    rights: {},
+    transparencyLayer: {},
+  };
+
+  const fieldGroupsMap = {};
+  const fieldsNeedingUserQuestion = [];
+  let disclosedCount = 0;
+  let partialCount = 0;
+  let missingCount = 0;
+
+  FORM_FIELD_SPECS.forEach((spec) => {
+    const rawValue = values[spec.key];
+    const disclosureStatus = getDisclosureStatus(rawValue, spec.type);
+    const normalizedValue = coerceFieldValue(rawValue, spec.type);
+
+    setRhirGroupField(
+      rhir,
+      spec.key,
+      formFieldValue(normalizedValue, disclosureStatus, "manualInput")
+    );
+
+    if (disclosureStatus === "disclosed") disclosedCount += 1;
+    if (disclosureStatus === "partial") partialCount += 1;
+    if (disclosureStatus === "missing") {
+      missingCount += 1;
+      fieldsNeedingUserQuestion.push(spec.key);
+    }
+
+    if (!fieldGroupsMap[spec.group]) {
+      fieldGroupsMap[spec.group] = {
+        id: spec.group,
+        title: FIELD_GROUP_TITLES[spec.group] || spec.group,
+        fields: [],
+      };
+    }
+
+    fieldGroupsMap[spec.group].fields.push({
+      key: spec.key,
+      label: spec.label,
+      value: formatFieldGroupValue(normalizedValue),
+      status: disclosureStatus,
+      src: "manualInput",
+    });
+  });
+
+  rhir.transparencyLayer = {
+    disclosedFieldCount: formFieldValue(disclosedCount, "disclosed", "systemInference"),
+    partialFieldCount: formFieldValue(partialCount, "disclosed", "systemInference"),
+    missingFieldCount: formFieldValue(missingCount, "disclosed", "systemInference"),
+    conflictFieldCount: formFieldValue(0, "disclosed", "systemInference"),
+    inferredFieldCount: formFieldValue(0, "disclosed", "systemInference"),
+    fieldsNeedingUserQuestion: formFieldValue(fieldsNeedingUserQuestion, "disclosed", "systemInference"),
+    notes: formFieldValue("由使用者表單直接轉成 RHIR JSON。", "disclosed", "manualInput"),
+  };
+
+  const fieldGroups = ["property", "cost", "lease", "safety", "rights"]
+    .map((groupId) => fieldGroupsMap[groupId])
+    .filter(Boolean);
+  const completion = FORM_FIELD_SPECS.length
+    ? (disclosedCount + partialCount) / FORM_FIELD_SPECS.length
+    : 0;
+
+  return {
+    recordId,
+    bundle: {
+      record: {
+        id: recordId,
+        title: `${district} ${propertyType}${buildingType ? ` ${buildingType}` : ""}`.trim(),
+        address: district,
+        district,
+        summary: `${propertyType}${buildingType ? ` / ${buildingType}` : ""}`,
+        rent: rentNumber,
+        updatedAt: isoMinute,
+        createdAt: isoDate,
+        versions: [versionLabel],
+        rri: null,
+        riskLevel: "尚未分析",
+        hasReport: false,
+        completion,
+      },
+      versions: [
+        {
+          id: versionLabel,
+          label: versionLabel,
+          title: "表單建立的初始版本",
+          createdAt: isoMinute,
+          author: "使用者",
+          diff: { added: disclosedCount + partialCount, changed: 0, removed: 0 },
+          completion,
+          rri: null,
+          riskLevel: "尚未分析",
+          hasReport: false,
+          note: "由表單欄位一一對應轉成 RHIR JSON。",
+        },
+      ],
+      fieldGroups,
+      rhir,
+      report: null,
+    },
+  };
+}
+
+function RHIRPreviewModal({ rhir, onClose }) {
+  const { Icon, highlightJSON } = window.RU;
+
+  return (
+    <div className="modal-back" onClick={onClose}>
+      <div className="modal" style={{ width: "min(960px, calc(100vw - 32px))" }} onClick={(event) => event.stopPropagation()}>
+        <div className="modal-head">
+          <h3>RHIR 預覽</h3>
+        </div>
+        <div className="modal-body" style={{ maxHeight: "70vh", overflow: "auto" }}>
+          <pre className="import-json" dangerouslySetInnerHTML={{ __html: highlightJSON(rhir) }} />
+        </div>
+        <div className="modal-foot" style={{ display: "flex", justifyContent: "flex-end" }}>
+          <button className="btn" onClick={onClose}>
+            <Icon name="x" size={14} />
+            關閉
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function pick(list) {
   return list[Math.floor(Math.random() * list.length)];
@@ -79,6 +333,8 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X" }) {
   const [section, setSection] = useStateF("property");
   const [seed, setSeed] = useStateF(() => buildRandomFormSeed());
   const [formResetKey, setFormResetKey] = useStateF(0);
+  const [previewRhir, setPreviewRhir] = useStateF(null);
+  const formRef = useRefF(null);
 
   const SECTIONS = [
     { id: "property", title: "物件基本資訊", step: "01", filled: 6, total: 8 },
@@ -95,6 +351,21 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X" }) {
   const handleGenerate = () => {
     setSeed(buildRandomFormSeed());
     setFormResetKey((value) => value + 1);
+  };
+
+  const handlePreviewRhir = () => {
+    if (!formRef.current) return;
+    const values = readFormValues(formRef.current);
+    const { bundle } = buildFormRhirBundle({ values, versionLabel });
+    setPreviewRhir(bundle.rhir);
+  };
+
+  const handleCreateVersion = () => {
+    if (!formRef.current) return;
+    const values = readFormValues(formRef.current);
+    const { bundle, recordId } = buildFormRhirBundle({ values, versionLabel });
+    window.RU_DATA.addImportedRecord(bundle);
+    setRoute({ name: "detail", id: recordId });
   };
 
   return (
@@ -121,7 +392,7 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X" }) {
             <Icon name="file" size={14} />
             暫存草稿
           </button>
-          <button className="btn btn-primary">
+          <button className="btn btn-primary" onClick={handleCreateVersion}>
             <Icon name="check" size={14} />
             建立版本 {versionLabel}
           </button>
@@ -148,9 +419,13 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X" }) {
           </div>
         </aside>
 
-        <div key={formResetKey}>
-          <FormSection section={SECTIONS.find((s) => s.id === section)} seed={seed} />
-        </div>
+        <form key={formResetKey} ref={formRef}>
+          {SECTIONS.map((item) => (
+            <div key={item.id} style={{ display: item.id === section ? "block" : "none" }}>
+              <FormSection section={item} seed={seed} />
+            </div>
+          ))}
+        </form>
 
         <aside>
           <div className="form-summary">
@@ -168,13 +443,20 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X" }) {
 
             <h4 style={{ marginTop: 18 }}>完成後會發生什麼</h4>
             <ul style={{ listStyle: "none", padding: 0, margin: 0, fontSize: 12, color: "#2a313b" }}>
-              <li style={{ display: "flex", gap: 8, padding: "5px 0" }}><Icon name="check" size={13} className="mono" /> 表單會轉成 RHIR JSON</li>
+              <li style={{ display: "flex", gap: 8, padding: "5px 0", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <Icon name="check" size={13} className="mono" /> 表單會轉成 RHIR JSON
+                </span>
+                <button type="button" className="btn btn-sm" onClick={handlePreviewRhir}>預覽</button>
+              </li>
               <li style={{ display: "flex", gap: 8, padding: "5px 0" }}><Icon name="check" size={13} /> 可建立初始版本 X</li>
               <li style={{ display: "flex", gap: 8, padding: "5px 0", color: "#5a6573" }}><Icon name="info" size={13} /> AI 分析報告仍是手動觸發</li>
             </ul>
           </div>
         </aside>
       </div>
+
+      {previewRhir && <RHIRPreviewModal rhir={previewRhir} onClose={() => setPreviewRhir(null)} />}
     </div>
   );
 }
@@ -200,7 +482,7 @@ function FormSection({ section, seed }) {
 
 function FieldInput({ label, hint, required, schemaKey, children }) {
   return (
-    <div className="field-input">
+    <div className="field-input" data-schema-key={schemaKey} data-label={label}>
       <label>
         {label}{required && <span className="req">*</span>}
         <span className="key mono">{schemaKey}</span>
@@ -215,7 +497,13 @@ function Seg({ value, onChange, options }) {
   return (
     <div className="seg">
       {options.map((o) => (
-        <button key={String(o.v)} className={value === o.v ? "active" : ""} onClick={() => onChange(o.v)} type="button">
+        <button
+          key={String(o.v)}
+          className={value === o.v ? "active" : ""}
+          onClick={() => onChange(o.v)}
+          type="button"
+          data-seg-value={o.v == null ? "null" : String(o.v)}
+        >
           {o.l}
         </button>
       ))}
