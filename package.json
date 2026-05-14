@@ -1,0 +1,12 @@
+{
+  "name": "rent-unfiltered",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "serve . --listen tcp://127.0.0.1:5500",
+    "start": "serve . --listen tcp://127.0.0.1:5500"
+  },
+  "devDependencies": {
+    "serve": "^14.2.4"
+  }
+}
