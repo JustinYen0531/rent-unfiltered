@@ -1,0 +1,98 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  width: 380px;
+  margin: 0;
+  background: #f6f7f9;
+  color: #101418;
+  font-family: Arial, "Microsoft JhengHei", sans-serif;
+}
+
+main {
+  padding: 14px;
+}
+
+header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.brand {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.tag,
+.label,
+.meta,
+.status {
+  color: #657080;
+  font-size: 12px;
+}
+
+.panel {
+  border: 1px solid #dde2ea;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.url {
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+button {
+  border: 1px solid #c9d1dc;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #101418;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 7px 10px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.primary {
+  width: 100%;
+  border-color: #1652f0;
+  background: #1652f0;
+  color: #ffffff;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+textarea {
+  width: 100%;
+  height: 220px;
+  margin-top: 8px;
+  border: 1px solid #dde2ea;
+  border-radius: 6px;
+  resize: vertical;
+  padding: 8px;
+  color: #101418;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.status {
+  min-height: 16px;
+}

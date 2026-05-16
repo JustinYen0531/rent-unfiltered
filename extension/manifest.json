@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Rent Unfiltered Capture",
+  "version": "0.1.0",
+  "description": "Capture visible rental listing text for Rent Unfiltered RHIR testing.",
+  "permissions": ["activeTab", "scripting"],
+  "action": {
+    "default_title": "Rent Unfiltered Capture",
+    "default_popup": "popup.html"
+  }
+}

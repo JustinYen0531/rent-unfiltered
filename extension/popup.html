@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rent Unfiltered Capture</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <div class="brand">Rent Unfiltered</div>
+        <div class="tag">Page Capture</div>
+      </header>
+
+      <section class="panel">
+        <div class="label">目前頁面</div>
+        <div id="sourceUrl" class="url">尚未擷取</div>
+      </section>
+
+      <button id="captureBtn" class="primary">擷取目前頁面文字</button>
+
+      <section class="panel">
+        <div class="row">
+          <div>
+            <div class="label">擷取結果</div>
+            <div id="meta" class="meta">等待擷取</div>
+          </div>
+          <button id="copyBtn" disabled>複製</button>
+        </div>
+        <textarea id="output" readonly placeholder="按下擷取後，這裡會出現目前頁面的可見文字。"></textarea>
+      </section>
+
+      <div id="status" class="status"></div>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>
