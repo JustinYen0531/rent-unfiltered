@@ -952,6 +952,63 @@ function hasAny(text, keywords) {
   return keywords.some((keyword) => text.includes(keyword));
 }
 
+function normalizeCaptureText(text) {
+  return String(text || "")
+    .replace(/[０-９]/g, (char) => String.fromCharCode(char.charCodeAt(0) - 0xfee0))
+    .replace(/[，,]/g, "")
+    .replace(/\s+/g, "");
+}
+
+function parseChineseNumber(value) {
+  const map = { 一: 1, 二: 2, 兩: 2, 两: 2, 三: 3, 四: 4, 五: 5 };
+  return map[value] || Number(value);
+}
+
+function extractDeposit(compact, rent) {
+  const cash = pickFirstMatch(compact, [
+    /押金(?:NT\$|NTD|\$)?(\d{4,6})/,
+    /押(?:金)?(?:為|:|：)?(\d{4,6})/,
+  ]);
+  if (cash) return cash;
+
+  const monthText = pickFirstMatch(compact, [
+    /押金(?:為)?([一二兩两三四五\d])個月/,
+    /押([一二兩两三四五\d])(?:個月|月)/,
+    /押金([一二兩两三四五\d])個月/,
+  ]);
+  const months = parseChineseNumber(monthText);
+  if (months && rent) return String(Number(rent) * months);
+  return null;
+}
+
+function extractFee(compact, label) {
+  const zero = new RegExp(`${label}(?:費)?(?:0元?|無|免|免費|已含|包含|含)`);
+  if (zero.test(compact)) return compact.includes(`${label}已含`) || compact.includes(`${label}包含`) || compact.includes(`${label}含`) ? "包含" : "0";
+
+  const separate = new RegExp(`${label}(?:費)?(?:另計|另收|自付|依帳單|照帳單)`);
+  if (separate.test(compact)) return "另計";
+
+  return pickFirstMatch(compact, [
+    new RegExp(`${label}(?:費)?(?:NT\\$|NTD|\\$)?(\\d{1,5})(?:元)?`),
+  ]);
+}
+
+function extractElectricityRate(compact) {
+  if (/電費(?:依)?台電|台電計價|照台電/.test(compact)) return "台電計價";
+  if (/電費(?:另計|另收|自付|依帳單|照帳單)/.test(compact)) return "另計";
+  return pickFirstMatch(compact, [
+    /電費(?:每度|一度|1度)?(\d+(?:\.\d+)?元?(?:\/度|一度|每度)?)/,
+    /(\d+(?:\.\d+)?)元\/度/,
+  ]);
+}
+
+function extractFurnitureStatus(text) {
+  if (hasAny(text, ["無家具", "不附家具", "未附家具", "沒有家具"])) return "no";
+  if (hasAny(text, ["附家具", "有家具", "提供家具", "家具齊全"])) return "yes";
+  if (hasAny(text, ["部分家具", "基本家具", "家具"])) return "partial";
+  return null;
+}
+
 function detectDistrictFromCapture(capture, fallback) {
   const title = capture?.title || "";
   const body = capture?.text || "";
@@ -982,19 +1039,21 @@ function detectDistrictFromCapture(capture, fallback) {
 
 function buildSeedFromCapture(capture, fallbackSeed) {
   const text = `${capture?.title || ""}\n${capture?.text || ""}`;
-  const compact = text.replace(/[,\s]/g, "");
+  const compact = normalizeCaptureText(text);
   const rent = pickFirstMatch(compact, [
     /租金(?:NT\$|NTD|\$)?(\d{4,6})/,
     /(?:NT\$|NTD|\$)(\d{4,6})(?:\/月|元|月)?/,
     /(\d{4,6})元\/月/,
   ]);
-  const deposit = pickFirstMatch(compact, [
-    /押金(?:NT\$|NTD|\$)?(\d{4,6})/,
-    /押金(\d+)個月/,
-  ]);
+  const deposit = extractDeposit(compact, rent);
   const areaPing = pickFirstMatch(compact, [/(\d+(?:\.\d+)?)坪/]);
   const floor = pickFirstMatch(compact, [/(\d+)F(?:\/\d+F)?/, /(\d+)樓/]);
   const totalFloor = pickFirstMatch(compact, [/\d+F\/(\d+)F/, /共(\d+)樓/]);
+  const electricityRate = extractElectricityRate(compact);
+  const waterFee = extractFee(compact, "水");
+  const managementFee = extractFee(compact, "管理");
+  const internetFee = extractFee(compact, "網路");
+  const furnitureStatus = extractFurnitureStatus(text);
 
   const propertyType = hasAny(text, ["雅房"]) ? "雅房" :
     hasAny(text, ["整層", "整層住家"]) ? "整層住家" :
@@ -1008,8 +1067,8 @@ function buildSeedFromCapture(capture, fallbackSeed) {
     fallbackSeed.buildingType;
 
   const yesNoUnknown = (yesWords, noWords, fallback) => {
-    if (hasAny(text, yesWords)) return "yes";
     if (hasAny(text, noWords)) return "no";
+    if (hasAny(text, yesWords)) return "yes";
     return fallback;
   };
 
@@ -1022,18 +1081,19 @@ function buildSeedFromCapture(capture, fallbackSeed) {
     totalFloor: totalFloor || fallbackSeed.totalFloor,
     sizePing: areaPing || fallbackSeed.sizePing,
     rent: rent || fallbackSeed.rent,
-    deposit: deposit ? (deposit.length <= 2 && rent ? String(Number(rent) * Number(deposit)) : deposit) : fallbackSeed.deposit,
+    deposit: deposit || fallbackSeed.deposit,
     petAllowed: yesNoUnknown(["可寵", "可養寵物", "寵物可"], ["禁寵", "不可養寵物", "不可寵"], fallbackSeed.petAllowed),
-    hasFurniture: yesNoUnknown(["附家具", "有家具", "家具"], ["無家具", "不附家具"], fallbackSeed.hasFurniture),
+    hasFurniture: furnitureStatus || fallbackSeed.hasFurniture,
     eligibleForSubsidy: yesNoUnknown(["可租補", "可申請租補", "租金補貼"], ["不可租補", "不能租補"], fallbackSeed.eligibleForSubsidy),
     hasWrittenContract: yesNoUnknown(["有契約", "書面契約"], ["無契約", "沒有契約"], fallbackSeed.hasWrittenContract),
     taxRegistrationAllowed: yesNoUnknown(["可報稅", "可以報稅"], ["不可報稅", "不能報稅", "禁報稅"], fallbackSeed.taxRegistrationAllowed),
     householdRegistrationAllowed: yesNoUnknown(["可遷戶籍", "可以遷戶籍"], ["不可遷戶籍", "不能遷戶籍"], fallbackSeed.householdRegistrationAllowed),
     rooftopAddition: yesNoUnknown(["頂樓加蓋"], ["非頂加", "不是頂樓加蓋"], fallbackSeed.rooftopAddition),
     illegalPartition: yesNoUnknown(["違法隔間"], ["非隔間", "非違法隔間"], fallbackSeed.illegalPartition),
-    electricityRate: pickFirstMatch(compact, [/電費(?:每度)?(\d+(?:\.\d+)?元?)/]) || fallbackSeed.electricityRate,
-    managementFee: pickFirstMatch(compact, [/管理費(?:NT\$|NTD|\$)?(\d{2,5})/]) || fallbackSeed.managementFee,
-    internetFee: pickFirstMatch(compact, [/網路費(?:NT\$|NTD|\$)?(\d{2,5})/]) || fallbackSeed.internetFee,
+    electricityRate: electricityRate || fallbackSeed.electricityRate,
+    waterFee: waterFee || fallbackSeed.waterFee,
+    managementFee: managementFee || fallbackSeed.managementFee,
+    internetFee: internetFee || fallbackSeed.internetFee,
     notes: capture?.sourceUrl ? `由擴充功能匯入：${capture.sourceUrl}` : fallbackSeed.notes,
   };
 }
@@ -1053,6 +1113,7 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", e
   const [previewRhir, setPreviewRhir] = useStateF(null);
   const [importInput, setImportInput] = useStateF(importId || "");
   const [importNotice, setImportNotice] = useStateF("");
+  const [formErrors, setFormErrors] = useStateF({});
   const formRef = useRefF(null);
 
   // Reactive form stats. Recomputed whenever the form is interacted with,
@@ -1073,6 +1134,30 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", e
   }, [tick, formResetKey, seed]);
 
   const bumpTick = () => setTick((t) => t + 1);
+
+  const handleFormInteraction = (event) => {
+    bumpTick();
+    const fieldNode = event.target?.closest?.("[data-schema-key]");
+    const schemaKey = fieldNode?.getAttribute("data-schema-key");
+    if (!schemaKey) return;
+    setFormErrors((current) => {
+      if (!current[schemaKey]) return current;
+      const next = { ...current };
+      delete next[schemaKey];
+      return next;
+    });
+  };
+
+  const focusFirstInvalidField = (errors) => {
+    const firstKey = Object.keys(errors)[0];
+    if (!firstKey) return;
+    setSection(sectionFromSchemaKey(firstKey));
+    window.setTimeout(() => {
+      const node = formRef.current?.querySelector(`[data-schema-key="${firstKey}"]`);
+      node?.scrollIntoView?.({ behavior: "smooth", block: "center" });
+      node?.querySelector?.("input, select, textarea, button")?.focus?.();
+    }, 0);
+  };
 
   useEffectF(() => {
     if (editRecordId) {
@@ -1161,6 +1246,13 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", e
   const handleCreateVersion = () => {
     if (!formRef.current) return;
     const values = readFormValues(formRef.current);
+    const errors = validateFormValues(values);
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      focusFirstInvalidField(errors);
+      return;
+    }
+    setFormErrors({});
     const title = (versionTitle || "").trim() || (isEditMode ? `補件版本 ${versionLabel}` : "初始版本");
     const completion = totalFields > 0 ? (totalFilled / totalFields) : 0;
 
@@ -1186,6 +1278,7 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", e
   };
 
   return (
+    <FormValidationContext.Provider value={formErrors}>
     <div className="page">
       <div className="page-header" style={{ marginBottom: 18 }}>
         <div>
