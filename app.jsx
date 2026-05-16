@@ -67,6 +67,7 @@ function App() {
         {route.name === "rhir-spec" && <window.GlossaryPage setRoute={setRoute} tab="rhir"/>}
         {route.name === "form" && <window.FormPage setRoute={setRoute} mode={route.mode} importId={route.importId}/>}
         {route.name === "detail" && <window.DetailPage setRoute={setRoute} recordId={route.id}/>}
+        {route.name === "admin" && <window.AdminPage setRoute={setRoute}/>}
       </div>
       <GovFoot/>
 

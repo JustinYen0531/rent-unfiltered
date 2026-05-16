@@ -149,6 +149,8 @@ function Icon({ name, size = 14, className = "" }) {
     sparkle: <><path d="M12 3v3" /><path d="M12 18v3" /><path d="M3 12h3" /><path d="M18 12h3" /><path d="m5.6 5.6 2.1 2.1" /><path d="m16.3 16.3 2.1 2.1" /><path d="m5.6 18.4 2.1-2.1" /><path d="m16.3 7.7 2.1-2.1" /></>,
     copy: <><rect x="9" y="9" width="11" height="11" rx="1.5" /><path d="M5 15V5a1 1 0 0 1 1-1h10" /></>,
     book: <><path d="M4 4h11a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4z" /><path d="M4 16a4 4 0 0 1 4-4h11" /></>,
+    upload: <><path d="M12 15V3" /><path d="m7 8 5-5 5 5" /><path d="M5 21h14" /></>,
+    database: <><ellipse cx="12" cy="5" rx="8" ry="3" /><path d="M4 5v5c0 1.66 3.58 3 8 3s8-1.34 8-3V5" /><path d="M4 10v5c0 1.66 3.58 3 8 3s8-1.34 8-3v-5" /></>,
   };
   return <svg {...props}>{paths[name] || null}</svg>;
 }
@@ -291,6 +293,7 @@ function TopBar({ route, setRoute }) {
           <a className={route.name === "home" ? "active" : ""} onClick={() => setRoute({ name: "home" })}>首頁</a>
           <a className={route.name === "project-guide" ? "active" : ""} onClick={() => setRoute({ name: "project-guide" })}>專案導引</a>
           <a className={route.name === "glossary" || route.name === "rhir-spec" ? "active" : ""} onClick={() => setRoute({ name: "glossary", tab: "rhir" })}>名詞解釋</a>
+          <a className={route.name === "admin" ? "active" : ""} onClick={() => setRoute({ name: "admin" })}>資料庫</a>
         </nav>
         <div className="topbar-right">
           <div className="search">

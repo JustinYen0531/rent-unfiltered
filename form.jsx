@@ -240,6 +240,25 @@ function RHIRPreviewModal({ rhir, onClose }) {
   const { Icon, downloadJSON, getRhirRecordId, highlightJSON } = window.RU;
   const recordId = getRhirRecordId(rhir);
   const followupQuestions = window.RU.getFollowupQuestionsFromRhir(rhir);
+  const [uploadState, setUploadState] = useStateF("idle"); // "idle" | "uploading" | "success" | "error"
+  const [uploadError, setUploadError] = useStateF(null);
+
+  async function handleUpload() {
+    if (!window.RU_SUPABASE?.isConfigured()) {
+      setUploadState("error");
+      setUploadError("Supabase 尚未設定，請先在 supabase.jsx 填入 Project URL 和 Anon Key，然後重新整理頁面。");
+      return;
+    }
+    setUploadState("uploading");
+    setUploadError(null);
+    try {
+      await window.RU_SUPABASE.uploadRhir(rhir);
+      setUploadState("success");
+    } catch (err) {
+      setUploadState("error");
+      setUploadError(err.message);
+    }
+  }
 
   return (
     <div className="modal-back" onClick={onClose}>
@@ -264,9 +283,38 @@ function RHIRPreviewModal({ rhir, onClose }) {
               </div>
             </div>
           )}
+          {uploadState === "error" && uploadError && (
+            <div className="callout" style={{ marginBottom: 12, background: "var(--s-missing-bg)" }}>
+              <span className="ic" style={{ color: "var(--s-missing-ink)" }}>
+                <Icon name="alert" size={14} />
+              </span>
+              <div style={{ color: "var(--s-missing-ink)" }}>{uploadError}</div>
+            </div>
+          )}
           <pre className="import-json" dangerouslySetInnerHTML={{ __html: highlightJSON(rhir) }} />
         </div>
-        <div className="modal-foot" style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+        <div className="modal-foot" style={{ display: "flex", justifyContent: "flex-end", gap: 8, alignItems: "center" }}>
+          {uploadState === "success" ? (
+            <span style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--s-disclosed-ink)", fontSize: 13, marginRight: 4 }}>
+              <Icon name="check" size={14} />
+              已上傳至 RHIR 資料庫
+            </span>
+          ) : (
+            <button
+              className="btn"
+              onClick={handleUpload}
+              disabled={uploadState === "uploading"}
+            >
+              {uploadState === "uploading" ? (
+                "上傳中..."
+              ) : (
+                <>
+                  <Icon name="database" size={14} />
+                  上傳到 RHIR 資料庫
+                </>
+              )}
+            </button>
+          )}
           <button className="btn btn-primary" onClick={() => downloadJSON(rhir, recordId)}>
             <Icon name="download" size={14} />
             下載 RHIR JSON
