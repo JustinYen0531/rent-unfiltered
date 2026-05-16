@@ -74,6 +74,46 @@ async function copyJSON(data) {
   return ok;
 }
 
+const RRI_FOLLOWUP_RULES = {
+  "cost.eligibleForSubsidy": { axis: "租客權益", priority: "high", question: "這個物件是否可以申請租金補貼？如果不行，原因是什麼？", reason: "租補資格會影響實際負擔，也常與報稅、戶籍條件一起影響租客權益。" },
+  "leaseTerms.hasWrittenContract": { axis: "契約透明度", priority: "high", question: "是否會簽正式書面租賃契約？可以先看契約草稿嗎？", reason: "沒有書面契約會讓修繕、押金、提前解約等責任難以追溯。" },
+  "leaseTerms.reviewPeriod": { axis: "契約透明度", priority: "medium", question: "簽約前是否有契約審閱期？可以帶回或線上先看嗎？", reason: "審閱期可以避免看房當下被迫立即簽約。" },
+  "leaseTerms.repairResponsibility": { axis: "契約透明度", priority: "high", question: "設備故障、漏水、冷氣與熱水器維修責任由誰負擔？", reason: "修繕責任不清楚時，入住後最容易產生費用爭議。" },
+  "leaseTerms.earlyTerminationClause": { axis: "契約透明度", priority: "medium", question: "提前解約需要提前多久告知？是否有違約金？", reason: "提前解約條款會影響搬離彈性與潛在成本。" },
+  "leaseTerms.depositRefundTerms": { axis: "費用透明度", priority: "medium", question: "押金何時退還？哪些情況會被扣押金？", reason: "押金退還方式不明會提高退租爭議風險。" },
+  "leaseTerms.taxRegistrationAllowed": { axis: "租客權益", priority: "high", question: "是否可以報稅？契約是否會限制申報租金支出？", reason: "報稅是租客重要權益，也會影響租金扣除與租補申請。" },
+  "leaseTerms.householdRegistrationAllowed": { axis: "租客權益", priority: "high", question: "是否可以遷入戶籍？如果不行，房東理由是什麼？", reason: "戶籍會影響租補、稅務與居住權益。" },
+  "rights.taxBurdenShift": { axis: "租客權益", priority: "high", question: "契約是否要求房客負擔因報稅或設籍增加的稅費？", reason: "稅負轉嫁條款可能是不合理或高風險條件。" },
+  "rights.unfairTerms": { axis: "租客權益", priority: "high", question: "契約是否有禁止報稅、禁止戶籍、任意進入房間等不合理條款？", reason: "不合理條款會直接影響租客權益與爭議風險。" },
+  "safety.rooftopAddition": { axis: "居住安全", priority: "high", question: "是否為頂樓加蓋或增建空間？可以確認建物合法性嗎？", reason: "頂樓加蓋可能牽涉隔熱、防水、消防與合法性風險。" },
+  "safety.illegalPartition": { axis: "居住安全", priority: "high", question: "是否為隔間套房？隔間材質與消防逃生是否符合安全需求？", reason: "違法或不良隔間會提高火災、噪音與逃生風險。" },
+  "safety.escapeRoute": { axis: "居住安全", priority: "high", question: "看房時請確認逃生路線是否暢通，是否有第二出口或可開啟鐵窗。", reason: "逃生動線通常需要現場查看，平台文字很難完整判斷。" },
+  "safety.fireEquipment": { axis: "居住安全", priority: "high", question: "現場是否有滅火器、偵煙器、緊急照明或出口標示？設備是否堪用？", reason: "消防設備多半要現場確認，會直接影響居住安全分數。" },
+  "safety.waterLeak": { axis: "居住安全", priority: "medium", question: "看房時請檢查天花板、牆角、浴室與窗框是否有漏水或壁癌痕跡。", reason: "漏水常被平台照片避開，需要使用者現場確認。" },
+  "safety.doorLock": { axis: "居住安全", priority: "medium", question: "門鎖、門禁與公共出入口是否安全？是否曾更換門鎖？", reason: "出入安全通常無法只靠租屋頁文字判斷。" },
+};
+
+function createFollowupQuestions(fieldKeys) {
+  const seen = new Set();
+  const weight = { high: 0, medium: 1, low: 2 };
+  return fieldKeys
+    .map((fieldKey) => {
+      const rule = RRI_FOLLOWUP_RULES[fieldKey];
+      if (!rule || seen.has(fieldKey)) return null;
+      seen.add(fieldKey);
+      return { field: fieldKey, ...rule };
+    })
+    .filter(Boolean)
+    .sort((a, b) => (weight[a.priority] ?? 9) - (weight[b.priority] ?? 9));
+}
+
+function getFollowupQuestionsFromRhir(rhir) {
+  const explicit = rhir?.transparencyLayer?.followupQuestions?.value;
+  if (Array.isArray(explicit)) return explicit;
+  const fields = rhir?.transparencyLayer?.fieldsNeedingUserQuestion?.value;
+  return Array.isArray(fields) ? createFollowupQuestions(fields) : [];
+}
+
 function Icon({ name, size = 14, className = "" }) {
   const props = {
     width: size,
@@ -325,5 +365,7 @@ window.RU = Object.assign(window.RU || {}, {
   getRhirRecordId,
   downloadJSON,
   copyJSON,
+  createFollowupQuestions,
+  getFollowupQuestionsFromRhir,
   highlightJSON,
 });

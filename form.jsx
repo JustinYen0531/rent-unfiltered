@@ -176,6 +176,8 @@ function buildFormRhirBundle({ values, versionLabel = "X" }) {
     });
   });
 
+  const followupQuestions = window.RU.createFollowupQuestions(fieldsNeedingUserQuestion);
+
   rhir.transparencyLayer = {
     disclosedFieldCount: formFieldValue(disclosedCount, "disclosed", "systemInference"),
     partialFieldCount: formFieldValue(partialCount, "disclosed", "systemInference"),
@@ -183,6 +185,7 @@ function buildFormRhirBundle({ values, versionLabel = "X" }) {
     conflictFieldCount: formFieldValue(0, "disclosed", "systemInference"),
     inferredFieldCount: formFieldValue(0, "disclosed", "systemInference"),
     fieldsNeedingUserQuestion: formFieldValue(fieldsNeedingUserQuestion, "disclosed", "systemInference"),
+    followupQuestions: formFieldValue(followupQuestions, "disclosed", "systemInference"),
     notes: formFieldValue("由使用者表單直接轉成 RHIR JSON。", "disclosed", "manualInput"),
   };
 
@@ -236,6 +239,7 @@ function buildFormRhirBundle({ values, versionLabel = "X" }) {
 function RHIRPreviewModal({ rhir, onClose }) {
   const { Icon, downloadJSON, getRhirRecordId, highlightJSON } = window.RU;
   const recordId = getRhirRecordId(rhir);
+  const followupQuestions = window.RU.getFollowupQuestionsFromRhir(rhir);
 
   return (
     <div className="modal-back" onClick={onClose}>
@@ -244,6 +248,22 @@ function RHIRPreviewModal({ rhir, onClose }) {
           <h3>RHIR 預覽 <span className="mono" style={{ color: "#1652f0" }}>{recordId}</span></h3>
         </div>
         <div className="modal-body" style={{ maxHeight: "70vh", overflow: "auto" }}>
+          {followupQuestions.length > 0 && (
+            <div className="callout" style={{ marginBottom: 12 }}>
+              <span className="ic"><Icon name="info" size={14} /></span>
+              <div>
+                <strong>下一次看房或詢問時建議補齊：</strong>
+                <ul style={{ margin: "8px 0 0", paddingLeft: 18 }}>
+                  {followupQuestions.slice(0, 6).map((item) => (
+                    <li key={item.field} style={{ marginBottom: 4 }}>
+                      {item.question}
+                      <span className="mono" style={{ color: "#8a93a0", marginLeft: 6 }}>{item.field}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
           <pre className="import-json" dangerouslySetInnerHTML={{ __html: highlightJSON(rhir) }} />
         </div>
         <div className="modal-foot" style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>

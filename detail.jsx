@@ -105,7 +105,7 @@ function DetailPage({ setRoute, recordId }) {
               </button>
             </div>
 
-            {tab === "fields" && <FieldCompletionView groups={fieldGroups}/>}
+            {tab === "fields" && <FieldCompletionView groups={fieldGroups} rhir={rhir}/>}
             {tab === "rhir" && <RHIRView data={rhir} recordId={record.id}/>}
             {tab === "report" && <ReportView report={report} version={activeVersion}/>}
           </main>
@@ -149,10 +149,44 @@ function VersionHeader({ version }) {
 
 /* ---------- Tab 1: Field completion ---------- */
 
-function FieldCompletionView({ groups }) {
+function FollowupQuestionsPanel({ questions, compact = false }) {
+  const { Icon } = window.RU;
+  if (!questions.length) return null;
+
+  return (
+    <div className="fg" style={{ marginBottom: compact ? 0 : 16 }}>
+      <div className="fg-head">
+        <h3>待詢問與現場確認</h3>
+        <span className="meta mono">{questions.length} questions</span>
+      </div>
+      <ul style={{ listStyle: "none", padding: "6px 0", margin: 0 }}>
+        {questions.map((item, index) => (
+          <li key={`${item.field}-${index}`} style={{ display: "grid", gridTemplateColumns: "32px 1fr auto", gap: 10, padding: "10px 16px", borderBottom: index === questions.length - 1 ? 0 : "1px solid var(--hairline)", fontSize: 13, alignItems: "start" }}>
+            <span className="mono" style={{ color: "#8a93a0", fontSize: 11 }}>{String(index + 1).padStart(2, "0")}</span>
+            <div>
+              <div>{item.question}</div>
+              {!compact && <div style={{ color: "#5a6573", fontSize: 12, lineHeight: 1.5, marginTop: 3 }}>{item.reason}</div>}
+              <div className="mono" style={{ color: "#8a93a0", fontSize: 11, marginTop: 3 }}>{item.field}</div>
+            </div>
+            <span className="badge badge-outline">{item.axis}</span>
+          </li>
+        ))}
+      </ul>
+      {!compact && (
+        <div className="callout" style={{ margin: "0 16px 14px" }}>
+          <span className="ic"><Icon name="info" size={14}/></span>
+          <div>這些項目通常無法只靠 591 或平台文字判斷，需要詢問房東、看契約或現場查看。補齊後再重新建立版本，RHIR 與 RRI 才會更完整。</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function FieldCompletionView({ groups, rhir }) {
   const { Icon, Badge } = window.RU;
   // counts across all groups
   const all = groups.flatMap(g => g.fields);
+  const followupQuestions = window.RU.getFollowupQuestionsFromRhir(rhir);
   const tally = {
     disclosed: all.filter(f => f.status === "disclosed").length,
     partial: all.filter(f => f.status === "partial").length,
@@ -168,6 +202,8 @@ function FieldCompletionView({ groups }) {
         <Tally count={tally.missing} label="未揭露" status="missing"/>
         <Tally count={tally.conflict + tally.inferred} label="衝突 / 推論" status="conflict"/>
       </div>
+
+      <FollowupQuestionsPanel questions={followupQuestions}/>
 
       {groups.map(g => {
         const filled = g.fields.filter(f => f.status !== "missing").length;
@@ -234,6 +270,7 @@ function RHIRView({ data, recordId }) {
   const nodes = Object.keys(data);
   const [active, setActive] = useStateD("property");
   const [copyStatus, setCopyStatus] = useStateD("");
+  const followupQuestions = window.RU.getFollowupQuestionsFromRhir(data);
 
   const subset = useMemoD(() => {
     return { [active]: data[active] };
@@ -288,6 +325,10 @@ function RHIRView({ data, recordId }) {
         <RHIRNote title="value" body="實際填入的值。可以是字串、數字、布林、陣列、物件或 null。"/>
         <RHIRNote title="disclosureStatus" body="揭露狀態。可選 disclosed / partial / missing / inferred / supplemented / conflict / unknown。"/>
         <RHIRNote title="sourceType" body="此值的來源。MVP 通常為 manualInput；推論欄位則為 systemInference。"/>
+      </div>
+
+      <div style={{ marginTop: 14 }}>
+        <FollowupQuestionsPanel questions={followupQuestions} compact/>
       </div>
     </>
   );

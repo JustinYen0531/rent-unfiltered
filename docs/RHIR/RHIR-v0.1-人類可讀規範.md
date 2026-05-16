@@ -452,7 +452,20 @@ RHIR v0.1 第一層包含以下區塊：
 - `inferredFieldCount`
 - `unknownFieldCount`
 - `fieldsNeedingUserQuestion`
+- `followupQuestions`
 - `notes`
+
+`fieldsNeedingUserQuestion` 記錄仍缺漏、需要使用者追問或現場確認的 RHIR 欄位 key。
+
+`followupQuestions` 則是面向使用者的問題清單。每一筆問題可包含：
+
+- `field`：對應的 RHIR 欄位
+- `axis`：影響的 RRI 面向，例如契約透明度、費用透明度、居住安全或租客權益
+- `priority`：high / medium / low
+- `question`：使用者下一次應詢問房東、查看契約或現場確認的問題
+- `reason`：為什麼此問題會影響 RHIR 完整性或 RRI 判讀
+
+這個欄位的目的不是替使用者做判斷，而是誠實標示：平台文字與瀏覽器插件可擷取的資訊有限，部分居住安全、權益限制與契約條款必須由使用者補問或現場確認。
 
 ## 七、v0.1 不包含的內容
 
