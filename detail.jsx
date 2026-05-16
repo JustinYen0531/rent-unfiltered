@@ -86,7 +86,7 @@ function DetailPage({ setRoute, recordId }) {
 
           {/* Content */}
           <main>
-            <VersionHeader version={activeVersion}/>
+            <VersionHeader version={activeVersion} recordId={record.id} setRoute={setRoute} nextLabel={`X-${versions.length}`}/>
 
             <div className="tabs">
               <button className={`tab ${tab === "fields" ? "active" : ""}`} onClick={() => setTab("fields")}>
@@ -105,20 +105,31 @@ function DetailPage({ setRoute, recordId }) {
               </button>
             </div>
 
-            {tab === "fields" && <FieldCompletionView groups={fieldGroups} rhir={rhir}/>}
+            {tab === "fields" && <FieldCompletionView groups={fieldGroups} rhir={rhir} recordId={record.id} setRoute={setRoute}/>}
             {tab === "rhir" && <RHIRView data={rhir} recordId={record.id}/>}
             {tab === "report" && <ReportView report={report} version={activeVersion} rhir={rhir}/>}
           </main>
         </div>
       </div>
 
-      {showAddModal && <AddVersionModal onClose={() => setShowAddModal(false)} nextLabel={`X-${versions.length}`}/>}
+      {showAddModal && (
+        <AddVersionModal
+          onClose={() => setShowAddModal(false)}
+          nextLabel={`X-${versions.length}`}
+          recordId={record.id}
+          setRoute={setRoute}
+        />
+      )}
     </>
   );
 }
 
-function VersionHeader({ version }) {
+function VersionHeader({ version, recordId, setRoute, nextLabel }) {
   const { Icon } = window.RU;
+  const openForm = (section = "") => {
+    if (!recordId || !setRoute) return;
+    setRoute({ name: "form", mode: "new", editRecordId: recordId, section, versionLabel: nextLabel || "X-1" });
+  };
   return (
     <div className="detail-head" style={{padding:"14px 18px", marginBottom:18}}>
       <div style={{flex:1}}>
@@ -141,7 +152,7 @@ function VersionHeader({ version }) {
         </div>
         <div style={{height:32, width:1, background:"#e4e7ec"}}/>
         <button className="btn btn-sm"><Icon name="eye" size={12}/> 對照 X</button>
-        <button className="btn btn-sm"><Icon name="edit" size={12}/> 編輯表單</button>
+        <button className="btn btn-sm" onClick={() => openForm()}><Icon name="edit" size={12}/> 編輯表單</button>
       </div>
     </div>
   );
@@ -182,8 +193,32 @@ function FollowupQuestionsPanel({ questions, compact = false }) {
   );
 }
 
-function FieldCompletionView({ groups, rhir }) {
+// Map RHIR schema-key prefix → form section id
+const SCHEMA_PREFIX_TO_SECTION = {
+  property: "property",
+  cost: "cost",
+  leaseTerms: "lease",
+  safety: "safety",
+  rights: "rights",
+  locationContext: "property",
+};
+function sectionFromSchemaKey(key) {
+  const prefix = String(key || "").split(".")[0];
+  return SCHEMA_PREFIX_TO_SECTION[prefix] || "property";
+}
+
+function FieldCompletionView({ groups, rhir, recordId, setRoute }) {
   const { Icon, Badge } = window.RU;
+  const openFormForField = (fieldKey) => {
+    if (!recordId || !setRoute) return;
+    setRoute({
+      name: "form",
+      mode: "new",
+      editRecordId: recordId,
+      section: sectionFromSchemaKey(fieldKey),
+      versionLabel: "X-1",
+    });
+  };
   // counts across all groups
   const all = groups.flatMap(g => g.fields);
   const followupQuestions = window.RU.getFollowupQuestionsFromRhir(rhir);
@@ -225,7 +260,9 @@ function FieldCompletionView({ groups, rhir }) {
                 <div><Badge status={f.status}/></div>
                 <div className="fsrc">{f.src}</div>
                 <div className="factions">
-                  <button className="btn btn-sm btn-ghost"><Icon name="edit" size={12}/></button>
+                  <button className="btn btn-sm btn-ghost" title="編輯這個欄位" onClick={() => openFormForField(f.key)}>
+                    <Icon name="edit" size={12}/>
+                  </button>
                 </div>
               </div>
             ))}
@@ -568,10 +605,12 @@ function ReportView({ report, version, rhir }) {
 
 /* ---------- Add version modal ---------- */
 
-function AddVersionModal({ onClose, nextLabel }) {
+function AddVersionModal({ onClose, nextLabel, recordId, setRoute }) {
   const { Icon } = window.RU;
-  const [base, setBase] = useStateD("X");
-  const [reAnalyze, setReAnalyze] = useStateD(false);
+  const goToForm = () => {
+    onClose();
+    setRoute({ name: "form", mode: "new", editRecordId: recordId, versionLabel: nextLabel });
+  };
   return (
     <div className="modal-back" onClick={onClose}>
       <div className="modal" onClick={e => e.stopPropagation()}>
@@ -579,31 +618,29 @@ function AddVersionModal({ onClose, nextLabel }) {
           <h3>新增子版本 <span className="mono" style={{color:"#1652f0"}}>{nextLabel}</span></h3>
         </div>
         <div className="modal-body">
-          <p style={{margin:"0 0 14px", color:"#5a6573", fontSize:13}}>
-            子版本是前一份資料的延伸。建議只在你補充欄位、修改錯誤、或希望重新分析時新增。
+          <p style={{margin:"0 0 14px", color:"#5a6573", fontSize:14, lineHeight:1.6}}>
+            新版本會延續目前版本的所有欄位內容，並開啟編輯表單讓你補件、修改或重新確認。
           </p>
-          <FieldInputCompat label="複製自" hint="新版本會繼承這個版本的所有欄位">
-            <div className="seg">
-              {["X","X-1","X-2"].map(v => (
-                <button key={v} className={base === v ? "active mono" : "mono"} onClick={() => setBase(v)}>
-                  {v}
-                </button>
-              ))}
+          <div className="callout" style={{margin:"0 0 14px"}}>
+            <span className="ic"><Icon name="info" size={14}/></span>
+            <div>
+              <strong>表單會預填現有資料</strong>，可逐欄修改後建立 <span className="mono">{nextLabel}</span>。
+              原版本會保留為歷史紀錄，可隨時切換對照。
             </div>
-          </FieldInputCompat>
-          <FieldInputCompat label="建立後動作">
-            <label style={{display:"flex", alignItems:"center", gap:8, fontSize:13}}>
-              <input type="checkbox" checked={reAnalyze} onChange={e => setReAnalyze(e.target.checked)}/>
-              建立後立即重新生成 AI 分析報告
-            </label>
-            <div style={{fontSize:11, color:"#8a93a0", marginTop:4}}>
-              若僅修改少量欄位，可先不重新分析。
-            </div>
+          </div>
+          <FieldInputCompat label="接下來會發生什麼">
+            <ul style={{margin:0, paddingLeft:18, fontSize:13, color:"#2a313b", lineHeight:1.8}}>
+              <li>跳到表單頁面，欄位已預填現有內容</li>
+              <li>逐項修改 / 補件 / 標記新資訊</li>
+              <li>建立後產生新的 RHIR 與 RRI 結論</li>
+            </ul>
           </FieldInputCompat>
         </div>
         <div className="modal-foot">
           <button className="btn" onClick={onClose}>取消</button>
-          <button className="btn btn-primary" onClick={onClose}><Icon name="check" size={14}/> 建立 {nextLabel}</button>
+          <button className="btn btn-primary" onClick={goToForm}>
+            <Icon name="edit" size={14}/> 開啟編輯表單
+          </button>
         </div>
       </div>
     </div>

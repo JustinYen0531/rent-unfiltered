@@ -629,6 +629,40 @@ function schemaValuesToSeed(schemaValues) {
   return seed;
 }
 
+// Schema keys whose RHIR value is a boolean (true/false) but whose form seed
+// uses "yes"/"no" strings (because the form's Seg components store option keys).
+const BOOLEAN_SCHEMA_KEYS = new Set([
+  "property.hasFurniture",
+  "leaseTerms.petsAllowed",
+  "leaseTerms.hasWrittenContract",
+  "safety.rooftopAddition",
+  "safety.illegalPartition",
+  "leaseTerms.taxRegistrationAllowed",
+  "leaseTerms.householdRegistrationAllowed",
+  "rights.taxBurdenShift",
+  "rights.unfairTerms",
+  "cost.eligibleForSubsidy",
+]);
+
+// Convert an RHIR bundle back into a form seed so the form can pre-fill
+// when editing or creating a sub-version.
+function seedFromRhirBundle(rhir) {
+  const seed = buildEmptyImportSeed();
+  if (!rhir) return seed;
+  for (const [schemaKey, seedKey] of Object.entries(SCHEMA_TO_SEED)) {
+    const fv = schemaKey.split(".").reduce((o, k) => (o == null ? undefined : o[k]), rhir);
+    if (!fv) continue;
+    const v = fv.value;
+    if (v === null || v === undefined) continue;
+    if (BOOLEAN_SCHEMA_KEYS.has(schemaKey)) {
+      seed[seedKey] = v === true ? "yes" : v === false ? "no" : v;
+    } else {
+      seed[seedKey] = typeof v === "number" ? String(v) : v;
+    }
+  }
+  return seed;
+}
+
 function pick(list) {
   return list[Math.floor(Math.random() * list.length)];
 }
@@ -839,15 +873,32 @@ function buildSeedFromCapture(capture, fallbackSeed) {
   };
 }
 
-function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "" }) {
+function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", editRecordId = "", initialSection = "" }) {
   const { Icon } = window.RU;
-  const [section, setSection] = useStateF("property");
-  const [seed, setSeed] = useStateF(() => buildRandomFormSeed());
+  const isEditMode = !!editRecordId;
+  const [section, setSection] = useStateF(initialSection || "property");
+  const [seed, setSeed] = useStateF(() => {
+    if (editRecordId) {
+      const bundle = window.RU_DATA?.getRecordBundle?.(editRecordId);
+      if (bundle?.rhir) return seedFromRhirBundle(bundle.rhir);
+    }
+    return buildRandomFormSeed();
+  });
   const [formResetKey, setFormResetKey] = useStateF(0);
   const [previewRhir, setPreviewRhir] = useStateF(null);
   const [importInput, setImportInput] = useStateF(importId || "");
   const [importNotice, setImportNotice] = useStateF("");
   const formRef = useRefF(null);
+
+  useEffectF(() => {
+    if (editRecordId) {
+      const bundle = window.RU_DATA?.getRecordBundle?.(editRecordId);
+      if (bundle?.rhir) {
+        setSeed(seedFromRhirBundle(bundle.rhir));
+        setFormResetKey((k) => k + 1);
+      }
+    }
+  }, [editRecordId]);
 
   const SECTIONS = [
     { id: "property", title: "物件基本資訊", step: "01", filled: 6, total: 8 },
@@ -922,17 +973,21 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "" })
       <div className="page-header" style={{ marginBottom: 18 }}>
         <div>
           <div className="mono" style={{ fontSize: 11, color: "#5a6573", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 6 }}>
-            NEW RECORD · INITIAL VERSION <span style={{ color: "#1652f0" }}>{versionLabel}</span>
+            {isEditMode ? "EDIT / SUB-VERSION" : "NEW RECORD · INITIAL VERSION"} <span style={{ color: "#1652f0" }}>{versionLabel}</span>
+            {isEditMode && <span style={{ color: "#5a6573", marginLeft: 10 }}>· 基於 {editRecordId}</span>}
           </div>
-          <h1 className="page-title">新增租屋資訊</h1>
+          <h1 className="page-title">{isEditMode ? "編輯租屋資訊" : "新增租屋資訊"}</h1>
           <p className="page-sub">
-            這份表單會直接被轉成一份完整的 RHIR JSON。未填寫的欄位會被標示為{" "}
-            <span className="badge badge-missing"><span className="dot"></span>missing</span>，
-            方便之後補齊與追蹤。
+            {isEditMode
+              ? <>表單已預填現有版本的欄位內容。可直接修改、補件或刪改後建立<strong>新版本</strong>。原版本會保留為歷史紀錄。</>
+              : <>這份表單會直接被轉成一份完整的 RHIR JSON。未填寫的欄位會被標示為{" "}
+                  <span className="badge badge-missing"><span className="dot"></span>missing</span>，
+                  方便之後補齊與追蹤。</>
+            }
           </p>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
-          <button className="btn" onClick={() => setRoute({ name: "home" })}>返回</button>
+          <button className="btn" onClick={() => isEditMode ? setRoute({ name: "detail", id: editRecordId }) : setRoute({ name: "home" })}>返回</button>
           <button className="btn" onClick={handleGenerate}>
             <Icon name="sparkle" size={14} />
             一鍵隨機生成

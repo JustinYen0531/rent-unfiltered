@@ -65,7 +65,7 @@ function App() {
         {route.name === "project-guide" && <window.ProjectGuidePage setRoute={setRoute}/>}
         {route.name === "glossary" && <window.GlossaryPage setRoute={setRoute} tab={route.tab}/>}
         {route.name === "rhir-spec" && <window.GlossaryPage setRoute={setRoute} tab="rhir"/>}
-        {route.name === "form" && <window.FormPage setRoute={setRoute} mode={route.mode} importId={route.importId}/>}
+        {route.name === "form" && <window.FormPage setRoute={setRoute} mode={route.mode} importId={route.importId} editRecordId={route.editRecordId} initialSection={route.section} versionLabel={route.versionLabel}/>}
         {route.name === "detail" && <window.DetailPage setRoute={setRoute} recordId={route.id}/>}
         {route.name === "admin" && <window.AdminPage setRoute={setRoute}/>}
       </div>
