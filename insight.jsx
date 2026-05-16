@@ -176,10 +176,93 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
     };
   }
 
+  // ── Chat consultant ──────────────────────────────────────────
+  // Multi-turn Q&A grounded in the same structured RRI result.
+  // No score recalculation, no legal judgment, no value overrides.
+
+  const CHAT_SYSTEM_PROMPT = `你是 Rent Unfiltered 的租屋風險顧問。
+使用者已經看過 RRI 分數與 AI Insight，現在想針對這個物件問你更多問題。
+
+回答原則：
+- 只能根據對話開頭提供的結構化 RRI 資料回答。
+- 不重新計算 RRI 分數，不修改風險等級。
+- 不做法律判定，不說房東違法、惡意、詐騙。
+- missing 不代表一定有問題，只能說「資訊不確定」「需要確認」。
+- 若使用者問的內容 RRI 沒涵蓋，請說「目前 RRI 資料中沒有這項資訊，建議簽約前現場確認」，不要自行推測。
+- 中性、具體、可行動。避免空泛形容詞與恐嚇語氣。
+- 回答以繁體中文為主，保持簡短（1–3 段話），除非使用者要求展開。
+- 若使用者問如何議價、如何溝通房東、如何寫信，可給範例句，但要提醒「依實際情況調整」。`;
+
+  async function chatWithRri(rriResult, conversation, newUserMessage) {
+    if (!rriResult) return { status: "error", message: "缺少 RRI 結果，無法開始對話。" };
+    if (!newUserMessage || !newUserMessage.trim()) return { status: "error", message: "請輸入問題。" };
+
+    const contextBlock =
+      `以下是 rule engine 產出的結構化 RRI 資料（僅供你參考；不要重算）：\n` +
+      `\`\`\`json\n${JSON.stringify({
+        totalScore:        rriResult.totalScore,
+        scoreRange:        rriResult.scoreRange,
+        riskLevel:         rriResult.riskLevel,
+        topRiskDimensions: rriResult.topRiskDimensions,
+        topIssues:         rriResult.topIssues,
+        conflictFields:    rriResult.conflictFields,
+        uncertainFields:   rriResult.uncertainFields,
+        suggestedQuestions: rriResult.suggestedQuestions,
+      }, null, 2)}\n\`\`\``;
+
+    const messages = [
+      { role: "system", content: CHAT_SYSTEM_PROMPT },
+      { role: "system", content: contextBlock },
+      ...(Array.isArray(conversation) ? conversation : []),
+      { role: "user", content: newUserMessage },
+    ];
+
+    let response;
+    try {
+      response = await fetch(OPENROUTER_URL, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": window.location.origin || "https://rent-unfiltered.local",
+          "X-Title": "Rent Unfiltered Chat",
+        },
+        body: JSON.stringify({
+          model: OPENROUTER_MODEL,
+          messages,
+          temperature: 0.5,
+        }),
+      });
+    } catch (e) {
+      return { status: "error", message: `網路錯誤：${e.message}` };
+    }
+
+    if (!response.ok) {
+      const text = await response.text().catch(() => "");
+      return { status: "error", message: `OpenRouter API ${response.status}：${text.slice(0, 400) || response.statusText}` };
+    }
+
+    let data;
+    try { data = await response.json(); }
+    catch (e) { return { status: "error", message: `回應解析失敗：${e.message}` }; }
+
+    const content = data?.choices?.[0]?.message?.content;
+    if (!content) return { status: "error", message: "AI 沒有回傳內容。" };
+
+    return {
+      status: "ok",
+      content: content.trim(),
+      model: data.model || OPENROUTER_MODEL,
+      usage: data.usage || null,
+    };
+  }
+
   window.RU_INSIGHT = {
     generateInsight,
+    chatWithRri,
     buildPromptPayload,
     SYSTEM_PROMPT,
+    CHAT_SYSTEM_PROMPT,
     INPUT_SCHEMA,
     OUTPUT_SCHEMA,
   };

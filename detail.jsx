@@ -384,8 +384,20 @@ function RHIRNote({ title, body }) {
 
 function ReportView({ report, version, rhir }) {
   const { Icon } = window.RU;
-  const [insightState, setInsightState] = useStateD("idle"); // "idle" | "loading" | "done" | "stub"
+  const [insightState, setInsightState] = useStateD("idle"); // "idle" | "loading" | "done" | "stub" | "error"
   const [insightResult, setInsightResult] = useStateD(null);
+
+  // Chat consultant state
+  const [chatMessages, setChatMessages] = useStateD([]); // [{role:"user"|"assistant", content, error?}]
+  const [chatInput, setChatInput] = useStateD("");
+  const [chatLoading, setChatLoading] = useStateD(false);
+  const chatScrollRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    }
+  }, [chatMessages, chatLoading]);
 
   // Compute live range from RHIR bundle (no AI involved)
   const rri = (window.RU_RRI && rhir) ? window.RU_RRI.calculate(rhir) : null;
@@ -412,6 +424,39 @@ function ReportView({ report, version, rhir }) {
   const pillType  = maxScore >= 61 ? "high" : maxScore >= 41 ? "mid" : "low";
 
   const dimEntries = Object.entries(rri.dimensions).map(([id, d]) => ({ id, name: d.label, min: d.min, max: d.max }));
+
+  async function handleSendChat() {
+    const text = chatInput.trim();
+    if (!text || chatLoading) return;
+    const nextMessages = [...chatMessages, { role: "user", content: text }];
+    setChatMessages(nextMessages);
+    setChatInput("");
+    setChatLoading(true);
+
+    try {
+      // Send only role/content pairs (strip any error flags) as conversation history
+      const history = chatMessages
+        .filter(m => !m.error)
+        .map(m => ({ role: m.role, content: m.content }));
+      const result = await window.RU_INSIGHT.chatWithRri(conclusion, history, text);
+      if (result.status === "ok") {
+        setChatMessages([...nextMessages, { role: "assistant", content: result.content }]);
+      } else {
+        setChatMessages([...nextMessages, { role: "assistant", content: result.message || "AI 回應失敗", error: true }]);
+      }
+    } catch (e) {
+      setChatMessages([...nextMessages, { role: "assistant", content: `呼叫失敗：${e.message}`, error: true }]);
+    } finally {
+      setChatLoading(false);
+    }
+  }
+
+  function handleChatKeyDown(e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendChat();
+    }
+  }
 
   async function handleGenerateInsight() {
     setInsightState("loading");
@@ -635,6 +680,122 @@ function ReportView({ report, version, rhir }) {
             </div>
           </div>
         )}
+      </div>
+
+      {/* AI Consultant Chat — multi-turn Q&A grounded in the RRI result */}
+      <div className="fg" style={{marginTop:18}}>
+        <div className="fg-head">
+          <h3><Icon name="sparkle" size={14}/> 詢問 AI 顧問</h3>
+          <span className="meta mono">CONTEXT: RRI {minScore}–{maxScore}</span>
+        </div>
+
+        <div style={{padding:"6px 16px 12px"}}>
+          <p style={{color:"#5a6573", margin:"6px 0 10px", fontSize:12, lineHeight:1.6}}>
+            針對這個物件進一步追問。AI 會用上方 RRI 結構化資料當作回答依據，不會自行推測沒寫的資訊。
+          </p>
+
+          {/* Message list */}
+          <div
+            ref={chatScrollRef}
+            style={{
+              minHeight: chatMessages.length ? 120 : 0,
+              maxHeight: 420,
+              overflowY: "auto",
+              padding: chatMessages.length ? "8px 0" : 0,
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+            }}
+          >
+            {chatMessages.map((m, i) => (
+              <div
+                key={i}
+                style={{
+                  alignSelf: m.role === "user" ? "flex-end" : "flex-start",
+                  maxWidth: "85%",
+                  padding: "8px 12px",
+                  borderRadius: 10,
+                  fontSize: 13,
+                  lineHeight: 1.6,
+                  whiteSpace: "pre-wrap",
+                  background: m.role === "user"
+                    ? "var(--accent)"
+                    : m.error ? "#fef2f2" : "#f1f5f9",
+                  color: m.role === "user" ? "#fff" : m.error ? "#dc2626" : "#1f2937",
+                  border: m.error ? "1px solid #fecaca" : "none",
+                }}
+              >
+                {m.content}
+              </div>
+            ))}
+            {chatLoading && (
+              <div style={{alignSelf:"flex-start", padding:"8px 12px", color:"#5a6573", fontSize:12, fontStyle:"italic"}}>
+                AI 顧問思考中…
+              </div>
+            )}
+          </div>
+
+          {/* Quick prompts (only when chat is empty) */}
+          {chatMessages.length === 0 && (
+            <div style={{display:"flex", flexWrap:"wrap", gap:6, marginBottom:10}}>
+              {[
+                "這個物件對學生租屋族來說，最該擔心什麼？",
+                "如果我要跟房東議價，可以從哪幾項切入？",
+                "把這個物件的風險翻成兩三句白話讓我能跟家人解釋。",
+                "禁止報稅這條會影響我什麼權益？",
+              ].map((q, i) => (
+                <button
+                  key={i}
+                  className="btn btn-sm btn-ghost"
+                  style={{fontSize:11, color:"#5a6573"}}
+                  onClick={() => setChatInput(q)}
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Input row */}
+          <div style={{display:"flex", gap:8, alignItems:"flex-end", marginTop:10}}>
+            <textarea
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              onKeyDown={handleChatKeyDown}
+              placeholder="例如：禁止報稅對我會有什麼具體影響？／要不要簽約？"
+              disabled={chatLoading}
+              rows={2}
+              style={{
+                flex: 1,
+                resize: "vertical",
+                padding: "8px 10px",
+                fontSize: 13,
+                fontFamily: "inherit",
+                border: "1px solid var(--hairline)",
+                borderRadius: 6,
+                outline: "none",
+                lineHeight: 1.5,
+              }}
+            />
+            <button
+              className="btn btn-primary"
+              onClick={handleSendChat}
+              disabled={chatLoading || !chatInput.trim()}
+              style={{whiteSpace:"nowrap"}}
+            >
+              <Icon name="sparkle" size={13}/> 送出
+            </button>
+          </div>
+
+          {chatMessages.length > 0 && (
+            <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:8, fontSize:11, color:"#8a93a0"}}>
+              <span>{chatMessages.filter(m => !m.error).length} 則訊息 · Enter 送出，Shift+Enter 換行</span>
+              <button className="btn btn-sm btn-ghost" onClick={() => setChatMessages([])}>
+                清空對話
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 建議簽前確認 — driven by conclusion.suggestedQuestions */}
