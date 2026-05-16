@@ -347,31 +347,46 @@ function RHIRNote({ title, body }) {
 
 function ReportView({ report, version, rhir }) {
   const { Icon } = window.RU;
-  if (!version.hasReport) {
+  const [insightState, setInsightState] = useStateD("idle"); // "idle" | "loading" | "done" | "stub"
+  const [insightResult, setInsightResult] = useStateD(null);
+
+  // Compute live range from RHIR bundle (no AI involved)
+  const rri = (window.RU_RRI && rhir) ? window.RU_RRI.calculate(rhir) : null;
+  if (!rri) {
     return (
       <div className="callout" style={{padding:"32px", justifyContent:"center", alignItems:"center", flexDirection:"column", textAlign:"center"}}>
-        <Icon name="sparkle" size={28} className="ic"/>
-        <h3 style={{margin:"8px 0 4px"}}>尚未生成分析報告</h3>
-        <p style={{color:"#5a6573", margin:"0 0 12px"}}>儲存版本不會自動觸發分析。請手動按下「生成分析報告」以節省算力。</p>
-        <button className="btn btn-primary"><Icon name="sparkle" size={14}/> 生成 {version.label} 分析報告</button>
+        <Icon name="alert" size={28} className="ic"/>
+        <h3 style={{margin:"8px 0 4px"}}>無法計算 RRI</h3>
+        <p style={{color:"#5a6573", margin:"0 0 12px"}}>此版本缺少 RHIR 資料，請先補齊欄位。</p>
       </div>
     );
   }
 
-  // Compute live range from RHIR bundle
-  const rri = (window.RU_RRI && rhir) ? window.RU_RRI.calculate(rhir) : null;
-  const minScore  = rri?.minScore  ?? report.rri;
-  const maxScore  = rri?.maxScore  ?? report.rri;
-  const midScore  = rri?.midScore  ?? report.rri;
-  const isCertain = rri?.isCertain ?? true;
-  const levelMin  = rri?.levelMin  ?? report.level;
-  const levelMax  = rri?.levelMax  ?? report.level;
+  // Layer 2: template conclusion (deterministic, no AI)
+  const conclusion = window.RU_CONCLUSION?.conclusionFromRri(rri);
+
+  const minScore  = rri.minScore;
+  const maxScore  = rri.maxScore;
+  const midScore  = rri.midScore;
+  const isCertain = rri.isCertain;
+  const levelMin  = rri.levelMin;
+  const levelMax  = rri.levelMax;
   const levelTag  = isCertain ? levelMin : (levelMin === levelMax ? levelMin : `${levelMin}～${levelMax}`);
   const pillType  = maxScore >= 61 ? "high" : maxScore >= 41 ? "mid" : "low";
 
-  const dimEntries = rri
-    ? Object.entries(rri.dimensions).map(([id, d]) => ({ id, name: d.label, min: d.min, max: d.max }))
-    : report.axes.map(a => ({ id: a.id, name: a.name, min: a.score * 0.2, max: a.score * 0.2 }));
+  const dimEntries = Object.entries(rri.dimensions).map(([id, d]) => ({ id, name: d.label, min: d.min, max: d.max }));
+
+  async function handleGenerateInsight() {
+    setInsightState("loading");
+    try {
+      const result = await window.RU_INSIGHT.generateInsight(conclusion);
+      setInsightResult(result);
+      setInsightState(result?.status === "not_implemented" ? "stub" : "done");
+    } catch (e) {
+      setInsightResult({ status: "error", message: String(e?.message || e) });
+      setInsightState("done");
+    }
+  }
 
   return (
     <>
@@ -451,61 +466,100 @@ function ReportView({ report, version, rhir }) {
               </div>
             );
           })}
-          <div style={{borderTop:"1px dashed var(--hairline)", paddingTop:10, marginTop:10}}>
-            <div style={{fontSize:11, color:"#5a6573", marginBottom:6}}>主要風險原因</div>
-            <ul className="risk-list">
-              {report.drivers.slice(0,3).map(d => (
-                <li key={d.id}>
-                  <span className="num">{String(d.id).padStart(2,"0")}</span>
-                  <div>
-                    <div>{d.title}</div>
-                    <div className="why">{d.why}</div>
-                  </div>
-                  <span className="badge badge-outline mono">{d.axis}</span>
-                </li>
-              ))}
-            </ul>
+          {conclusion?.topIssues?.length > 0 && (
+            <div style={{borderTop:"1px dashed var(--hairline)", paddingTop:10, marginTop:10}}>
+              <div style={{fontSize:11, color:"#5a6573", marginBottom:6}}>主要風險原因（rule engine）</div>
+              <ul className="risk-list">
+                {conclusion.topIssues.slice(0,4).map((title, i) => (
+                  <li key={i}>
+                    <span className="num">{String(i+1).padStart(2,"0")}</span>
+                    <div>
+                      <div>{title}</div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Layer 2 — Template conclusion (always shown, no AI) */}
+      {conclusion && (
+        <div className="explain">
+          <div style={{display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:8}}>
+            <h4 style={{margin:0}}>RRI 結論</h4>
+            <span className="mono" style={{fontSize:10, color:"#8a93a0", letterSpacing:"0.06em"}}>RULE-BASED · 固定格式</span>
           </div>
+          <p style={{whiteSpace:"pre-line", margin:0}}>{conclusion.finalText}</p>
         </div>
-      </div>
+      )}
 
-      <div className="explain">
-        <h4>白話解釋</h4>
-        <p>{report.explanation}</p>
-      </div>
-
-      <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:18, marginTop:18}}>
-        <div className="fg">
-          <div className="fg-head"><h3>簽約前檢查清單</h3><span className="meta mono">{report.checklist.length} items</span></div>
-          <ul style={{listStyle:"none", padding:"6px 0", margin:0}}>
-            {report.checklist.map((c, i) => (
-              <li key={i} style={{display:"grid", gridTemplateColumns:"32px 1fr", padding:"10px 16px", borderBottom: i === report.checklist.length-1 ? 0 : "1px solid var(--hairline)", fontSize:13}}>
-                <span className="mono" style={{color:"#8a93a0", fontSize:11}}>{String(i+1).padStart(2,"0")}</span>
-                <span>{c}</span>
-              </li>
+      {/* Layer 3 — AI Insight (gated; pure風險脈絡解讀，不重算分數) */}
+      <div className="fg" style={{marginTop:18}}>
+        <div className="fg-head">
+          <h3><Icon name="sparkle" size={14}/> AI Insight · 風險脈絡解讀</h3>
+          <span className="meta mono">OPTIONAL</span>
+        </div>
+        {insightState === "idle" && (
+          <div style={{padding:"18px 16px"}}>
+            <p style={{color:"#5a6573", margin:"0 0 12px", fontSize:13, lineHeight:1.6}}>
+              RRI 分數與結論已由 rule engine 產生（上方），AI Insight 不重算分數，只解讀風險之間的關聯、
+              排出簽前最該問的問題，並把技術性欄位翻成生活情境。<strong>需要手動觸發以節省算力。</strong>
+            </p>
+            <button className="btn btn-primary" onClick={handleGenerateInsight}>
+              <Icon name="sparkle" size={14}/> 生成 AI Insight
+            </button>
+          </div>
+        )}
+        {insightState === "loading" && (
+          <div style={{padding:"18px 16px", color:"#5a6573"}}>正在解讀風險脈絡…</div>
+        )}
+        {insightState === "stub" && (
+          <div className="callout" style={{margin:"12px 16px"}}>
+            <span className="ic"><Icon name="info" size={14}/></span>
+            <div>{insightResult?.message}</div>
+          </div>
+        )}
+        {insightState === "done" && insightResult?.insightSummary && (
+          <div style={{padding:"6px 16px 14px"}}>
+            <p style={{margin:"6px 0 10px"}}>{insightResult.insightSummary}</p>
+            {insightResult.riskPattern?.map((p, i) => (
+              <div key={i} style={{margin:"8px 0", padding:"8px 10px", background:"var(--accent-soft)", borderRadius:6}}>
+                <div style={{fontWeight:600, fontSize:13}}>{p.title}</div>
+                <div style={{fontSize:12, color:"#2a313b"}}>{p.explanation}</div>
+              </div>
             ))}
-          </ul>
-        </div>
-        <div className="fg">
-          <div className="fg-head"><h3>待追問事項</h3><span className="meta mono">{report.followups.length} questions</span></div>
+          </div>
+        )}
+      </div>
+
+      {/* 建議簽前確認 — driven by conclusion.suggestedQuestions */}
+      {conclusion?.suggestedQuestions?.length > 0 && (
+        <div className="fg" style={{marginTop:18}}>
+          <div className="fg-head">
+            <h3>建議簽前確認</h3>
+            <span className="meta mono">{conclusion.suggestedQuestions.length} questions</span>
+          </div>
           <ul style={{listStyle:"none", padding:"6px 0", margin:0}}>
-            {report.followups.map((f, i) => (
-              <li key={i} style={{display:"grid", gridTemplateColumns:"1fr auto", gap:12, padding:"10px 16px", borderBottom: i === report.followups.length-1 ? 0 : "1px solid var(--hairline)", fontSize:13, alignItems:"center"}}>
+            {conclusion.suggestedQuestions.map((f, i) => (
+              <li key={i} style={{display:"grid", gridTemplateColumns:"32px 1fr auto", gap:12, padding:"10px 16px", borderBottom: i === conclusion.suggestedQuestions.length-1 ? 0 : "1px solid var(--hairline)", fontSize:13, alignItems:"start"}}>
+                <span className="mono" style={{color:"#8a93a0", fontSize:11}}>{String(i+1).padStart(2,"0")}</span>
                 <div>
                   <div>{f.q}</div>
-                  <div className="mono" style={{fontSize:11, color:"#8a93a0"}}>{f.field}</div>
+                  <div className="mono" style={{fontSize:11, color:"#8a93a0", marginTop:2}}>{f.field}</div>
                 </div>
-                <button className="btn btn-sm">補件</button>
+                <span className="badge badge-outline">{f.dimension}</span>
               </li>
             ))}
           </ul>
         </div>
-      </div>
+      )}
 
       <div className="callout" style={{marginTop:18}}>
         <span className="ic"><Icon name="alert" size={14}/></span>
         <div>
-          這份報告基於目前版本（<span className="mono">{version.label}</span>）的 RHIR 資料生成。若你補充新欄位後想重新跑分析，請新增一個子版本並手動觸發。儲存版本不會自動消耗 AI 算力。
+          上方 RRI 與結論由 rule engine + template 產生，<strong>每次顯示都是即時重算</strong>，不消耗 AI 算力。AI Insight 是選擇性功能，需手動觸發。本分析作為租屋決策輔助，不代表法律判定。
         </div>
       </div>
     </>
