@@ -111,7 +111,7 @@ RHIR v0.1 建議每個欄位都使用同一種外殼：`FieldValue`。
 - `publicData`：政府資料或公開資料。
 - `systemInference`：系統推估。
 - `userReport`：使用者回報。
-- `manualInput`：人工輸入。
+- `user_input`：使用者自行輸入。
 - `unknown`：來源未知。
 
 ### sourceText

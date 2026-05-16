@@ -157,7 +157,7 @@
             "publicData",
             "systemInference",
             "userReport",
-            "manualInput",
+            "user_input",
             "unknown"
           ]
         },
@@ -203,7 +203,7 @@
             "publicData",
             "systemInference",
             "userReport",
-            "manualInput",
+            "user_input",
             "unknown"
           ]
         },
