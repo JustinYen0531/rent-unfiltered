@@ -1,4 +1,4 @@
-﻿// New rental form - create the initial version X
+// New rental form - create the initial version X
 
 const { useEffect: useEffectF, useMemo: useMemoF, useRef: useRefF, useState: useStateF } = React;
 
@@ -78,6 +78,118 @@ const FORM_SPEC_BY_KEY = Object.fromEntries(
   (typeof FORM_FIELD_SPECS !== "undefined" ? FORM_FIELD_SPECS : []).map(s => [s.key, s])
 );
 
+const FormValidationContext = React.createContext({});
+
+const REQUIRED_FORM_KEYS = new Set([
+  "property.propertyType",
+  "property.buildingType",
+  "property.floor",
+  "property.totalFloors",
+  "property.areaPing",
+  "property.district",
+  "cost.monthlyRent",
+  "cost.deposit",
+  "leaseTerms.hasWrittenContract",
+  "safety.rooftopAddition",
+  "leaseTerms.taxRegistrationAllowed",
+  "leaseTerms.householdRegistrationAllowed",
+]);
+
+const FIELD_ALLOWED_VALUES = {
+  "property.propertyType": ["套房", "雅房", "整層住家", "分租住宅"],
+  "property.buildingType": ["公寓", "電梯大樓", "透天"],
+  "property.hasFurniture": ["yes", "no", "partial"],
+  "leaseTerms.petsAllowed": ["yes", "no", "null"],
+  "cost.eligibleForSubsidy": ["yes", "no", "null"],
+  "leaseTerms.hasWrittenContract": ["yes", "no", "null"],
+  "safety.rooftopAddition": ["yes", "no", "null"],
+  "safety.illegalPartition": ["yes", "no", "null"],
+  "leaseTerms.taxRegistrationAllowed": ["yes", "no", "null"],
+  "leaseTerms.householdRegistrationAllowed": ["yes", "no", "null"],
+  "rights.taxBurdenShift": ["yes", "no", "null"],
+  "rights.unfairTerms": ["yes", "no", "null"],
+};
+
+const SCHEMA_PREFIX_TO_FORM_SECTION = {
+  property: "property",
+  cost: "cost",
+  leaseTerms: "lease",
+  safety: "safety",
+  rights: "rights",
+};
+
+function sectionFromSchemaKey(key) {
+  const prefix = String(key || "").split(".")[0];
+  return SCHEMA_PREFIX_TO_FORM_SECTION[prefix] || "property";
+}
+
+function isBlankFormValue(value) {
+  return value == null || value === "" || value === "null";
+}
+
+function numberFromFormValue(value) {
+  if (isBlankFormValue(value)) return null;
+  const normalized = Number(String(value).replace(/[^\d.-]/g, ""));
+  return Number.isFinite(normalized) ? normalized : NaN;
+}
+
+function validateFormValues(values) {
+  const errors = {};
+
+  FORM_FIELD_SPECS.forEach((spec) => {
+    const rawValue = values?.[spec.key];
+    const label = spec.label || spec.key;
+    const blank = isBlankFormValue(rawValue);
+
+    if (REQUIRED_FORM_KEYS.has(spec.key) && blank) {
+      errors[spec.key] = "這是必填欄位，請先填寫或選擇。";
+      return;
+    }
+
+    if (blank) return;
+
+    const allowed = FIELD_ALLOWED_VALUES[spec.key];
+    if (allowed && !allowed.includes(String(rawValue))) {
+      errors[spec.key] = "這個欄位只能使用系統提供的選項。";
+      return;
+    }
+
+    if (spec.type === "boolean" && !["yes", "no", "null"].includes(String(rawValue))) {
+      errors[spec.key] = "請選擇是、否或未確認。";
+      return;
+    }
+
+    if (spec.type === "enum" && !["yes", "no", "partial"].includes(String(rawValue))) {
+      errors[spec.key] = "請選擇是、否或部分。";
+      return;
+    }
+
+    if (spec.type === "number") {
+      const value = numberFromFormValue(rawValue);
+      if (!Number.isFinite(value)) {
+        errors[spec.key] = `${label} 必須是數字。`;
+        return;
+      }
+      if (value <= 0) {
+        errors[spec.key] = `${label} 必須大於 0。`;
+        return;
+      }
+      if ((spec.key === "property.floor" || spec.key === "property.totalFloors") && !Number.isInteger(value)) {
+        errors[spec.key] = `${label} 必須是整數。`;
+      }
+    }
+  });
+
+  const floor = numberFromFormValue(values?.["property.floor"]);
+  const totalFloors = numberFromFormValue(values?.["property.totalFloors"]);
+  if (Number.isFinite(floor) && Number.isFinite(totalFloors) && floor > totalFloors) {
+    errors["property.floor"] = "樓層不能大於總樓層。";
+    errors["property.totalFloors"] = "總樓層必須大於或等於樓層。";
+  }
+
+  return errors;
+}
+
 function computeFormStats(values) {
   const sections = {};
   const overall = { disclosed: 0, partial: 0, missing: 0, inferred: 0, total: 0 };
@@ -97,7 +209,7 @@ function computeFormStats(values) {
   return { sections, overall };
 }
 
-function formFieldValue(value, disclosureStatus = "disclosed", sourceType = "manualInput", extra = {}) {
+function formFieldValue(value, disclosureStatus = "disclosed", sourceType = "user_input", extra = {}) {
   return {
     value,
     disclosureStatus,
@@ -177,8 +289,8 @@ function buildFormRhirBundle({ values, versionLabel = "X" }) {
       rhirVersion: formFieldValue("0.1", "disclosed", "platform"),
       createdAt: formFieldValue(isoDate, "disclosed", "platform"),
       updatedAt: formFieldValue(isoDate, "disclosed", "platform"),
-      sourcePlatform: formFieldValue("user-form", "disclosed", "manualInput"),
-      listingStatus: formFieldValue("draft", "disclosed", "manualInput"),
+      sourcePlatform: formFieldValue("user-form", "disclosed", "user_input"),
+      listingStatus: formFieldValue("draft", "disclosed", "user_input"),
     },
     property: {},
     cost: {},
@@ -202,7 +314,7 @@ function buildFormRhirBundle({ values, versionLabel = "X" }) {
     setRhirGroupField(
       rhir,
       spec.key,
-      formFieldValue(normalizedValue, disclosureStatus, "manualInput")
+      formFieldValue(normalizedValue, disclosureStatus, "user_input")
     );
 
     if (disclosureStatus === "disclosed") disclosedCount += 1;
@@ -225,7 +337,7 @@ function buildFormRhirBundle({ values, versionLabel = "X" }) {
       label: spec.label,
       value: formatFieldGroupValue(normalizedValue),
       status: disclosureStatus,
-      src: "manualInput",
+      src: "user_input",
     });
   });
 
@@ -239,7 +351,7 @@ function buildFormRhirBundle({ values, versionLabel = "X" }) {
     inferredFieldCount: formFieldValue(0, "disclosed", "systemInference"),
     fieldsNeedingUserQuestion: formFieldValue(fieldsNeedingUserQuestion, "disclosed", "systemInference"),
     followupQuestions: formFieldValue(followupQuestions, "disclosed", "systemInference"),
-    notes: formFieldValue("由使用者表單直接轉成 RHIR JSON。", "disclosed", "manualInput"),
+    notes: formFieldValue("由使用者表單直接轉成 RHIR JSON。", "disclosed", "user_input"),
   };
 
   const fieldGroups = ["property", "cost", "lease", "safety", "rights"]
@@ -1159,7 +1271,7 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", e
           </div>
         </aside>
 
-        <form key={formResetKey} ref={formRef} onInput={bumpTick} onClick={bumpTick} onChange={bumpTick}>
+        <form key={formResetKey} ref={formRef} onInput={handleFormInteraction} onClick={handleFormInteraction} onChange={handleFormInteraction}>
           {SECTIONS.map((item) => (
             <div key={item.id} style={{ display: item.id === section ? "block" : "none" }}>
               <FormSection section={item} seed={seed} />
@@ -1229,6 +1341,7 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", e
 
       {previewRhir && <RHIRPreviewModal rhir={previewRhir} onClose={() => setPreviewRhir(null)} onFillMissing={handleFillMissing} />}
     </div>
+    </FormValidationContext.Provider>
   );
 }
 
@@ -1252,13 +1365,16 @@ function FormSection({ section, seed }) {
 }
 
 function FieldInput({ label, hint, required, schemaKey, children }) {
+  const errors = React.useContext(FormValidationContext);
+  const error = errors?.[schemaKey];
   return (
-    <div className="field-input" data-schema-key={schemaKey} data-label={label}>
+    <div className={`field-input ${error ? "field-input-invalid" : ""}`} data-schema-key={schemaKey} data-label={label}>
       <label>
         {label}{required && <span className="req">*</span>}
         <span className="key mono">{schemaKey}</span>
       </label>
       {children}
+      {error && <div className="field-error">{error}</div>}
       {hint && <div className="hint">{hint}</div>}
     </div>
   );

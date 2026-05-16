@@ -17,7 +17,7 @@ function RHIRSpecPage({ setRoute }) {
     ["publicData", "政府或公開資料"],
     ["systemInference", "系統推估"],
     ["userReport", "使用者回報"],
-    ["manualInput", "人工輸入"],
+    ["user_input", "使用者輸入"],
     ["unknown", "來源未知"],
   ];
 

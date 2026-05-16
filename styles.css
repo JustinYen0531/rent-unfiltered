@@ -705,6 +705,18 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .field-input .hint { font-size: 11px; color: var(--ink-4); }
+.field-input-invalid input,
+.field-input-invalid select,
+.field-input-invalid textarea,
+.field-input-invalid > .seg {
+  border-color: var(--s-missing-ink);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+.field-input .field-error {
+  font-size: 11px;
+  color: var(--s-missing-ink);
+  line-height: 1.45;
+}
 .field-input.with-prefix { position: relative; }
 .field-input.with-prefix input { padding-left: 32px; }
 .field-input .prefix {

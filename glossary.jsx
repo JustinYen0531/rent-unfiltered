@@ -22,7 +22,7 @@ function GlossaryPage({ setRoute, tab = "rhir" }) {
     ["publicData", "公開資料來源"],
     ["systemInference", "系統推論結果"],
     ["userReport", "使用者回報"],
-    ["manualInput", "手動輸入"],
+    ["user_input", "使用者輸入"],
     ["unknown", "來源不明"],
   ];
 
@@ -46,7 +46,7 @@ function GlossaryPage({ setRoute, tab = "rhir" }) {
   "rent": {
     "value": 18000,
     "disclosureStatus": "disclosed",
-    "sourceType": "manualInput"
+    "sourceType": "user_input"
   }
 }`;
 

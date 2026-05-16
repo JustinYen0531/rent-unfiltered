@@ -361,7 +361,7 @@ function RHIRView({ data, recordId }) {
       <div style={{display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:14, marginTop:14}}>
         <RHIRNote title="value" body="實際填入的值。可以是字串、數字、布林、陣列、物件或 null。"/>
         <RHIRNote title="disclosureStatus" body="揭露狀態。可選 disclosed / partial / missing / inferred / supplemented / conflict / unknown。"/>
-        <RHIRNote title="sourceType" body="此值的來源。MVP 通常為 manualInput；推論欄位則為 systemInference。"/>
+        <RHIRNote title="sourceType" body="此值的來源。MVP 通常為 user_input；推論欄位則為 systemInference。"/>
       </div>
 
       <div style={{ marginTop: 14 }}>
