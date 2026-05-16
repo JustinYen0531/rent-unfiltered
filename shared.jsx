@@ -31,6 +31,49 @@ function maskApiKey(value) {
   return `${value.slice(0, 6)}...${value.slice(-4)}`;
 }
 
+function getRhirRecordId(rhir) {
+  return rhir?.metadata?.rhirRecordId?.value || "rhir-record";
+}
+
+function makeJsonFileName(baseName) {
+  return `${String(baseName || "rhir-record").replace(/[^\w.-]+/g, "-")}.json`;
+}
+
+function downloadJSON(data, baseName) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = makeJsonFileName(baseName);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+async function copyJSON(data) {
+  const text = JSON.stringify(data, null, 2);
+  if (navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (error) {
+      // Some embedded browsers block clipboard writes even after a user click.
+    }
+  }
+
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.left = "-9999px";
+  document.body.appendChild(textarea);
+  textarea.select();
+  const ok = document.execCommand("copy");
+  textarea.remove();
+  return ok;
+}
+
 function Icon({ name, size = 14, className = "" }) {
   const props = {
     width: size,
@@ -279,5 +322,8 @@ window.RU = Object.assign(window.RU || {}, {
   GovFoot,
   getStoredApiKey,
   setStoredApiKey,
+  getRhirRecordId,
+  downloadJSON,
+  copyJSON,
   highlightJSON,
 });

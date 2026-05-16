@@ -234,18 +234,23 @@ function buildFormRhirBundle({ values, versionLabel = "X" }) {
 }
 
 function RHIRPreviewModal({ rhir, onClose }) {
-  const { Icon, highlightJSON } = window.RU;
+  const { Icon, downloadJSON, getRhirRecordId, highlightJSON } = window.RU;
+  const recordId = getRhirRecordId(rhir);
 
   return (
     <div className="modal-back" onClick={onClose}>
       <div className="modal" style={{ width: "min(960px, calc(100vw - 32px))" }} onClick={(event) => event.stopPropagation()}>
         <div className="modal-head">
-          <h3>RHIR 預覽</h3>
+          <h3>RHIR 預覽 <span className="mono" style={{ color: "#1652f0" }}>{recordId}</span></h3>
         </div>
         <div className="modal-body" style={{ maxHeight: "70vh", overflow: "auto" }}>
           <pre className="import-json" dangerouslySetInnerHTML={{ __html: highlightJSON(rhir) }} />
         </div>
-        <div className="modal-foot" style={{ display: "flex", justifyContent: "flex-end" }}>
+        <div className="modal-foot" style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+          <button className="btn btn-primary" onClick={() => downloadJSON(rhir, recordId)}>
+            <Icon name="download" size={14} />
+            下載 RHIR JSON
+          </button>
           <button className="btn" onClick={onClose}>
             <Icon name="x" size={14} />
             關閉
@@ -391,6 +396,10 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X" }) {
           <button className="btn">
             <Icon name="file" size={14} />
             暫存草稿
+          </button>
+          <button className="btn" onClick={handlePreviewRhir}>
+            <Icon name="code" size={14} />
+            預覽 RHIR
           </button>
           <button className="btn btn-primary" onClick={handleCreateVersion}>
             <Icon name="check" size={14} />

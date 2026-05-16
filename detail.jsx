@@ -4,9 +4,13 @@ const { useState: useStateD, useMemo: useMemoD } = React;
 
 function DetailPage({ setRoute, recordId }) {
   const { SAMPLE_RECORDS, VERSIONS_0142, FIELD_GROUPS, REPORT_X2, RECORD_0142_RHIR } = window.RU_DATA;
-  const { Icon, Badge, RiskPill, Crumbs } = window.RU;
-  const record = SAMPLE_RECORDS.find(r => r.id === recordId) || SAMPLE_RECORDS[0];
-  const versions = VERSIONS_0142;
+  const { Icon, Badge, RiskPill, Crumbs, downloadJSON } = window.RU;
+  const bundle = window.RU_DATA.getRecordBundle(recordId);
+  const record = bundle?.record || SAMPLE_RECORDS.find(r => r.id === recordId) || SAMPLE_RECORDS[0];
+  const versions = bundle?.versions || VERSIONS_0142;
+  const fieldGroups = bundle?.fieldGroups || FIELD_GROUPS;
+  const rhir = bundle?.rhir || RECORD_0142_RHIR;
+  const report = bundle?.report || REPORT_X2;
 
   const [activeVer, setActiveVer] = useStateD(versions[0].id);
   const [tab, setTab] = useStateD("fields");
@@ -37,7 +41,9 @@ function DetailPage({ setRoute, recordId }) {
             </div>
           </div>
           <div style={{display:"flex", gap:8, flexShrink:0}}>
-            <button className="btn"><Icon name="download" size={14}/> 下載 RHIR</button>
+            <button className="btn" onClick={() => downloadJSON(rhir, record.id)}>
+              <Icon name="download" size={14}/> 下載 RHIR
+            </button>
             <button className="btn"><Icon name="copy" size={14}/> 複製紀錄</button>
             <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
               <Icon name="git" size={14}/> 新增子版本
@@ -99,9 +105,9 @@ function DetailPage({ setRoute, recordId }) {
               </button>
             </div>
 
-            {tab === "fields" && <FieldCompletionView groups={FIELD_GROUPS}/>}
-            {tab === "rhir" && <RHIRView data={RECORD_0142_RHIR}/>}
-            {tab === "report" && <ReportView report={REPORT_X2} version={activeVersion}/>}
+            {tab === "fields" && <FieldCompletionView groups={fieldGroups}/>}
+            {tab === "rhir" && <RHIRView data={rhir} recordId={record.id}/>}
+            {tab === "report" && <ReportView report={report} version={activeVersion}/>}
           </main>
         </div>
       </div>
@@ -223,14 +229,21 @@ function Tally({ count, label, status }) {
 
 /* ---------- Tab 2: RHIR JSON viewer ---------- */
 
-function RHIRView({ data }) {
-  const { Icon, highlightJSON } = window.RU;
+function RHIRView({ data, recordId }) {
+  const { Icon, copyJSON, downloadJSON, highlightJSON } = window.RU;
   const nodes = Object.keys(data);
   const [active, setActive] = useStateD("property");
+  const [copyStatus, setCopyStatus] = useStateD("");
 
   const subset = useMemoD(() => {
     return { [active]: data[active] };
   }, [active, data]);
+
+  const handleCopy = async () => {
+    const ok = await copyJSON(data);
+    setCopyStatus(ok ? "已複製完整 RHIR" : "複製失敗，請改用下載");
+    window.setTimeout(() => setCopyStatus(""), 1800);
+  };
 
   return (
     <>
@@ -262,8 +275,9 @@ function RHIRView({ data }) {
               </span>
             </div>
             <div style={{display:"flex", gap:6}}>
-              <button className="btn btn-sm btn-ghost"><Icon name="copy" size={12}/> 複製</button>
-              <button className="btn btn-sm"><Icon name="download" size={12}/> 下載 .json</button>
+              {copyStatus && <span className="mono" style={{fontSize:11, color:"#1652f0", alignSelf:"center"}}>{copyStatus}</span>}
+              <button className="btn btn-sm btn-ghost" onClick={handleCopy}><Icon name="copy" size={12}/> 複製完整 JSON</button>
+              <button className="btn btn-sm" onClick={() => downloadJSON(data, recordId)}><Icon name="download" size={12}/> 下載 .json</button>
             </div>
           </div>
           <pre dangerouslySetInnerHTML={{ __html: highlightJSON(subset) }}/>

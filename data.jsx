@@ -320,6 +320,71 @@ const REPORT_X2 = {
   ],
 };
 
+const IMPORTED_RECORDS_KEY = "ru_imported_rhir_records";
+const IMPORTED_RECORD_BUNDLES = [];
+
+function loadImportedRecordBundles() {
+  try {
+    const raw = window.localStorage.getItem(IMPORTED_RECORDS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function saveImportedRecordBundles() {
+  try {
+    window.localStorage.setItem(IMPORTED_RECORDS_KEY, JSON.stringify(IMPORTED_RECORD_BUNDLES));
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+function upsertVisibleRecord(record) {
+  const existingIndex = SAMPLE_RECORDS.findIndex((item) => item.id === record.id);
+  if (existingIndex >= 0) {
+    SAMPLE_RECORDS[existingIndex] = record;
+    return;
+  }
+  SAMPLE_RECORDS.unshift(record);
+}
+
+function addImportedRecord(bundle) {
+  if (!bundle?.record?.id) return null;
+  const existingIndex = IMPORTED_RECORD_BUNDLES.findIndex((item) => item.record?.id === bundle.record.id);
+  if (existingIndex >= 0) {
+    IMPORTED_RECORD_BUNDLES[existingIndex] = bundle;
+  } else {
+    IMPORTED_RECORD_BUNDLES.unshift(bundle);
+  }
+  upsertVisibleRecord(bundle.record);
+  saveImportedRecordBundles();
+  return bundle.record.id;
+}
+
+function getRecordBundle(recordId) {
+  const imported = IMPORTED_RECORD_BUNDLES.find((item) => item.record?.id === recordId);
+  if (imported) return imported;
+  if (recordId === "RHIR-2026-0142") {
+    return {
+      record: SAMPLE_RECORDS.find((item) => item.id === recordId),
+      versions: VERSIONS_0142,
+      fieldGroups: FIELD_GROUPS,
+      rhir: buildRecord0142(),
+      report: REPORT_X2,
+    };
+  }
+  return null;
+}
+
+loadImportedRecordBundles().forEach((bundle) => {
+  IMPORTED_RECORD_BUNDLES.push(bundle);
+  if (bundle?.record) upsertVisibleRecord(bundle.record);
+});
+
 window.RU_DATA = {
   STATUS,
   SAMPLE_RECORDS,
@@ -327,6 +392,8 @@ window.RU_DATA = {
   FIELD_GROUPS,
   REPORT_X2,
   RECORD_0142_RHIR: buildRecord0142(),
+  addImportedRecord,
+  getRecordBundle,
 };
 
 
