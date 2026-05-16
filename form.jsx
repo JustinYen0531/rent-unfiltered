@@ -333,6 +333,46 @@ function buildRandomFormSeed() {
   };
 }
 
+function buildEmptyImportSeed() {
+  return {
+    propertyType: null,
+    buildingType: null,
+    floor: "",
+    totalFloor: "",
+    sizePing: "",
+    district: "",
+    hasFurniture: null,
+    petAllowed: null,
+
+    rent: "",
+    deposit: "",
+    electricityRate: "",
+    waterFee: "",
+    managementFee: "",
+    internetFee: "",
+    eligibleForSubsidy: null,
+
+    hasWrittenContract: null,
+    reviewPeriod: "",
+    repairResponsibility: "",
+    earlyTermination: "",
+    depositReturnTerms: "",
+    notes: "",
+
+    rooftopAddition: null,
+    illegalPartition: null,
+    escapeRoute: "",
+    fireEquipment: "",
+    waterLeak: "",
+    doorLock: "",
+
+    taxRegistrationAllowed: null,
+    householdRegistrationAllowed: null,
+    taxBurdenShift: null,
+    unfairTerms: null,
+  };
+}
+
 function pickFirstMatch(text, patterns) {
   for (const pattern of patterns) {
     const match = text.match(pattern);
@@ -469,7 +509,7 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "" })
       setImportNotice("找不到這個匯入 ID。請確認擴充功能已經打開過 Rent Unfiltered。");
       return;
     }
-    setSeed(buildSeedFromCapture(imported.capture, buildRandomFormSeed()));
+    setSeed(buildSeedFromCapture(imported.capture, buildEmptyImportSeed()));
     setFormResetKey((value) => value + 1);
     setImportInput(cleanId);
     setImportNotice(`已載入 ${cleanId}，表單已先用可辨識資訊預填。`);
@@ -691,6 +731,7 @@ function PropertySection({ seed }) {
       </FieldInput>
       <FieldInput label="行政區" required schemaKey="property.district">
         <select defaultValue={seed.district}>
+          <option value="">未確認</option>
           {["文山區", "大安區", "信義區", "中山區", "中正區", "松山區", "萬華區", "士林區", "北投區", "內湖區", "南港區", "板橋區", "永和區", "新店區", "三重區", "新莊區"].map((d) => <option key={d}>{d}</option>)}
         </select>
       </FieldInput>
@@ -761,6 +802,7 @@ function LeaseSection({ seed }) {
         <Seg value={writtenContract} onChange={setWrittenContract} options={[
           { v: "yes", l: "有" },
           { v: "no", l: "沒有" },
+          { v: null, l: "未確認" },
         ]} />
       </FieldInput>
       <FieldInput label="是否有審閱期" schemaKey="leaseTerms.reviewPeriod">
@@ -832,12 +874,14 @@ function RightsSection({ seed }) {
         <Seg value={taxRegistrationAllowed} onChange={setTaxRegistrationAllowed} options={[
           { v: "yes", l: "是" },
           { v: "no", l: "否" },
+          { v: null, l: "未確認" },
         ]} />
       </FieldInput>
       <FieldInput label="是否可遷戶籍" required schemaKey="leaseTerms.householdRegistrationAllowed">
         <Seg value={householdRegistrationAllowed} onChange={setHouseholdRegistrationAllowed} options={[
           { v: "yes", l: "是" },
           { v: "no", l: "否" },
+          { v: null, l: "未確認" },
         ]} />
       </FieldInput>
       <FieldInput label="是否有稅負轉嫁條款" schemaKey="rights.taxBurdenShift">
