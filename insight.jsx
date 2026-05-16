@@ -72,9 +72,12 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
   // WARNING: API key is exposed to anyone who opens this page in DevTools.
   // For testing only. Replace with backend proxy before production.
 
-  const OPENROUTER_API_KEY = "";
   const OPENROUTER_MODEL   = "deepseek/deepseek-v4-pro";
   const OPENROUTER_URL     = "https://openrouter.ai/api/v1/chat/completions";
+
+  function getOpenRouterApiKey() {
+    return window.RU?.getStoredApiKey?.() || "";
+  }
 
   function stripCodeFence(s) {
     return String(s || "")
@@ -91,6 +94,11 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
     }
 
     const payload = buildPromptPayload(rriResult, userProfile);
+    const apiKey = getOpenRouterApiKey();
+
+    if (!apiKey) {
+      return { status: "error", message: "尚未設定 OpenRouter API Key。請先到右上角設定中儲存 API Key。" };
+    }
 
     const userPrompt =
       `以下是 rule engine 產出的結構化 RRI 結果。請依照系統指示產生 AI Insight，僅輸出 JSON（不要 markdown code fence、不要前後文）。\n\n` +
@@ -102,7 +110,7 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
       response = await fetch(OPENROUTER_URL, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+          "Authorization": `Bearer ${apiKey}`,
           "Content-Type": "application/json",
           "HTTP-Referer": window.location.origin || "https://rent-unfiltered.local",
           "X-Title": "Rent Unfiltered",
@@ -196,6 +204,11 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
   async function chatWithRri(rriResult, conversation, newUserMessage) {
     if (!rriResult) return { status: "error", message: "缺少 RRI 結果，無法開始對話。" };
     if (!newUserMessage || !newUserMessage.trim()) return { status: "error", message: "請輸入問題。" };
+    const apiKey = getOpenRouterApiKey();
+
+    if (!apiKey) {
+      return { status: "error", message: "尚未設定 OpenRouter API Key。請先到右上角設定中儲存 API Key。" };
+    }
 
     const contextBlock =
       `以下是 rule engine 產出的結構化 RRI 資料（僅供你參考；不要重算）：\n` +
@@ -222,7 +235,7 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
       response = await fetch(OPENROUTER_URL, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+          "Authorization": `Bearer ${apiKey}`,
           "Content-Type": "application/json",
           "HTTP-Referer": window.location.origin || "https://rent-unfiltered.local",
           "X-Title": "Rent Unfiltered Chat",
