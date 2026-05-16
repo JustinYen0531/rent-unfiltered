@@ -329,6 +329,294 @@ function RHIRPreviewModal({ rhir, onClose }) {
   );
 }
 
+// 10 租約人格範本 — 「一鍵補齊」從這裡隨機抽一份填入空白欄位
+const LEASE_TEMPLATES = [
+  {
+    _name: "友善透明型",
+    electricityRate: "台電計價（獨立電表）",
+    waterFee: "台水計價（獨立水表）",
+    managementFee: "1500",
+    internetFee: "含網路（光纖 100M）",
+    eligibleForSubsidy: "yes",
+    hasWrittenContract: "yes",
+    reviewPeriod: "7 天",
+    repairResponsibility: "主要設備（冷氣、熱水器、冰箱）由房東負擔，耗材由房客自理",
+    earlyTermination: "提前 30 天書面通知，不收違約金",
+    depositReturnTerms: "退租後 7 日內退還，扣除實際損耗",
+    notes: "房東提供完整合約草稿可先審閱，歡迎攜帶親友一同看房。",
+    rooftopAddition: "no",
+    illegalPartition: "no",
+    escapeRoute: "走廊暢通，有兩處逃生出口，鐵窗可開啟",
+    fireEquipment: "每層有偵煙器與滅火器，每年定期檢查",
+    waterLeak: "目前無漏水，牆面無壁癌",
+    doorLock: "電子鎖 + 大樓磁扣門禁，進出有記錄",
+    taxRegistrationAllowed: "yes",
+    householdRegistrationAllowed: "yes",
+    taxBurdenShift: "no",
+    unfairTerms: "no",
+  },
+  {
+    _name: "常見普通型",
+    electricityRate: "5 元 / 度",
+    waterFee: "均分",
+    managementFee: "800",
+    internetFee: "含網路",
+    eligibleForSubsidy: null,
+    hasWrittenContract: "yes",
+    reviewPeriod: "3 天",
+    repairResponsibility: "依情況協商",
+    earlyTermination: "提前 1 個月告知",
+    depositReturnTerms: "退租後 14 日內退還",
+    notes: "網路速度未說明，報稅、租補資格需另行確認。",
+    rooftopAddition: null,
+    illegalPartition: null,
+    escapeRoute: "有主要逃生出口",
+    fireEquipment: "未揭露",
+    waterLeak: "實地看房時確認",
+    doorLock: "傳統鑰匙門鎖",
+    taxRegistrationAllowed: null,
+    householdRegistrationAllowed: null,
+    taxBurdenShift: null,
+    unfairTerms: null,
+  },
+  {
+    _name: "費用模糊型",
+    electricityRate: "另計",
+    waterFee: "均分",
+    managementFee: "另計",
+    internetFee: "另計",
+    eligibleForSubsidy: null,
+    hasWrittenContract: "yes",
+    reviewPeriod: "尚未確認",
+    repairResponsibility: "尚未確認",
+    earlyTermination: "尚未確認",
+    depositReturnTerms: "尚未確認",
+    notes: "電費、管理費、網路費均未明確說明計算方式，垃圾代收費、清潔費未揭露。",
+    rooftopAddition: null,
+    illegalPartition: null,
+    escapeRoute: "",
+    fireEquipment: "",
+    waterLeak: "",
+    doorLock: "",
+    taxRegistrationAllowed: null,
+    householdRegistrationAllowed: null,
+    taxBurdenShift: null,
+    unfairTerms: null,
+  },
+  {
+    _name: "偏向房東條款型",
+    electricityRate: "5.5 元 / 度",
+    waterFee: "固定 300",
+    managementFee: "1200",
+    internetFee: "300",
+    eligibleForSubsidy: "no",
+    hasWrittenContract: "yes",
+    reviewPeriod: "尚未確認",
+    repairResponsibility: "設備故障一律由房客負責維修或賠償",
+    earlyTermination: "提前解約須沒收全額押金",
+    depositReturnTerms: "扣除清潔費、維修費後退還，標準由房東認定",
+    notes: "房東保留定期進入查看房間的權利，需簽署同意書。",
+    rooftopAddition: null,
+    illegalPartition: null,
+    escapeRoute: "有逃生出口",
+    fireEquipment: "未揭露",
+    waterLeak: "未揭露",
+    doorLock: "傳統門鎖",
+    taxRegistrationAllowed: "no",
+    householdRegistrationAllowed: "no",
+    taxBurdenShift: "yes",
+    unfairTerms: "yes",
+  },
+  {
+    _name: "不合理條款型",
+    electricityRate: "6 元 / 度",
+    waterFee: "固定 500",
+    managementFee: "另計",
+    internetFee: "另計",
+    eligibleForSubsidy: "no",
+    hasWrittenContract: "yes",
+    reviewPeriod: "no",
+    repairResponsibility: "所有損壞一律由房客全額負擔",
+    earlyTermination: "提前解約押金全額沒收，另需賠償剩餘租期租金 50%",
+    depositReturnTerms: "退租後 60 日內退還，扣除清潔費、重新粉刷費、維修費",
+    notes: "合約有大量罰款條款：晚繳 1 天罰 1000 元，擅帶訪客罰 2000 元，禁止辦公及業務使用。",
+    rooftopAddition: null,
+    illegalPartition: null,
+    escapeRoute: "未揭露",
+    fireEquipment: "未揭露",
+    waterLeak: "未揭露",
+    doorLock: "傳統門鎖，房東保留鑰匙",
+    taxRegistrationAllowed: "no",
+    householdRegistrationAllowed: "no",
+    taxBurdenShift: "yes",
+    unfairTerms: "yes",
+  },
+  {
+    _name: "學生套房型",
+    electricityRate: "4.8 元 / 度",
+    waterFee: "均分",
+    managementFee: "0",
+    internetFee: "含網路",
+    eligibleForSubsidy: null,
+    hasWrittenContract: "yes",
+    reviewPeriod: "尚未確認",
+    repairResponsibility: "依情況協商，小型修繕房客自理",
+    earlyTermination: "提前 1 個月通知，違約金 1 個月租金",
+    depositReturnTerms: "退租後 14 日內退還",
+    notes: "限學生優先租賃，需提供學生證。不可報稅或戶籍遷入未明確說明。",
+    rooftopAddition: null,
+    illegalPartition: null,
+    escapeRoute: "未揭露",
+    fireEquipment: "未揭露",
+    waterLeak: "未揭露",
+    doorLock: "磁扣門禁",
+    taxRegistrationAllowed: null,
+    householdRegistrationAllowed: null,
+    taxBurdenShift: null,
+    unfairTerms: null,
+  },
+  {
+    _name: "頂樓加蓋疑慮型",
+    electricityRate: "另計（夏季冷氣費用較高）",
+    waterFee: "均分",
+    managementFee: "0",
+    internetFee: "另計",
+    eligibleForSubsidy: null,
+    hasWrittenContract: "yes",
+    reviewPeriod: "3 天",
+    repairResponsibility: "屋頂漏水維修責任不明確",
+    earlyTermination: "提前 1 個月告知",
+    depositReturnTerms: "退租後 30 日內退還",
+    notes: "位於頂樓，夏季可能悶熱，是否為合法使用空間未揭露。",
+    rooftopAddition: "yes",
+    illegalPartition: null,
+    escapeRoute: "未揭露",
+    fireEquipment: "未揭露",
+    waterLeak: "未揭露",
+    doorLock: "傳統門鎖",
+    taxRegistrationAllowed: null,
+    householdRegistrationAllowed: null,
+    taxBurdenShift: null,
+    unfairTerms: null,
+  },
+  {
+    _name: "老公寓分租型",
+    electricityRate: "台電計價均分",
+    waterFee: "均分",
+    managementFee: "0",
+    internetFee: "共用網路均分",
+    eligibleForSubsidy: null,
+    hasWrittenContract: "yes",
+    reviewPeriod: "3 天",
+    repairResponsibility: "公共區域修繕責任不明確，私有空間自理",
+    earlyTermination: "提前 1 個月告知",
+    depositReturnTerms: "退租後 14 日內退還",
+    notes: "多人分租，共用衛浴與廚房，公共區域清潔由租客輪流負責。房東不同住。",
+    rooftopAddition: null,
+    illegalPartition: null,
+    escapeRoute: "走廊有出口，但公共區域雜物較多",
+    fireEquipment: "未揭露",
+    waterLeak: "實地看房時確認",
+    doorLock: "傳統鑰匙，公共大門有門禁",
+    taxRegistrationAllowed: null,
+    householdRegistrationAllowed: null,
+    taxBurdenShift: null,
+    unfairTerms: null,
+  },
+  {
+    _name: "寵物友善費用不透明型",
+    electricityRate: "5 元 / 度",
+    waterFee: "台水計價",
+    managementFee: "800",
+    internetFee: "含網路",
+    eligibleForSubsidy: null,
+    hasWrittenContract: "yes",
+    reviewPeriod: "3 天",
+    repairResponsibility: "寵物造成損壞由房客全額負擔，標準由房東認定",
+    earlyTermination: "提前 1 個月告知",
+    depositReturnTerms: "扣除清潔費（寵物清潔費用標準不明確）後退還",
+    notes: "可養寵物，但需額外繳交寵物押金，金額未明確說明。入住前需確認押金扣除標準。",
+    rooftopAddition: null,
+    illegalPartition: null,
+    escapeRoute: "有逃生出口",
+    fireEquipment: "未揭露",
+    waterLeak: "實地看房時確認",
+    doorLock: "電子鎖",
+    taxRegistrationAllowed: null,
+    householdRegistrationAllowed: null,
+    taxBurdenShift: null,
+    unfairTerms: null,
+  },
+  {
+    _name: "包租代管型",
+    electricityRate: "台電計價（獨立電表）",
+    waterFee: "台水計價",
+    managementFee: "2000（含代管服務費）",
+    internetFee: "300",
+    eligibleForSubsidy: "yes",
+    hasWrittenContract: "yes",
+    reviewPeriod: "5 天",
+    repairResponsibility: "通報代管公司，由專業人員處理，24 小時緊急服務",
+    earlyTermination: "提前 1 個月書面通知，需支付代管手續費",
+    depositReturnTerms: "退租後 14 日內退還，有正式清點程序",
+    notes: "由包租代管公司統一管理，聯絡窗口明確。管理費含行政費與清潔費，請確認細項。仲介費另計。",
+    rooftopAddition: "no",
+    illegalPartition: "no",
+    escapeRoute: "公共逃生動線清楚標示",
+    fireEquipment: "符合消防法規，定期送檢",
+    waterLeak: "目前無異常",
+    doorLock: "智慧型門禁 + 監視系統",
+    taxRegistrationAllowed: "yes",
+    householdRegistrationAllowed: "yes",
+    taxBurdenShift: "no",
+    unfairTerms: "no",
+  },
+];
+
+// schema key (from readFormValues) → seed key
+const SCHEMA_TO_SEED = {
+  "property.propertyType": "propertyType",
+  "property.buildingType": "buildingType",
+  "property.floor": "floor",
+  "property.totalFloors": "totalFloor",
+  "property.areaPing": "sizePing",
+  "property.district": "district",
+  "property.hasFurniture": "hasFurniture",
+  "leaseTerms.petsAllowed": "petAllowed",
+  "cost.monthlyRent": "rent",
+  "cost.deposit": "deposit",
+  "cost.electricityRate": "electricityRate",
+  "cost.waterFee": "waterFee",
+  "cost.managementFee": "managementFee",
+  "cost.internetFee": "internetFee",
+  "cost.eligibleForSubsidy": "eligibleForSubsidy",
+  "leaseTerms.hasWrittenContract": "hasWrittenContract",
+  "leaseTerms.reviewPeriod": "reviewPeriod",
+  "leaseTerms.repairResponsibility": "repairResponsibility",
+  "leaseTerms.earlyTerminationClause": "earlyTermination",
+  "leaseTerms.depositRefundTerms": "depositReturnTerms",
+  "leaseTerms.notes": "notes",
+  "safety.rooftopAddition": "rooftopAddition",
+  "safety.illegalPartition": "illegalPartition",
+  "safety.escapeRoute": "escapeRoute",
+  "safety.fireEquipment": "fireEquipment",
+  "safety.waterLeak": "waterLeak",
+  "safety.doorLock": "doorLock",
+  "leaseTerms.taxRegistrationAllowed": "taxRegistrationAllowed",
+  "leaseTerms.householdRegistrationAllowed": "householdRegistrationAllowed",
+  "rights.taxBurdenShift": "taxBurdenShift",
+  "rights.unfairTerms": "unfairTerms",
+};
+
+function schemaValuesToSeed(schemaValues) {
+  const seed = buildEmptyImportSeed();
+  for (const [schemaKey, seedKey] of Object.entries(SCHEMA_TO_SEED)) {
+    const val = schemaValues[schemaKey];
+    if (val !== null && val !== undefined) seed[seedKey] = val;
+  }
+  return seed;
+}
+
 function pick(list) {
   return list[Math.floor(Math.random() * list.length)];
 }
@@ -587,6 +875,21 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "" })
     if (importId) handleLoadImport(importId);
   }, [importId]);
 
+  const handleFillMissing = () => {
+    if (!formRef.current) return;
+    const schemaValues = readFormValues(formRef.current);
+    const currentSeed = schemaValuesToSeed(schemaValues);
+    const template = LEASE_TEMPLATES[Math.floor(Math.random() * LEASE_TEMPLATES.length)];
+    const isEmpty = (v) => v === null || v === undefined || v === "" || v === "null";
+    const merged = { ...currentSeed };
+    for (const [key, val] of Object.entries(template)) {
+      if (key === "_name") continue;
+      if (isEmpty(merged[key])) merged[key] = val;
+    }
+    setSeed(merged);
+    setFormResetKey((k) => k + 1);
+  };
+
   const handlePreviewRhir = () => {
     if (!formRef.current) return;
     const values = readFormValues(formRef.current);
@@ -650,6 +953,17 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "" })
               </li>
             ))}
           </ul>
+
+          <div className="side-title" style={{ marginTop: 24 }}>待詢問欄位補齊</div>
+          <div style={{ fontSize: 11, color: "#5a6573", lineHeight: 1.7, padding: "4px 10px", marginBottom: 8 }}>
+            從 10 種租約人格中隨機抽一份，只補入尚未填寫的欄位，已填的內容不會更動。
+          </div>
+          <div style={{ padding: "0 10px", marginBottom: 8 }}>
+            <button type="button" className="btn btn-sm" style={{ width: "100%" }} onClick={handleFillMissing}>
+              <Icon name="sparkle" size={12} />
+              一鍵補齊空白欄位
+            </button>
+          </div>
 
           <div className="side-title" style={{ marginTop: 24 }}>測試說明</div>
           <div style={{ fontSize: 11, color: "#5a6573", lineHeight: 1.7, padding: "4px 10px" }}>
