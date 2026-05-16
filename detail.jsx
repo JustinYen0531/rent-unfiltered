@@ -107,7 +107,7 @@ function DetailPage({ setRoute, recordId }) {
 
             {tab === "fields" && <FieldCompletionView groups={fieldGroups} rhir={rhir}/>}
             {tab === "rhir" && <RHIRView data={rhir} recordId={record.id}/>}
-            {tab === "report" && <ReportView report={report} version={activeVersion}/>}
+            {tab === "report" && <ReportView report={report} version={activeVersion} rhir={rhir}/>}
           </main>
         </div>
       </div>
@@ -345,7 +345,7 @@ function RHIRNote({ title, body }) {
 
 /* ---------- Tab 3: Analysis report ---------- */
 
-function ReportView({ report, version }) {
+function ReportView({ report, version, rhir }) {
   const { Icon } = window.RU;
   if (!version.hasReport) {
     return (
@@ -358,43 +358,99 @@ function ReportView({ report, version }) {
     );
   }
 
-  const level = report.rri >= 70 ? "low" : report.rri >= 50 ? "mid" : "high";
+  // Compute live range from RHIR bundle
+  const rri = (window.RU_RRI && rhir) ? window.RU_RRI.calculate(rhir) : null;
+  const minScore  = rri?.minScore  ?? report.rri;
+  const maxScore  = rri?.maxScore  ?? report.rri;
+  const midScore  = rri?.midScore  ?? report.rri;
+  const isCertain = rri?.isCertain ?? true;
+  const levelMin  = rri?.levelMin  ?? report.level;
+  const levelMax  = rri?.levelMax  ?? report.level;
+  const levelTag  = isCertain ? levelMin : (levelMin === levelMax ? levelMin : `${levelMin}～${levelMax}`);
+  const pillType  = maxScore >= 61 ? "high" : maxScore >= 41 ? "mid" : "low";
+
+  const dimEntries = rri
+    ? Object.entries(rri.dimensions).map(([id, d]) => ({ id, name: d.label, min: d.min, max: d.max }))
+    : report.axes.map(a => ({ id: a.id, name: a.name, min: a.score * 0.2, max: a.score * 0.2 }));
+
   return (
     <>
       <div className="report-grid">
         <div className="rri-card">
           <div className="rri-head">
             <div className="rri-label">RRI · 租屋風險指數</div>
-            <span className={`risk-pill risk-${level}`}>{report.level}</span>
+            <span className={`risk-pill risk-${pillType}`}>{levelTag}</span>
           </div>
+
+          {/* Range score display */}
           <div className="rri-score mono">
-            {report.rri}<span className="over">/ 100</span>
+            {isCertain
+              ? <>{midScore}<span className="over">/ 100</span></>
+              : <>{minScore}<span className="over" style={{fontSize:"0.55em", letterSpacing:0}}> – {maxScore} / 100</span></>
+            }
           </div>
-          <div className="rri-bar">
-            <div className="fill" style={{width:`${report.rri}%`}}/>
+
+          {/* Bar: solid fill up to minScore, hatched band from minScore to maxScore */}
+          <div className="rri-bar" style={{position:"relative"}}>
+            <div className="fill" style={{width:`${minScore}%`}}/>
+            {!isCertain && (
+              <div style={{
+                position:"absolute", top:0, bottom:0,
+                left:`${minScore}%`, width:`${maxScore - minScore}%`,
+                background:"repeating-linear-gradient(45deg, var(--accent) 0px, var(--accent) 2px, transparent 2px, transparent 6px)",
+                opacity:0.35,
+              }}/>
+            )}
+            <div className="seg" style={{left:"20%"}}/>
             <div className="seg" style={{left:"40%"}}/>
-            <div className="seg" style={{left:"70%"}}/>
+            <div className="seg" style={{left:"60%"}}/>
+            <div className="seg" style={{left:"80%"}}/>
           </div>
+
+          {!isCertain && (
+            <div style={{fontSize:11, color:"#5a6573", marginTop:4}}>
+              斜線區間（<span className="mono">{minScore}–{maxScore}</span>）為未揭露欄位的不確定範圍。補齊欄位後區間會縮小。
+            </div>
+          )}
+
           <div className="rri-meta">
             <div><div className="k">VERSION</div><div className="mono">{version.label}</div></div>
             <div><div className="k">GENERATED</div><div className="mono">{version.createdAt.slice(0,10)}</div></div>
             <div><div className="k">RULE SET</div><div className="mono">rri-v0.1</div></div>
-            <div><div className="k">MODEL</div><div className="mono">rule + LLM</div></div>
+            <div><div className="k">ENGINE</div><div className="mono">rule-based</div></div>
           </div>
           <div style={{borderTop:"1px solid var(--hairline)", paddingTop:12, fontSize:11, color:"#5a6573"}}>
-            分數區間：<span className="mono">0–49</span> 高風險 · <span className="mono">50–69</span> 中度 · <span className="mono">70–100</span> 低風險
+            分數越高 = 風險越高 · <span className="mono">0–20</span> 低 · <span className="mono">21–40</span> 中低 · <span className="mono">41–60</span> 中 · <span className="mono">61–80</span> 高 · <span className="mono">81–100</span> 極高
           </div>
         </div>
 
         <div className="rri-axes">
-          <h4>分面向分數</h4>
-          {report.axes.map(a => (
-            <div className="axis" key={a.id}>
-              <div className="aname">{a.name}</div>
-              <div className="abar"><div className="afill" style={{width:`${a.score}%`, background: a.score >= 70 ? "var(--s-disclosed-ink)" : a.score >= 50 ? "var(--s-partial-ink)" : "var(--s-missing-ink)"}}/></div>
-              <div className="aval">{a.score}</div>
-            </div>
-          ))}
+          <h4>分面向分數（各滿分 20）</h4>
+          {dimEntries.map(d => {
+            const pctMin = (d.min / 20) * 100;
+            const pctMax = (d.max / 20) * 100;
+            const certain = d.min === d.max;
+            const barColor = d.max >= 14 ? "var(--s-missing-ink)" : d.max >= 8 ? "var(--s-partial-ink)" : "var(--s-disclosed-ink)";
+            return (
+              <div className="axis" key={d.id}>
+                <div className="aname">{d.name}</div>
+                <div className="abar" style={{position:"relative"}}>
+                  <div className="afill" style={{width:`${pctMin}%`, background: barColor}}/>
+                  {!certain && (
+                    <div style={{
+                      position:"absolute", top:0, bottom:0,
+                      left:`${pctMin}%`, width:`${pctMax - pctMin}%`,
+                      background:"repeating-linear-gradient(45deg, var(--accent) 0px, var(--accent) 1px, transparent 1px, transparent 5px)",
+                      opacity:0.3,
+                    }}/>
+                  )}
+                </div>
+                <div className="aval mono" style={{minWidth:52, textAlign:"right"}}>
+                  {certain ? d.min.toFixed(1) : `${d.min.toFixed(0)}–${d.max.toFixed(0)}`}
+                </div>
+              </div>
+            );
+          })}
           <div style={{borderTop:"1px dashed var(--hairline)", paddingTop:10, marginTop:10}}>
             <div style={{fontSize:11, color:"#5a6573", marginBottom:6}}>主要風險原因</div>
             <ul className="risk-list">
