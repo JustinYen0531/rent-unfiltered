@@ -68,14 +68,91 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
     cautionNote: "string — fixed disclaimer about decision aid, not legal judgment",
   };
 
-  // ── Generation stub ───────────────────────────────────────────
-  // Returns a sentinel result indicating "not yet implemented".
-  // When an API is wired up, replace the body with a real fetch + JSON parse.
+  // ── OpenRouter config ────────────────────────────────────────
+  // WARNING: API key is exposed to anyone who opens this page in DevTools.
+  // For testing only. Replace with backend proxy before production.
 
-  async function generateInsight(/* rriResult, userProfile */) {
+  const OPENROUTER_API_KEY = "";
+  const OPENROUTER_MODEL   = "deepseek/deepseek-v4-flash:free";
+  const OPENROUTER_URL     = "https://openrouter.ai/api/v1/chat/completions";
+
+  function stripCodeFence(s) {
+    return String(s || "")
+      .replace(/^\s*```(?:json)?\s*/i, "")
+      .replace(/```\s*$/, "")
+      .trim();
+  }
+
+  // ── Real generator: calls OpenRouter and parses JSON output ───
+
+  async function generateInsight(rriResult, userProfile) {
+    if (!rriResult) {
+      return { status: "error", message: "缺少 RRI 結果，無法產生 Insight。" };
+    }
+
+    const payload = buildPromptPayload(rriResult, userProfile);
+
+    const userPrompt =
+      `以下是 rule engine 產出的結構化 RRI 結果。請依照系統指示產生 AI Insight，僅輸出 JSON（不要 markdown code fence、不要前後文）。\n\n` +
+      `### 結構化資料\n${payload.user}\n\n` +
+      `### 輸出 schema（必須完全符合）\n${JSON.stringify(payload.expectedOutputSchema, null, 2)}`;
+
+    let response;
+    try {
+      response = await fetch(OPENROUTER_URL, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": window.location.origin || "https://rent-unfiltered.local",
+          "X-Title": "Rent Unfiltered",
+        },
+        body: JSON.stringify({
+          model: OPENROUTER_MODEL,
+          messages: [
+            { role: "system", content: payload.system },
+            { role: "user",   content: userPrompt },
+          ],
+          temperature: 0.4,
+          response_format: { type: "json_object" },
+        }),
+      });
+    } catch (e) {
+      return { status: "error", message: `網路錯誤：${e.message}` };
+    }
+
+    if (!response.ok) {
+      const text = await response.text().catch(() => "");
+      return {
+        status: "error",
+        message: `OpenRouter API ${response.status}：${text.slice(0, 400) || response.statusText}`,
+      };
+    }
+
+    let data;
+    try { data = await response.json(); }
+    catch (e) { return { status: "error", message: `回應解析失敗：${e.message}` }; }
+
+    const content = data?.choices?.[0]?.message?.content;
+    if (!content) {
+      return { status: "error", message: "AI 沒有回傳內容。", raw: data };
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(stripCodeFence(content));
+    } catch (e) {
+      return {
+        status: "error",
+        message: `AI 回傳的不是合法 JSON。原始輸出：\n${content.slice(0, 500)}`,
+      };
+    }
+
     return {
-      status: "not_implemented",
-      message: "AI Insight 尚未啟用。所有結論目前皆由 rule engine + template 產生。未來接上 API 後，此區會顯示 AI 對風險組合的解讀。",
+      status: "ok",
+      model: data.model || OPENROUTER_MODEL,
+      usage: data.usage || null,
+      ...parsed,
     };
   }
 

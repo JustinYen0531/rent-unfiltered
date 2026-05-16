@@ -418,10 +418,12 @@ function ReportView({ report, version, rhir }) {
     try {
       const result = await window.RU_INSIGHT.generateInsight(conclusion);
       setInsightResult(result);
-      setInsightState(result?.status === "not_implemented" ? "stub" : "done");
+      if (result?.status === "not_implemented") setInsightState("stub");
+      else if (result?.status === "error") setInsightState("error");
+      else setInsightState("done");
     } catch (e) {
       setInsightResult({ status: "error", message: String(e?.message || e) });
-      setInsightState("done");
+      setInsightState("error");
     }
   }
 
@@ -549,24 +551,88 @@ function ReportView({ report, version, rhir }) {
             </button>
           </div>
         )}
+
         {insightState === "loading" && (
-          <div style={{padding:"18px 16px", color:"#5a6573"}}>正在解讀風險脈絡…</div>
+          <div style={{padding:"18px 16px", color:"#5a6573", display:"flex", alignItems:"center", gap:8}}>
+            <Icon name="sparkle" size={14}/>
+            正在呼叫 OpenRouter，解讀風險脈絡中…（首次呼叫可能 10–30 秒）
+          </div>
         )}
+
         {insightState === "stub" && (
           <div className="callout" style={{margin:"12px 16px"}}>
             <span className="ic"><Icon name="info" size={14}/></span>
             <div>{insightResult?.message}</div>
           </div>
         )}
-        {insightState === "done" && insightResult?.insightSummary && (
-          <div style={{padding:"6px 16px 14px"}}>
-            <p style={{margin:"6px 0 10px"}}>{insightResult.insightSummary}</p>
-            {insightResult.riskPattern?.map((p, i) => (
-              <div key={i} style={{margin:"8px 0", padding:"8px 10px", background:"var(--accent-soft)", borderRadius:6}}>
-                <div style={{fontWeight:600, fontSize:13}}>{p.title}</div>
-                <div style={{fontSize:12, color:"#2a313b"}}>{p.explanation}</div>
+
+        {insightState === "error" && (
+          <div className="callout" style={{margin:"12px 16px", background:"#fef2f2", borderColor:"#fecaca"}}>
+            <span className="ic" style={{color:"#dc2626"}}><Icon name="alert" size={14}/></span>
+            <div>
+              <strong style={{color:"#dc2626"}}>AI Insight 失敗</strong>
+              <div style={{whiteSpace:"pre-wrap", fontSize:12, marginTop:4, color:"#5a6573"}}>{insightResult?.message}</div>
+              <button className="btn btn-sm" style={{marginTop:8}} onClick={handleGenerateInsight}>重試</button>
+            </div>
+          </div>
+        )}
+
+        {insightState === "done" && insightResult && (
+          <div style={{padding:"6px 16px 16px"}}>
+            {insightResult.insightSummary && (
+              <p style={{margin:"6px 0 12px", lineHeight:1.7}}>{insightResult.insightSummary}</p>
+            )}
+
+            {insightResult.riskPattern?.length > 0 && (
+              <div style={{margin:"12px 0"}}>
+                <div className="mono" style={{fontSize:10, color:"#8a93a0", letterSpacing:"0.06em", marginBottom:6}}>RISK PATTERN</div>
+                {insightResult.riskPattern.map((p, i) => (
+                  <div key={i} style={{margin:"6px 0", padding:"10px 12px", background:"var(--accent-soft)", borderRadius:6, borderLeft:"3px solid var(--accent)"}}>
+                    <div style={{fontWeight:600, fontSize:13, marginBottom:3}}>{p.title}</div>
+                    <div style={{fontSize:12, color:"#2a313b", lineHeight:1.6}}>{p.explanation}</div>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
+
+            {insightResult.priorityQuestions?.length > 0 && (
+              <div style={{margin:"14px 0"}}>
+                <div className="mono" style={{fontSize:10, color:"#8a93a0", letterSpacing:"0.06em", marginBottom:6}}>PRIORITY QUESTIONS</div>
+                <ol style={{margin:0, paddingLeft:20, fontSize:13, lineHeight:1.8}}>
+                  {insightResult.priorityQuestions.map((q, i) => <li key={i}>{q}</li>)}
+                </ol>
+              </div>
+            )}
+
+            {insightResult.beginnerExplanation && (
+              <div style={{margin:"14px 0", padding:"10px 12px", background:"#f8fafc", borderRadius:6, border:"1px solid var(--hairline)"}}>
+                <div className="mono" style={{fontSize:10, color:"#8a93a0", letterSpacing:"0.06em", marginBottom:4}}>新手白話</div>
+                <div style={{fontSize:13, lineHeight:1.6}}>{insightResult.beginnerExplanation}</div>
+              </div>
+            )}
+
+            {insightResult.personalNote && (
+              <div style={{margin:"14px 0", padding:"10px 12px", background:"#fff7ed", borderRadius:6, border:"1px solid #fed7aa"}}>
+                <div className="mono" style={{fontSize:10, color:"#9a3412", letterSpacing:"0.06em", marginBottom:4}}>個人化提醒</div>
+                <div style={{fontSize:13, lineHeight:1.6}}>{insightResult.personalNote}</div>
+              </div>
+            )}
+
+            {insightResult.cautionNote && (
+              <div style={{fontSize:11, color:"#8a93a0", fontStyle:"italic", marginTop:10, lineHeight:1.5}}>
+                {insightResult.cautionNote}
+              </div>
+            )}
+
+            <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", borderTop:"1px dashed var(--hairline)", marginTop:12, paddingTop:8, fontSize:10, color:"#8a93a0"}}>
+              <span className="mono">MODEL · {insightResult.model || "—"}</span>
+              {insightResult.usage && (
+                <span className="mono">
+                  TOKENS · {insightResult.usage.total_tokens || (insightResult.usage.prompt_tokens + insightResult.usage.completion_tokens) || "—"}
+                </span>
+              )}
+              <button className="btn btn-sm btn-ghost" onClick={handleGenerateInsight}><Icon name="sparkle" size={11}/> 重新生成</button>
+            </div>
           </div>
         )}
       </div>
