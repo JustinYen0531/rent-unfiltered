@@ -236,7 +236,7 @@ function buildFormRhirBundle({ values, versionLabel = "X" }) {
   };
 }
 
-function RHIRPreviewModal({ rhir, onClose }) {
+function RHIRPreviewModal({ rhir, onClose, onFillMissing }) {
   const { Icon, downloadJSON, getRhirRecordId, highlightJSON } = window.RU;
   const recordId = getRhirRecordId(rhir);
   const followupQuestions = window.RU.getFollowupQuestionsFromRhir(rhir);
@@ -270,8 +270,20 @@ function RHIRPreviewModal({ rhir, onClose }) {
           {followupQuestions.length > 0 && (
             <div className="callout" style={{ marginBottom: 12 }}>
               <span className="ic"><Icon name="info" size={14} /></span>
-              <div>
-                <strong>下一次看房或詢問時建議補齊：</strong>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                  <strong>下一次看房或詢問時建議補齊：</strong>
+                  {onFillMissing && (
+                    <button
+                      className="btn btn-sm"
+                      style={{ whiteSpace: "nowrap", flexShrink: 0 }}
+                      onClick={() => { onFillMissing(); onClose(); }}
+                    >
+                      <Icon name="sparkle" size={12} />
+                      一鍵補齊
+                    </button>
+                  )}
+                </div>
                 <ul style={{ margin: "8px 0 0", paddingLeft: 18 }}>
                   {followupQuestions.slice(0, 6).map((item) => (
                     <li key={item.field} style={{ marginBottom: 4 }}>
@@ -1024,7 +1036,7 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "" })
         </aside>
       </div>
 
-      {previewRhir && <RHIRPreviewModal rhir={previewRhir} onClose={() => setPreviewRhir(null)} />}
+      {previewRhir && <RHIRPreviewModal rhir={previewRhir} onClose={() => setPreviewRhir(null)} onFillMissing={handleFillMissing} />}
     </div>
   );
 }
