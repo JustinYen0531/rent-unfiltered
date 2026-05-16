@@ -345,9 +345,32 @@ function hasAny(text, keywords) {
   return keywords.some((keyword) => text.includes(keyword));
 }
 
-function detectDistrict(text, fallback) {
+function detectDistrictFromCapture(capture, fallback) {
+  const title = capture?.title || "";
+  const body = capture?.text || "";
+  const text = `${title}\n${body}`;
   const districts = ["文山區", "大安區", "信義區", "中山區", "板橋區", "永和區", "中正區", "松山區", "萬華區", "士林區", "北投區", "內湖區", "南港區", "新店區", "三重區", "新莊區"];
-  return districts.find((district) => text.includes(district)) || fallback;
+  const scored = districts
+    .map((district) => {
+      const firstIndex = text.indexOf(district);
+      if (firstIndex < 0) return null;
+
+      const occurrences = text.split(district).length - 1;
+      const titleHit = title.includes(district) ? 120 : 0;
+      const earlyHit = firstIndex < 600 ? 50 : firstIndex < 1400 ? 20 : 0;
+      const contextPattern = new RegExp(`(地址|地區|區域|行政區|位置|地點).{0,30}${district}|${district}.{0,40}(租金|套房|雅房|整層|公寓|大樓|地址)`);
+      const contextHit = contextPattern.test(text) ? 80 : 0;
+
+      return {
+        district,
+        firstIndex,
+        score: titleHit + earlyHit + contextHit + occurrences * 10,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.score - a.score || a.firstIndex - b.firstIndex);
+
+  return scored[0]?.district || fallback;
 }
 
 function buildSeedFromCapture(capture, fallbackSeed) {
@@ -387,7 +410,7 @@ function buildSeedFromCapture(capture, fallbackSeed) {
     ...fallbackSeed,
     propertyType,
     buildingType,
-    district: detectDistrict(text, fallbackSeed.district),
+    district: detectDistrictFromCapture(capture, fallbackSeed.district),
     floor: floor || fallbackSeed.floor,
     totalFloor: totalFloor || fallbackSeed.totalFloor,
     sizePing: areaPing || fallbackSeed.sizePing,
@@ -668,7 +691,7 @@ function PropertySection({ seed }) {
       </FieldInput>
       <FieldInput label="行政區" required schemaKey="property.district">
         <select defaultValue={seed.district}>
-          {["文山區", "大安區", "信義區", "中山區", "板橋區", "永和區"].map((d) => <option key={d}>{d}</option>)}
+          {["文山區", "大安區", "信義區", "中山區", "中正區", "松山區", "萬華區", "士林區", "北投區", "內湖區", "南港區", "板橋區", "永和區", "新店區", "三重區", "新莊區"].map((d) => <option key={d}>{d}</option>)}
         </select>
       </FieldInput>
       <FieldInput label="是否附家具" schemaKey="property.hasFurniture">
