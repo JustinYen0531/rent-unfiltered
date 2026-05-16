@@ -367,6 +367,70 @@ function addImportedRecord(bundle) {
   return bundle.record.id;
 }
 
+// Append a new sub-version under an existing record (preserving its version
+// history). Works for both imported records and sample records — if the parent
+// is a sample, we create an imported shadow that takes over the same record id
+// and starts from the sample's versions list.
+function addSubVersion(parentRecordId, newRhir, versionMeta) {
+  if (!parentRecordId) return null;
+  const now = new Date();
+  const isoDate = now.toISOString().slice(0, 10);
+  const isoMinute = `${isoDate} ${now.toTimeString().slice(0, 5)}`;
+
+  let existingIndex = IMPORTED_RECORD_BUNDLES.findIndex((item) => item.record?.id === parentRecordId);
+  let bundle;
+
+  if (existingIndex >= 0) {
+    bundle = IMPORTED_RECORD_BUNDLES[existingIndex];
+  } else {
+    // Sample fallback: build an imported shadow from sample bundle
+    const sampleBundle = getRecordBundle(parentRecordId);
+    if (!sampleBundle) return null;
+    bundle = {
+      record: { ...sampleBundle.record },
+      versions: [...(sampleBundle.versions || [])],
+      fieldGroups: sampleBundle.fieldGroups,
+      rhir: sampleBundle.rhir,
+    };
+  }
+
+  const newVersion = {
+    id: versionMeta.label,
+    label: versionMeta.label,
+    title: versionMeta.title || "新版本",
+    createdAt: isoMinute,
+    author: versionMeta.author || "你",
+    diff: versionMeta.diff || { added: 0, changed: 0, removed: 0 },
+    completion: versionMeta.completion ?? 0,
+    rri: null,
+    riskLevel: "尚未分析",
+    hasReport: false,
+    note: versionMeta.note || "由表單建立的子版本",
+  };
+
+  bundle.versions = [newVersion, ...(bundle.versions || [])];
+  bundle.rhir = newRhir;
+  bundle.report = null; // invalidate any previous AI report
+  bundle.record = {
+    ...bundle.record,
+    updatedAt: isoMinute,
+    versions: bundle.versions.map(v => v.label),
+    completion: newVersion.completion,
+    hasReport: false,
+    rri: null,
+    riskLevel: "尚未分析",
+  };
+
+  if (existingIndex >= 0) {
+    IMPORTED_RECORD_BUNDLES[existingIndex] = bundle;
+  } else {
+    IMPORTED_RECORD_BUNDLES.unshift(bundle);
+  }
+  upsertVisibleRecord(bundle.record);
+  saveImportedRecordBundles();
+  return parentRecordId;
+}
+
 function getRecordBundle(recordId) {
   const imported = IMPORTED_RECORD_BUNDLES.find((item) => item.record?.id === recordId);
   if (imported) return imported;
@@ -428,6 +492,7 @@ window.RU_DATA = {
   REPORT_X2,
   RECORD_0142_RHIR: buildRecord0142(),
   addImportedRecord,
+  addSubVersion,
   getRecordBundle,
   saveCaptureImport,
   getCaptureImport,

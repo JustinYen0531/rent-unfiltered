@@ -949,6 +949,11 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", e
   const [tick, setTick] = useStateF(0);
   const [stats, setStats] = useStateF(() => computeFormStats({}));
 
+  // Version name (user-editable). Default depends on mode.
+  const [versionTitle, setVersionTitle] = useStateF(
+    editRecordId ? `補件版本 ${versionLabel}` : "初始版本"
+  );
+
   useEffectF(() => {
     if (!formRef.current) return;
     const values = readFormValues(formRef.current);
@@ -1016,11 +1021,19 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", e
     const schemaValues = readFormValues(formRef.current);
     const currentSeed = schemaValuesToSeed(schemaValues);
     const template = LEASE_TEMPLATES[Math.floor(Math.random() * LEASE_TEMPLATES.length)];
+    const fallback = buildRandomFormSeed();
     const isEmpty = (v) => v === null || v === undefined || v === "" || v === "null";
     const merged = { ...currentSeed };
+    // First pass: use template values (skip null entries — some templates
+    // intentionally don't have an opinion on certain fields)
     for (const [key, val] of Object.entries(template)) {
       if (key === "_name") continue;
-      if (isEmpty(merged[key])) merged[key] = val;
+      if (isEmpty(merged[key]) && !isEmpty(val)) merged[key] = val;
+    }
+    // Second pass: fill anything still empty with random seed values so the
+    // form reaches 100% — no field is left missing.
+    for (const [key, val] of Object.entries(fallback)) {
+      if (isEmpty(merged[key]) && !isEmpty(val)) merged[key] = val;
     }
     setSeed(merged);
     setFormResetKey((k) => k + 1);
@@ -1036,9 +1049,28 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", e
   const handleCreateVersion = () => {
     if (!formRef.current) return;
     const values = readFormValues(formRef.current);
-    const { bundle, recordId } = buildFormRhirBundle({ values, versionLabel });
-    window.RU_DATA.addImportedRecord(bundle);
-    setRoute({ name: "detail", id: recordId });
+    const title = (versionTitle || "").trim() || (isEditMode ? `補件版本 ${versionLabel}` : "初始版本");
+    const completion = totalFields > 0 ? (totalFilled / totalFields) : 0;
+
+    if (isEditMode) {
+      // Build a fresh RHIR but keep the existing record id, appending a new
+      // version entry instead of replacing.
+      const { bundle: tmp } = buildFormRhirBundle({ values, versionLabel });
+      window.RU_DATA.addSubVersion(editRecordId, tmp.rhir, {
+        label: versionLabel,
+        title,
+        completion,
+        note: `由表單於 ${new Date().toISOString().slice(0,10)} 建立`,
+      });
+      setRoute({ name: "detail", id: editRecordId });
+    } else {
+      const { bundle, recordId } = buildFormRhirBundle({ values, versionLabel });
+      // Stamp user-chosen title onto the first version entry
+      if (bundle.versions?.[0]) bundle.versions[0].title = title;
+      if (bundle.record) bundle.record.title = bundle.record.title; // (record title is property summary, leave alone)
+      window.RU_DATA.addImportedRecord(bundle);
+      setRoute({ name: "detail", id: recordId });
+    }
   };
 
   return (
@@ -1075,7 +1107,7 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", e
           </button>
           <button className="btn btn-primary" onClick={handleCreateVersion}>
             <Icon name="check" size={14} />
-            建立版本 {versionLabel}
+            {isEditMode ? `建立子版本 ${versionLabel}` : `建立版本 ${versionLabel}`}
           </button>
         </div>
       </div>
@@ -1149,6 +1181,31 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", e
             <div className="row"><span className="l">尚未確認</span><span className="v">{stats.overall.missing}</span></div>
             <div className="row"><span className="l">推論欄位</span><span className="v">{stats.overall.inferred}</span></div>
 
+            <h4 style={{ marginTop: 18 }}>版本資訊</h4>
+            <div style={{ fontSize: 12, color: "#5a6573", marginBottom: 6 }}>
+              版本編號 <span className="mono" style={{ color: "#1652f0", marginLeft: 4 }}>{versionLabel}</span>
+              <span style={{ color: "#8a93a0", marginLeft: 6, fontSize: 11 }}>（系統自動編號）</span>
+            </div>
+            <div style={{ fontSize: 12, color: "#2a313b", marginBottom: 4 }}>版本名稱</div>
+            <input
+              type="text"
+              value={versionTitle}
+              onChange={(e) => setVersionTitle(e.target.value)}
+              placeholder={isEditMode ? `補件版本 ${versionLabel}` : "初始版本"}
+              style={{
+                width: "100%",
+                padding: "6px 8px",
+                fontSize: 12,
+                fontFamily: "inherit",
+                border: "1px solid var(--hairline)",
+                borderRadius: 4,
+                marginBottom: 4,
+              }}
+            />
+            <div style={{ fontSize: 11, color: "#8a93a0", marginBottom: 10 }}>
+              建立後會顯示在版本歷史，例如「補件後重新分析」「房東確認後」
+            </div>
+
             <h4 style={{ marginTop: 18 }}>完成後會發生什麼</h4>
             <ul style={{ listStyle: "none", padding: 0, margin: 0, fontSize: 12, color: "#2a313b" }}>
               <li style={{ display: "flex", gap: 8, padding: "5px 0", alignItems: "center", justifyContent: "space-between" }}>
@@ -1157,7 +1214,13 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", e
                 </span>
                 <button type="button" className="btn btn-sm" onClick={handlePreviewRhir}>預覽</button>
               </li>
-              <li style={{ display: "flex", gap: 8, padding: "5px 0" }}><Icon name="check" size={13} /> 可建立初始版本 X</li>
+              <li style={{ display: "flex", gap: 8, padding: "5px 0" }}>
+                <Icon name="check" size={13} />
+                {isEditMode
+                  ? <>會新增子版本 <span className="mono" style={{ color: "#1652f0", marginLeft: 4 }}>{versionLabel}</span>，原版本保留</>
+                  : <>可建立初始版本 <span className="mono" style={{ color: "#1652f0", marginLeft: 4 }}>{versionLabel}</span></>
+                }
+              </li>
               <li style={{ display: "flex", gap: 8, padding: "5px 0", color: "#5a6573" }}><Icon name="info" size={13} /> AI 分析報告仍是手動觸發</li>
             </ul>
           </div>
