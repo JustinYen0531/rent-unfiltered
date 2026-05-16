@@ -321,7 +321,9 @@ const REPORT_X2 = {
 };
 
 const IMPORTED_RECORDS_KEY = "ru_imported_rhir_records";
+const CAPTURE_IMPORTS_KEY = "ru_capture_imports";
 const IMPORTED_RECORD_BUNDLES = [];
+const CAPTURE_IMPORTS = {};
 
 function loadImportedRecordBundles() {
   try {
@@ -380,10 +382,43 @@ function getRecordBundle(recordId) {
   return null;
 }
 
+function loadCaptureImports() {
+  try {
+    const raw = window.localStorage.getItem(CAPTURE_IMPORTS_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (error) {
+    return {};
+  }
+}
+
+function saveCaptureImports() {
+  try {
+    window.localStorage.setItem(CAPTURE_IMPORTS_KEY, JSON.stringify(CAPTURE_IMPORTS));
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+function saveCaptureImport(payload) {
+  if (!payload?.id) return null;
+  CAPTURE_IMPORTS[payload.id] = payload;
+  saveCaptureImports();
+  return payload.id;
+}
+
+function getCaptureImport(id) {
+  return CAPTURE_IMPORTS[id] || null;
+}
+
 loadImportedRecordBundles().forEach((bundle) => {
   IMPORTED_RECORD_BUNDLES.push(bundle);
   if (bundle?.record) upsertVisibleRecord(bundle.record);
 });
+
+Object.assign(CAPTURE_IMPORTS, loadCaptureImports());
 
 window.RU_DATA = {
   STATUS,
@@ -394,6 +429,8 @@ window.RU_DATA = {
   RECORD_0142_RHIR: buildRecord0142(),
   addImportedRecord,
   getRecordBundle,
+  saveCaptureImport,
+  getCaptureImport,
 };
 
 

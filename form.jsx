@@ -1,6 +1,6 @@
 ﻿// New rental form - create the initial version X
 
-const { useMemo: useMemoF, useRef: useRefF, useState: useStateF } = React;
+const { useEffect: useEffectF, useMemo: useMemoF, useRef: useRefF, useState: useStateF } = React;
 
 const FORM_FIELD_SPECS = [
   { key: "property.propertyType", label: "房型", group: "property", type: "text" },
@@ -333,12 +333,89 @@ function buildRandomFormSeed() {
   };
 }
 
-function FormPage({ setRoute, mode = "new", versionLabel = "X" }) {
+function pickFirstMatch(text, patterns) {
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    if (match?.[1]) return match[1].trim();
+  }
+  return null;
+}
+
+function hasAny(text, keywords) {
+  return keywords.some((keyword) => text.includes(keyword));
+}
+
+function detectDistrict(text, fallback) {
+  const districts = ["文山區", "大安區", "信義區", "中山區", "板橋區", "永和區", "中正區", "松山區", "萬華區", "士林區", "北投區", "內湖區", "南港區", "新店區", "三重區", "新莊區"];
+  return districts.find((district) => text.includes(district)) || fallback;
+}
+
+function buildSeedFromCapture(capture, fallbackSeed) {
+  const text = `${capture?.title || ""}\n${capture?.text || ""}`;
+  const compact = text.replace(/[,\s]/g, "");
+  const rent = pickFirstMatch(compact, [
+    /租金(?:NT\$|NTD|\$)?(\d{4,6})/,
+    /(?:NT\$|NTD|\$)(\d{4,6})(?:\/月|元|月)?/,
+    /(\d{4,6})元\/月/,
+  ]);
+  const deposit = pickFirstMatch(compact, [
+    /押金(?:NT\$|NTD|\$)?(\d{4,6})/,
+    /押金(\d+)個月/,
+  ]);
+  const areaPing = pickFirstMatch(compact, [/(\d+(?:\.\d+)?)坪/]);
+  const floor = pickFirstMatch(compact, [/(\d+)F(?:\/\d+F)?/, /(\d+)樓/]);
+  const totalFloor = pickFirstMatch(compact, [/\d+F\/(\d+)F/, /共(\d+)樓/]);
+
+  const propertyType = hasAny(text, ["雅房"]) ? "雅房" :
+    hasAny(text, ["整層", "整層住家"]) ? "整層住家" :
+    hasAny(text, ["分租"]) ? "分租住宅" :
+    hasAny(text, ["套房"]) ? "套房" :
+    fallbackSeed.propertyType;
+
+  const buildingType = hasAny(text, ["電梯", "大樓"]) ? "電梯大樓" :
+    hasAny(text, ["透天"]) ? "透天" :
+    hasAny(text, ["公寓"]) ? "公寓" :
+    fallbackSeed.buildingType;
+
+  const yesNoUnknown = (yesWords, noWords, fallback) => {
+    if (hasAny(text, yesWords)) return "yes";
+    if (hasAny(text, noWords)) return "no";
+    return fallback;
+  };
+
+  return {
+    ...fallbackSeed,
+    propertyType,
+    buildingType,
+    district: detectDistrict(text, fallbackSeed.district),
+    floor: floor || fallbackSeed.floor,
+    totalFloor: totalFloor || fallbackSeed.totalFloor,
+    sizePing: areaPing || fallbackSeed.sizePing,
+    rent: rent || fallbackSeed.rent,
+    deposit: deposit ? (deposit.length <= 2 && rent ? String(Number(rent) * Number(deposit)) : deposit) : fallbackSeed.deposit,
+    petAllowed: yesNoUnknown(["可寵", "可養寵物", "寵物可"], ["禁寵", "不可養寵物", "不可寵"], fallbackSeed.petAllowed),
+    hasFurniture: yesNoUnknown(["附家具", "有家具", "家具"], ["無家具", "不附家具"], fallbackSeed.hasFurniture),
+    eligibleForSubsidy: yesNoUnknown(["可租補", "可申請租補", "租金補貼"], ["不可租補", "不能租補"], fallbackSeed.eligibleForSubsidy),
+    hasWrittenContract: yesNoUnknown(["有契約", "書面契約"], ["無契約", "沒有契約"], fallbackSeed.hasWrittenContract),
+    taxRegistrationAllowed: yesNoUnknown(["可報稅", "可以報稅"], ["不可報稅", "不能報稅", "禁報稅"], fallbackSeed.taxRegistrationAllowed),
+    householdRegistrationAllowed: yesNoUnknown(["可遷戶籍", "可以遷戶籍"], ["不可遷戶籍", "不能遷戶籍"], fallbackSeed.householdRegistrationAllowed),
+    rooftopAddition: yesNoUnknown(["頂樓加蓋"], ["非頂加", "不是頂樓加蓋"], fallbackSeed.rooftopAddition),
+    illegalPartition: yesNoUnknown(["違法隔間"], ["非隔間", "非違法隔間"], fallbackSeed.illegalPartition),
+    electricityRate: pickFirstMatch(compact, [/電費(?:每度)?(\d+(?:\.\d+)?元?)/]) || fallbackSeed.electricityRate,
+    managementFee: pickFirstMatch(compact, [/管理費(?:NT\$|NTD|\$)?(\d{2,5})/]) || fallbackSeed.managementFee,
+    internetFee: pickFirstMatch(compact, [/網路費(?:NT\$|NTD|\$)?(\d{2,5})/]) || fallbackSeed.internetFee,
+    notes: capture?.sourceUrl ? `由擴充功能匯入：${capture.sourceUrl}` : fallbackSeed.notes,
+  };
+}
+
+function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "" }) {
   const { Icon } = window.RU;
   const [section, setSection] = useStateF("property");
   const [seed, setSeed] = useStateF(() => buildRandomFormSeed());
   const [formResetKey, setFormResetKey] = useStateF(0);
   const [previewRhir, setPreviewRhir] = useStateF(null);
+  const [importInput, setImportInput] = useStateF(importId || "");
+  const [importNotice, setImportNotice] = useStateF("");
   const formRef = useRefF(null);
 
   const SECTIONS = [
@@ -357,6 +434,27 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X" }) {
     setSeed(buildRandomFormSeed());
     setFormResetKey((value) => value + 1);
   };
+
+  const handleLoadImport = (id = importInput) => {
+    const cleanId = String(id || "").trim();
+    if (!cleanId) {
+      setImportNotice("請先輸入匯入 ID。");
+      return;
+    }
+    const imported = window.RU_DATA.getCaptureImport(cleanId);
+    if (!imported) {
+      setImportNotice("找不到這個匯入 ID。請確認擴充功能已經打開過 Rent Unfiltered。");
+      return;
+    }
+    setSeed(buildSeedFromCapture(imported.capture, buildRandomFormSeed()));
+    setFormResetKey((value) => value + 1);
+    setImportInput(cleanId);
+    setImportNotice(`已載入 ${cleanId}，表單已先用可辨識資訊預填。`);
+  };
+
+  useEffectF(() => {
+    if (importId) handleLoadImport(importId);
+  }, [importId]);
 
   const handlePreviewRhir = () => {
     if (!formRef.current) return;
@@ -425,6 +523,22 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X" }) {
           <div className="side-title" style={{ marginTop: 24 }}>測試說明</div>
           <div style={{ fontSize: 11, color: "#5a6573", lineHeight: 1.7, padding: "4px 10px" }}>
             按下「一鍵隨機生成」會自動灌入一組測試資料，方便快速驗證 RHIR 轉換、版本建立與報告流程。
+          </div>
+
+          <div className="side-title" style={{ marginTop: 24 }}>擴充匯入</div>
+          <div style={{ padding: "4px 10px" }}>
+            <input
+              className="mono"
+              value={importInput}
+              onChange={(event) => setImportInput(event.target.value)}
+              placeholder="RU-CAP-..."
+              style={{ width: "100%", height: 32, marginBottom: 8 }}
+            />
+            <button type="button" className="btn btn-sm" style={{ width: "100%" }} onClick={() => handleLoadImport()}>
+              <Icon name="download" size={12} />
+              載入匯入 ID
+            </button>
+            {importNotice && <div style={{ fontSize: 11, color: "#5a6573", lineHeight: 1.6, marginTop: 8 }}>{importNotice}</div>}
           </div>
         </aside>
 

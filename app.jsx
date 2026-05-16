@@ -15,6 +15,11 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "showSchemaKeys": true
 }/*EDITMODE-END*/;
 
+function decodeImportPayload(encoded) {
+  const padded = encoded.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(encoded.length / 4) * 4, "=");
+  return JSON.parse(decodeURIComponent(escape(atob(padded))));
+}
+
 function App() {
   const { TopBar, GovFoot } = window.RU;
   const [route, setRoute] = useStateA({ name: "home" });
@@ -31,6 +36,27 @@ function App() {
     document.documentElement.setAttribute("data-density", t.density || "comfortable");
   }, [t.accent, t.density]);
 
+  useEffectA(() => {
+    const processImportHash = () => {
+      const hash = window.location.hash || "";
+      const match = hash.match(/ruImport=([^&]+)/);
+      if (!match) return;
+
+      try {
+        const payload = decodeImportPayload(match[1]);
+        const id = window.RU_DATA.saveCaptureImport(payload);
+        window.history.replaceState(null, "", window.location.pathname);
+        setRoute({ name: "form", mode: "new", importId: id });
+      } catch (error) {
+        window.history.replaceState(null, "", window.location.pathname);
+      }
+    };
+
+    processImportHash();
+    window.addEventListener("hashchange", processImportHash);
+    return () => window.removeEventListener("hashchange", processImportHash);
+  }, []);
+
   return (
     <div className="shell">
       <TopBar route={route} setRoute={setRoute}/>
@@ -39,7 +65,7 @@ function App() {
         {route.name === "project-guide" && <window.ProjectGuidePage setRoute={setRoute}/>}
         {route.name === "glossary" && <window.GlossaryPage setRoute={setRoute} tab={route.tab}/>}
         {route.name === "rhir-spec" && <window.GlossaryPage setRoute={setRoute} tab="rhir"/>}
-        {route.name === "form" && <window.FormPage setRoute={setRoute} mode={route.mode}/>}
+        {route.name === "form" && <window.FormPage setRoute={setRoute} mode={route.mode} importId={route.importId}/>}
         {route.name === "detail" && <window.DetailPage setRoute={setRoute} recordId={route.id}/>}
       </div>
       <GovFoot/>
