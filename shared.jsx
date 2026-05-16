@@ -292,6 +292,7 @@ function TopBar({ route, setRoute }) {
         <nav className="topnav">
           <a className={route.name === "home" ? "active" : ""} onClick={() => setRoute({ name: "home" })}>首頁</a>
           <a className={route.name === "project-guide" ? "active" : ""} onClick={() => setRoute({ name: "project-guide" })}>專案導引</a>
+          <a className={route.name === "extension-guide" ? "active" : ""} onClick={() => setRoute({ name: "extension-guide" })}>擴充插件</a>
           <a className={route.name === "glossary" || route.name === "rhir-spec" ? "active" : ""} onClick={() => setRoute({ name: "glossary", tab: "rhir" })}>名詞解釋</a>
           <a className={route.name === "admin" ? "active" : ""} onClick={() => setRoute({ name: "admin" })}>資料庫</a>
         </nav>

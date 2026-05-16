@@ -63,6 +63,7 @@ function App() {
       <div className="main">
         {route.name === "home" && <window.HomePage setRoute={setRoute}/>}
         {route.name === "project-guide" && <window.ProjectGuidePage setRoute={setRoute}/>}
+        {route.name === "extension-guide" && <window.ExtensionGuidePage setRoute={setRoute}/>}
         {route.name === "glossary" && <window.GlossaryPage setRoute={setRoute} tab={route.tab}/>}
         {route.name === "rhir-spec" && <window.GlossaryPage setRoute={setRoute} tab="rhir"/>}
         {route.name === "form" && <window.FormPage setRoute={setRoute} mode={route.mode} importId={route.importId} editRecordId={route.editRecordId} initialSection={route.section} versionLabel={route.versionLabel}/>}
