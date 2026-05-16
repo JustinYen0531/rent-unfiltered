@@ -73,7 +73,7 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
   // For testing only. Replace with backend proxy before production.
 
   const OPENROUTER_API_KEY = "";
-  const OPENROUTER_MODEL   = "deepseek/deepseek-v4-flash:free";
+  const OPENROUTER_MODEL   = "deepseek/deepseek-v4-pro";
   const OPENROUTER_URL     = "https://openrouter.ai/api/v1/chat/completions";
 
   function stripCodeFence(s) {

@@ -44,6 +44,59 @@ const FIELD_GROUP_TITLES = {
   rights: "權益限制",
 };
 
+// Visual section → list of schema keys actually rendered in that UI section.
+// (Note: this differs from FORM_FIELD_SPECS.group because petsAllowed sits in
+//  the property section visually but is grouped as "lease" in the spec, and
+//  tax/household registration sit in the rights section but are "lease" too.)
+const SECTION_FIELD_KEYS = {
+  property: [
+    "property.propertyType", "property.buildingType",
+    "property.floor", "property.totalFloors", "property.areaPing",
+    "property.district", "property.hasFurniture", "leaseTerms.petsAllowed",
+  ],
+  cost: [
+    "cost.monthlyRent", "cost.deposit", "cost.electricityRate",
+    "cost.waterFee", "cost.managementFee", "cost.internetFee",
+    "cost.eligibleForSubsidy",
+  ],
+  lease: [
+    "leaseTerms.hasWrittenContract", "leaseTerms.reviewPeriod",
+    "leaseTerms.repairResponsibility", "leaseTerms.earlyTerminationClause",
+    "leaseTerms.depositRefundTerms", "leaseTerms.notes",
+  ],
+  safety: [
+    "safety.rooftopAddition", "safety.illegalPartition", "safety.escapeRoute",
+    "safety.fireEquipment", "safety.waterLeak", "safety.doorLock",
+  ],
+  rights: [
+    "leaseTerms.taxRegistrationAllowed", "leaseTerms.householdRegistrationAllowed",
+    "rights.taxBurdenShift", "rights.unfairTerms",
+  ],
+};
+
+const FORM_SPEC_BY_KEY = Object.fromEntries(
+  (typeof FORM_FIELD_SPECS !== "undefined" ? FORM_FIELD_SPECS : []).map(s => [s.key, s])
+);
+
+function computeFormStats(values) {
+  const sections = {};
+  const overall = { disclosed: 0, partial: 0, missing: 0, inferred: 0, total: 0 };
+  for (const [sectionId, keys] of Object.entries(SECTION_FIELD_KEYS)) {
+    let filled = 0, partial = 0, missing = 0;
+    for (const key of keys) {
+      const type = FORM_SPEC_BY_KEY[key]?.type || "text";
+      const status = getDisclosureStatus(values?.[key], type);
+      overall[status] = (overall[status] || 0) + 1;
+      overall.total += 1;
+      if (status === "disclosed") filled += 1;
+      else if (status === "partial") partial += 1;
+      else missing += 1;
+    }
+    sections[sectionId] = { filled, partial, missing, total: keys.length };
+  }
+  return { sections, overall };
+}
+
 function formFieldValue(value, disclosureStatus = "disclosed", sourceType = "manualInput", extra = {}) {
   return {
     value,
@@ -890,6 +943,20 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", e
   const [importNotice, setImportNotice] = useStateF("");
   const formRef = useRefF(null);
 
+  // Reactive form stats. Recomputed whenever the form is interacted with,
+  // the seed is replaced (regenerate / fill missing / import / edit-mode),
+  // or React commits (via formResetKey).
+  const [tick, setTick] = useStateF(0);
+  const [stats, setStats] = useStateF(() => computeFormStats({}));
+
+  useEffectF(() => {
+    if (!formRef.current) return;
+    const values = readFormValues(formRef.current);
+    setStats(computeFormStats(values));
+  }, [tick, formResetKey, seed]);
+
+  const bumpTick = () => setTick((t) => t + 1);
+
   useEffectF(() => {
     if (editRecordId) {
       const bundle = window.RU_DATA?.getRecordBundle?.(editRecordId);
@@ -900,17 +967,23 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", e
     }
   }, [editRecordId]);
 
-  const SECTIONS = [
-    { id: "property", title: "物件基本資訊", step: "01", filled: 6, total: 8 },
-    { id: "cost", title: "租金與費用", step: "02", filled: 4, total: 7 },
-    { id: "lease", title: "契約與條款", step: "03", filled: 3, total: 6 },
-    { id: "safety", title: "安全與屋況", step: "04", filled: 2, total: 6 },
-    { id: "rights", title: "權益限制", step: "05", filled: 2, total: 4 },
+  const SECTION_META = [
+    { id: "property", title: "物件基本資訊", step: "01" },
+    { id: "cost",     title: "租金與費用",   step: "02" },
+    { id: "lease",    title: "契約與條款",   step: "03" },
+    { id: "safety",   title: "安全與屋況",   step: "04" },
+    { id: "rights",   title: "權益限制",     step: "05" },
   ];
 
-  const totalFilled = SECTIONS.reduce((a, s) => a + s.filled, 0);
-  const totalFields = SECTIONS.reduce((a, s) => a + s.total, 0);
-  const pct = Math.round((totalFilled / totalFields) * 100);
+  const SECTIONS = SECTION_META.map(s => ({
+    ...s,
+    filled: stats.sections[s.id]?.filled ?? 0,
+    total:  stats.sections[s.id]?.total  ?? 0,
+  }));
+
+  const totalFilled = stats.overall.disclosed + stats.overall.partial;
+  const totalFields = stats.overall.total;
+  const pct = totalFields > 0 ? Math.round((totalFilled / totalFields) * 100) : 0;
 
   const handleGenerate = () => {
     setSeed(buildRandomFormSeed());
@@ -1054,7 +1127,7 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", e
           </div>
         </aside>
 
-        <form key={formResetKey} ref={formRef}>
+        <form key={formResetKey} ref={formRef} onInput={bumpTick} onClick={bumpTick} onChange={bumpTick}>
           {SECTIONS.map((item) => (
             <div key={item.id} style={{ display: item.id === section ? "block" : "none" }}>
               <FormSection section={item} seed={seed} />
@@ -1071,10 +1144,10 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", e
             </div>
             <div className="meter"><div className="fill" style={{ width: `${pct}%` }} /></div>
 
-            <div className="row"><span className="l">已揭露</span><span className="v">17</span></div>
-            <div className="row"><span className="l">部分揭露</span><span className="v">2</span></div>
-            <div className="row"><span className="l">尚未確認</span><span className="v">12</span></div>
-            <div className="row"><span className="l">推論欄位</span><span className="v">5</span></div>
+            <div className="row"><span className="l">已揭露</span><span className="v">{stats.overall.disclosed}</span></div>
+            <div className="row"><span className="l">部分揭露</span><span className="v">{stats.overall.partial}</span></div>
+            <div className="row"><span className="l">尚未確認</span><span className="v">{stats.overall.missing}</span></div>
+            <div className="row"><span className="l">推論欄位</span><span className="v">{stats.overall.inferred}</span></div>
 
             <h4 style={{ marginTop: 18 }}>完成後會發生什麼</h4>
             <ul style={{ listStyle: "none", padding: 0, margin: 0, fontSize: 12, color: "#2a313b" }}>
