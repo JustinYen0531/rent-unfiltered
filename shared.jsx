@@ -284,11 +284,11 @@ function TopBar({ route, setRoute }) {
     <div>
       <div className="gov-strip" />
       <header className="topbar">
-        <div className="brand">
+        <button type="button" className="brand brand-button" onClick={() => setRoute({ name: "home" })} title="回到首頁">
           <div className="brand-mark"></div>
           <div className="brand-name">Rent Unfiltered</div>
           <div className="brand-tag mono">v0.1 · MVP</div>
-        </div>
+        </button>
         <nav className="topnav">
           <a className={route.name === "home" ? "active" : ""} onClick={() => setRoute({ name: "home" })}>首頁</a>
           <a className={route.name === "project-guide" ? "active" : ""} onClick={() => setRoute({ name: "project-guide" })}>專案導引</a>

@@ -82,6 +82,19 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
 .brand {
   display: flex; align-items: baseline; gap: 10px;
 }
+.brand-button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  cursor: pointer;
+}
+.brand-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
 .brand-mark {
   width: 22px; height: 22px; align-self: center;
   border: 1.5px solid var(--ink);

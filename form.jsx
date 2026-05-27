@@ -785,8 +785,68 @@ const SCHEMA_TO_SEED = {
   "rights.unfairTerms": "unfairTerms",
 };
 
+const GUARANTEED_FILL_VALUES = {
+  propertyType: "套房",
+  buildingType: "公寓",
+  floor: "3",
+  totalFloor: "5",
+  sizePing: "8",
+  district: "文山區",
+  hasFurniture: "yes",
+  petAllowed: "no",
+
+  rent: "12000",
+  deposit: "24000",
+  electricityRate: "台電計價",
+  waterFee: "台水計價",
+  managementFee: "0",
+  internetFee: "0",
+  eligibleForSubsidy: "yes",
+
+  hasWrittenContract: "yes",
+  reviewPeriod: "3 天",
+  repairResponsibility: "房東負擔主要設備維修",
+  earlyTermination: "提前 30 天通知",
+  depositReturnTerms: "退租後 14 日內",
+  notes: "已補齊基本契約備註，簽約前仍建議再次確認。",
+
+  rooftopAddition: "no",
+  illegalPartition: "no",
+  escapeRoute: "兩處逃生動線",
+  fireEquipment: "有滅火器與偵煙器",
+  waterLeak: "目前未見漏水",
+  doorLock: "獨立門禁 + 房門鎖",
+
+  taxRegistrationAllowed: "yes",
+  householdRegistrationAllowed: "yes",
+  taxBurdenShift: "no",
+  unfairTerms: "no",
+};
+
+function isEmptySeedValue(value) {
+  return value === null || value === undefined || value === "" || value === "null" || String(value).includes("尚未確認");
+}
+
+function ensureCompleteSeed(seed) {
+  const complete = { ...seed };
+  for (const seedKey of Object.values(SCHEMA_TO_SEED)) {
+    if (isEmptySeedValue(complete[seedKey])) {
+      complete[seedKey] = GUARANTEED_FILL_VALUES[seedKey];
+    }
+  }
+  return complete;
+}
+
+function seedToSchemaValues(seed) {
+  const values = {};
+  for (const [schemaKey, seedKey] of Object.entries(SCHEMA_TO_SEED)) {
+    values[schemaKey] = seed?.[seedKey];
+  }
+  return values;
+}
+
 function schemaValuesToSeed(schemaValues) {
-  const seed = buildEmptyImportSeed();
+  const seed = buildEmptyFormSeed();
   for (const [schemaKey, seedKey] of Object.entries(SCHEMA_TO_SEED)) {
     const val = schemaValues[schemaKey];
     if (val !== null && val !== undefined) seed[seedKey] = val;
@@ -812,7 +872,7 @@ const BOOLEAN_SCHEMA_KEYS = new Set([
 // Convert an RHIR bundle back into a form seed so the form can pre-fill
 // when editing or creating a sub-version.
 function seedFromRhirBundle(rhir) {
-  const seed = buildEmptyImportSeed();
+  const seed = buildEmptyFormSeed();
   if (!rhir) return seed;
   for (const [schemaKey, seedKey] of Object.entries(SCHEMA_TO_SEED)) {
     const fv = schemaKey.split(".").reduce((o, k) => (o == null ? undefined : o[k]), rhir);
@@ -1219,21 +1279,24 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", e
     const currentSeed = schemaValuesToSeed(schemaValues);
     const template = LEASE_TEMPLATES[Math.floor(Math.random() * LEASE_TEMPLATES.length)];
     const fallback = buildRandomFormSeed();
-    const isEmpty = (v) => v === null || v === undefined || v === "" || v === "null";
     const merged = { ...currentSeed };
     // First pass: use template values (skip null entries — some templates
     // intentionally don't have an opinion on certain fields)
     for (const [key, val] of Object.entries(template)) {
       if (key === "_name") continue;
-      if (isEmpty(merged[key]) && !isEmpty(val)) merged[key] = val;
+      if (isEmptySeedValue(merged[key]) && !isEmptySeedValue(val)) merged[key] = val;
     }
     // Second pass: fill anything still empty with random seed values so the
     // form reaches 100% — no field is left missing.
     for (const [key, val] of Object.entries(fallback)) {
-      if (isEmpty(merged[key]) && !isEmpty(val)) merged[key] = val;
+      if (isEmptySeedValue(merged[key]) && !isEmptySeedValue(val)) merged[key] = val;
     }
-    setSeed(merged);
+    const completed = ensureCompleteSeed(merged);
+    const completedStats = computeFormStats(seedToSchemaValues(completed));
+    setSeed(completed);
+    setStats(completedStats);
     setFormResetKey((k) => k + 1);
+    window.setTimeout(() => setStats(completedStats), 150);
   };
 
   const handlePreviewRhir = () => {
