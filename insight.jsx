@@ -69,11 +69,12 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
   };
 
   // ── OpenRouter config ────────────────────────────────────────
-  // WARNING: API key is exposed to anyone who opens this page in DevTools.
-  // For testing only. Replace with backend proxy before production.
+  // Judges can use the Vercel proxy without setting a browser-local key.
+  // A browser-local key still works as an override for local testing.
 
   const OPENROUTER_MODEL   = "deepseek/deepseek-v4-pro";
   const OPENROUTER_URL     = "https://openrouter.ai/api/v1/chat/completions";
+  const OPENROUTER_PROXY_URL = "/api/openrouter";
 
   function getOpenRouterApiKey() {
     return window.RU?.getStoredApiKey?.() || "";
@@ -86,6 +87,25 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
       .trim();
   }
 
+  async function callOpenRouter(body, title) {
+    const apiKey = getOpenRouterApiKey();
+    const useBrowserKey = Boolean(apiKey);
+    const response = await fetch(useBrowserKey ? OPENROUTER_URL : OPENROUTER_PROXY_URL, {
+      method: "POST",
+      headers: {
+        ...(useBrowserKey ? { "Authorization": `Bearer ${apiKey}` } : {}),
+        "Content-Type": "application/json",
+        ...(useBrowserKey ? {
+          "HTTP-Referer": window.location.origin || "https://rent-unfiltered.local",
+          "X-Title": title,
+        } : {}),
+      },
+      body: JSON.stringify(useBrowserKey ? body : { ...body, title }),
+    });
+
+    return response;
+  }
+
   // ── Real generator: calls OpenRouter and parses JSON output ───
 
   async function generateInsight(rriResult, userProfile) {
@@ -94,12 +114,6 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
     }
 
     const payload = buildPromptPayload(rriResult, userProfile);
-    const apiKey = getOpenRouterApiKey();
-
-    if (!apiKey) {
-      return { status: "error", message: "尚未設定 OpenRouter API Key。請先到右上角設定中儲存 API Key。" };
-    }
-
     const userPrompt =
       `以下是 rule engine 產出的結構化 RRI 結果。請依照系統指示產生 AI Insight，僅輸出 JSON（不要 markdown code fence、不要前後文）。\n\n` +
       `### 結構化資料\n${payload.user}\n\n` +
@@ -107,24 +121,15 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
 
     let response;
     try {
-      response = await fetch(OPENROUTER_URL, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": window.location.origin || "https://rent-unfiltered.local",
-          "X-Title": "Rent Unfiltered",
-        },
-        body: JSON.stringify({
-          model: OPENROUTER_MODEL,
-          messages: [
-            { role: "system", content: payload.system },
-            { role: "user",   content: userPrompt },
-          ],
-          temperature: 0.4,
-          response_format: { type: "json_object" },
-        }),
-      });
+      response = await callOpenRouter({
+        model: OPENROUTER_MODEL,
+        messages: [
+          { role: "system", content: payload.system },
+          { role: "user",   content: userPrompt },
+        ],
+        temperature: 0.4,
+        response_format: { type: "json_object" },
+      }, "Rent Unfiltered");
     } catch (e) {
       return { status: "error", message: `網路錯誤：${e.message}` };
     }
@@ -204,11 +209,6 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
   async function chatWithRri(rriResult, conversation, newUserMessage) {
     if (!rriResult) return { status: "error", message: "缺少 RRI 結果，無法開始對話。" };
     if (!newUserMessage || !newUserMessage.trim()) return { status: "error", message: "請輸入問題。" };
-    const apiKey = getOpenRouterApiKey();
-
-    if (!apiKey) {
-      return { status: "error", message: "尚未設定 OpenRouter API Key。請先到右上角設定中儲存 API Key。" };
-    }
 
     const contextBlock =
       `以下是 rule engine 產出的結構化 RRI 資料（僅供你參考；不要重算）：\n` +
@@ -232,20 +232,11 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
 
     let response;
     try {
-      response = await fetch(OPENROUTER_URL, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": window.location.origin || "https://rent-unfiltered.local",
-          "X-Title": "Rent Unfiltered Chat",
-        },
-        body: JSON.stringify({
-          model: OPENROUTER_MODEL,
-          messages,
-          temperature: 0.5,
-        }),
-      });
+      response = await callOpenRouter({
+        model: OPENROUTER_MODEL,
+        messages,
+        temperature: 0.5,
+      }, "Rent Unfiltered Chat");
     } catch (e) {
       return { status: "error", message: `網路錯誤：${e.message}` };
     }
