@@ -345,13 +345,45 @@ function saveImportedRecordBundles() {
   }
 }
 
+function summarizeRri(rhir) {
+  if (!window.RU_RRI?.calculate || !rhir) return null;
+  const result = window.RU_RRI.calculate(rhir);
+  if (!result) return null;
+  const score = Math.round(result.midScore);
+  const level = result.isCertain || result.levelMin === result.levelMax
+    ? result.levelMin
+    : `${result.levelMin}～${result.levelMax}`;
+  return { score, level };
+}
+
+function applyRriSummary(record, rhir) {
+  const summary = summarizeRri(rhir);
+  if (!summary) return record;
+  return {
+    ...record,
+    rri: summary.score,
+    riskLevel: summary.level,
+  };
+}
+
+function getScoredRecord(record) {
+  if (!record?.id) return record;
+  if (record.rri != null) return record;
+  const bundle = getRecordBundle(record.id);
+  return applyRriSummary(record, bundle?.rhir);
+}
+
+function getVisibleRecords() {
+  return SAMPLE_RECORDS.map(getScoredRecord);
+}
+
 function upsertVisibleRecord(record) {
   const existingIndex = SAMPLE_RECORDS.findIndex((item) => item.id === record.id);
   if (existingIndex >= 0) {
-    SAMPLE_RECORDS[existingIndex] = record;
+    SAMPLE_RECORDS[existingIndex] = getScoredRecord(record);
     return;
   }
-  SAMPLE_RECORDS.unshift(record);
+  SAMPLE_RECORDS.unshift(getScoredRecord(record));
 }
 
 function addImportedRecord(bundle) {
@@ -496,6 +528,8 @@ window.RU_DATA = {
   getRecordBundle,
   saveCaptureImport,
   getCaptureImport,
+  getVisibleRecords,
+  getScoredRecord,
 };
 
 

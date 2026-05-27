@@ -3,23 +3,23 @@
 const { useState: useStateH } = React;
 
 function HomePage({ setRoute }) {
-  const { SAMPLE_RECORDS } = window.RU_DATA;
+  const records = window.RU_DATA.getVisibleRecords?.() || window.RU_DATA.SAMPLE_RECORDS;
   const { Icon, RiskPill } = window.RU;
   const [filter, setFilter] = useStateH("all");
 
-  const filtered = SAMPLE_RECORDS.filter(r =>
+  const filtered = records.filter(r =>
     filter === "all" ? true :
-    filter === "analyzed" ? r.hasReport :
-    filter === "pending" ? !r.hasReport :
+    filter === "analyzed" ? r.rri != null :
+    filter === "pending" ? r.rri == null :
     filter === "highrisk" ? (r.rri != null && r.rri < 50) :
     true
   );
 
   const stats = {
-    total: SAMPLE_RECORDS.length,
-    analyzed: SAMPLE_RECORDS.filter(r => r.hasReport).length,
-    pending: SAMPLE_RECORDS.filter(r => !r.hasReport).length,
-    avgCompletion: Math.round(SAMPLE_RECORDS.reduce((a, r) => a + r.completion, 0) / SAMPLE_RECORDS.length * 100),
+    total: records.length,
+    analyzed: records.filter(r => r.rri != null).length,
+    pending: records.filter(r => r.rri == null).length,
+    avgCompletion: Math.round(records.reduce((a, r) => a + r.completion, 0) / records.length * 100),
   };
 
   return (
@@ -48,12 +48,12 @@ function HomePage({ setRoute }) {
           <div className="stat-value">{stats.total}<span className="delta mono">+1 本週</span></div>
         </div>
         <div className="stat">
-          <div className="stat-label">已生成分析報告</div>
+          <div className="stat-label">已完成 RRI 評分</div>
           <div className="stat-value">{stats.analyzed}<span className="delta mono">/ {stats.total}</span></div>
         </div>
         <div className="stat">
-          <div className="stat-label">待補資料</div>
-          <div className="stat-value">{stats.pending}<span className="delta mono">尚未跑 RRI</span></div>
+          <div className="stat-label">尚未評分</div>
+          <div className="stat-value">{stats.pending}<span className="delta mono">等待 RRI</span></div>
         </div>
         <div className="stat">
           <div className="stat-label">平均欄位完整度</div>
@@ -63,10 +63,10 @@ function HomePage({ setRoute }) {
 
       <div className="toolbar">
         {[
-          {id:"all", label:"全部", count: SAMPLE_RECORDS.length},
-          {id:"analyzed", label:"已分析", count: stats.analyzed},
-          {id:"pending", label:"未分析", count: stats.pending},
-          {id:"highrisk", label:"高風險", count: SAMPLE_RECORDS.filter(r => r.rri != null && r.rri < 50).length},
+          {id:"all", label:"全部", count: records.length},
+          {id:"analyzed", label:"已評分", count: stats.analyzed},
+          {id:"pending", label:"未評分", count: stats.pending},
+          {id:"highrisk", label:"高風險", count: records.filter(r => r.rri != null && r.rri < 50).length},
         ].map(c => (
           <button key={c.id} className={`chip ${filter === c.id ? "active" : ""}`} onClick={() => setFilter(c.id)}>
             {c.label} <span className="count mono">{c.count}</span>
