@@ -900,16 +900,16 @@ function buildRandomFormSeed() {
   };
 }
 
-function buildEmptyImportSeed() {
+function buildEmptyFormSeed() {
   return {
-    propertyType: null,
-    buildingType: null,
+    propertyType: undefined,
+    buildingType: undefined,
     floor: "",
     totalFloor: "",
     sizePing: "",
     district: "",
-    hasFurniture: null,
-    petAllowed: null,
+    hasFurniture: undefined,
+    petAllowed: undefined,
 
     rent: "",
     deposit: "",
@@ -917,26 +917,26 @@ function buildEmptyImportSeed() {
     waterFee: "",
     managementFee: "",
     internetFee: "",
-    eligibleForSubsidy: null,
+    eligibleForSubsidy: undefined,
 
-    hasWrittenContract: null,
+    hasWrittenContract: undefined,
     reviewPeriod: "",
     repairResponsibility: "",
     earlyTermination: "",
     depositReturnTerms: "",
     notes: "",
 
-    rooftopAddition: null,
-    illegalPartition: null,
+    rooftopAddition: undefined,
+    illegalPartition: undefined,
     escapeRoute: "",
     fireEquipment: "",
     waterLeak: "",
     doorLock: "",
 
-    taxRegistrationAllowed: null,
-    householdRegistrationAllowed: null,
-    taxBurdenShift: null,
-    unfairTerms: null,
+    taxRegistrationAllowed: undefined,
+    householdRegistrationAllowed: undefined,
+    taxBurdenShift: undefined,
+    unfairTerms: undefined,
   };
 }
 
@@ -1107,7 +1107,7 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", e
       const bundle = window.RU_DATA?.getRecordBundle?.(editRecordId);
       if (bundle?.rhir) return seedFromRhirBundle(bundle.rhir);
     }
-    return buildRandomFormSeed();
+    return buildEmptyFormSeed();
   });
   const [formResetKey, setFormResetKey] = useStateF(0);
   const [previewRhir, setPreviewRhir] = useStateF(null);
@@ -1203,7 +1203,7 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", e
       setImportNotice("找不到這個匯入 ID。請確認擴充功能已經打開過 Rent Unfiltered。");
       return;
     }
-    setSeed(buildSeedFromCapture(imported.capture, buildEmptyImportSeed()));
+    setSeed(buildSeedFromCapture(imported.capture, buildEmptyFormSeed()));
     setFormResetKey((value) => value + 1);
     setImportInput(cleanId);
     setImportNotice(`已載入 ${cleanId}，表單已先用可辨識資訊預填。`);
