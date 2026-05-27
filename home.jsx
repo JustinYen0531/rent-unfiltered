@@ -19,7 +19,9 @@ function HomePage({ setRoute }) {
     total: records.length,
     analyzed: records.filter(r => r.rri != null).length,
     pending: records.filter(r => r.rri == null).length,
-    avgCompletion: Math.round(records.reduce((a, r) => a + r.completion, 0) / records.length * 100),
+    avgCompletion: records.length
+      ? Math.round(records.reduce((a, r) => a + r.completion, 0) / records.length * 100)
+      : 0,
   };
 
   return (
@@ -94,6 +96,13 @@ function HomePage({ setRoute }) {
             </tr>
           </thead>
           <tbody>
+            {filtered.length === 0 && (
+              <tr>
+                <td colSpan="9" style={{ padding: "28px 16px", textAlign: "center", color: "#5a6573" }}>
+                  目前沒有租屋紀錄。請先新增一筆租屋資訊。
+                </td>
+              </tr>
+            )}
             {filtered.map(r => (
               <tr key={r.id} className="clickable" onClick={() => setRoute({ name: "detail", id: r.id })}>
                 <td className="t-id mono">{r.id}</td>

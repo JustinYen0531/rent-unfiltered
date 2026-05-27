@@ -374,7 +374,10 @@ function getScoredRecord(record) {
 }
 
 function getVisibleRecords() {
-  return SAMPLE_RECORDS.map(getScoredRecord);
+  return IMPORTED_RECORD_BUNDLES
+    .map((bundle) => bundle?.record)
+    .filter(Boolean)
+    .map(getScoredRecord);
 }
 
 function upsertVisibleRecord(record) {
