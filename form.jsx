@@ -1247,11 +1247,6 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", e
   const totalFields = stats.overall.total;
   const pct = totalFields > 0 ? Math.round((totalFilled / totalFields) * 100) : 0;
 
-  const handleGenerate = () => {
-    setSeed(buildRandomFormSeed());
-    setFormResetKey((value) => value + 1);
-  };
-
   const handleLoadImport = (id = importInput) => {
     const cleanId = String(id || "").trim();
     if (!cleanId) {
@@ -1361,10 +1356,6 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", e
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
           <button className="btn" onClick={() => isEditMode ? setRoute({ name: "detail", id: editRecordId }) : setRoute({ name: "home" })}>返回</button>
-          <button className="btn" onClick={handleGenerate}>
-            <Icon name="sparkle" size={14} />
-            一鍵隨機生成
-          </button>
           <button className="btn">
             <Icon name="file" size={14} />
             暫存草稿
@@ -1403,11 +1394,6 @@ function FormPage({ setRoute, mode = "new", versionLabel = "X", importId = "", e
               <Icon name="sparkle" size={12} />
               一鍵補齊空白欄位
             </button>
-          </div>
-
-          <div className="side-title" style={{ marginTop: 24 }}>測試說明</div>
-          <div style={{ fontSize: 11, color: "#5a6573", lineHeight: 1.7, padding: "4px 10px" }}>
-            按下「一鍵隨機生成」會自動灌入一組測試資料，方便快速驗證 RHIR 轉換、版本建立與報告流程。
           </div>
 
           <div className="side-title" style={{ marginTop: 24 }}>擴充匯入</div>
