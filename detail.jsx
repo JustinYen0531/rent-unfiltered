@@ -307,6 +307,8 @@ function RHIRView({ data, recordId }) {
   const nodes = Object.keys(data);
   const [active, setActive] = useStateD("property");
   const [copyStatus, setCopyStatus] = useStateD("");
+  const [uploadState, setUploadState] = useStateD("idle");
+  const [uploadError, setUploadError] = useStateD("");
   const followupQuestions = window.RU.getFollowupQuestionsFromRhir(data);
 
   const subset = useMemoD(() => {
@@ -317,6 +319,23 @@ function RHIRView({ data, recordId }) {
     const ok = await copyJSON(data);
     setCopyStatus(ok ? "已複製完整 RHIR" : "複製失敗，請改用下載");
     window.setTimeout(() => setCopyStatus(""), 1800);
+  };
+
+  const handleUpload = async () => {
+    if (!window.RU_SUPABASE?.isConfigured()) {
+      setUploadState("error");
+      setUploadError("Supabase 尚未設定，請先在 supabase.jsx 填入 Project URL 和 Anon Key，然後重新整理頁面。");
+      return;
+    }
+    setUploadState("uploading");
+    setUploadError("");
+    try {
+      await window.RU_SUPABASE.uploadRhir(data);
+      setUploadState("success");
+    } catch (error) {
+      setUploadState("error");
+      setUploadError(error.message || "上傳失敗，請稍後再試。");
+    }
   };
 
   return (
@@ -350,6 +369,11 @@ function RHIRView({ data, recordId }) {
             </div>
             <div style={{display:"flex", gap:6}}>
               {copyStatus && <span className="mono" style={{fontSize:11, color:"#1652f0", alignSelf:"center"}}>{copyStatus}</span>}
+              {uploadState === "error" && uploadError && <span className="mono" style={{fontSize:11, color:"var(--s-missing-ink)", alignSelf:"center"}}>{uploadError}</span>}
+              {uploadState === "success" && <span className="mono" style={{fontSize:11, color:"var(--s-disclosed-ink)", alignSelf:"center"}}>已上傳</span>}
+              <button className="btn btn-sm" onClick={handleUpload} disabled={uploadState === "uploading"}>
+                {uploadState === "uploading" ? "上傳中..." : <><Icon name="database" size={12}/> 上傳資料庫</>}
+              </button>
               <button className="btn btn-sm btn-ghost" onClick={handleCopy}><Icon name="copy" size={12}/> 複製完整 JSON</button>
               <button className="btn btn-sm" onClick={() => downloadJSON(data, recordId)}><Icon name="download" size={12}/> 下載 .json</button>
             </div>
