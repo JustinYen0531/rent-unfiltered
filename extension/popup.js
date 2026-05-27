@@ -7,6 +7,7 @@ const meta = document.getElementById("meta");
 const importId = document.getElementById("importId");
 const statusEl = document.getElementById("status");
 let latestPayload = null;
+const RENT_UNFILTERED_APP_URL = "https://rent-unfiltered.vercel.app";
 
 function setStatus(message) {
   statusEl.textContent = message;
@@ -88,7 +89,7 @@ sendBtn.addEventListener("click", async () => {
     capture: latestPayload,
   };
   const encoded = encodeImportPayload(payload);
-  const targetUrl = `http://127.0.0.1:5500/#ruImport=${encoded}`;
+  const targetUrl = `${RENT_UNFILTERED_APP_URL}/#ruImport=${encoded}`;
   importId.textContent = id;
   setStatus(`已產生 ${id}，正在打開 Rent Unfiltered。`);
   await chrome.tabs.create({ url: targetUrl });

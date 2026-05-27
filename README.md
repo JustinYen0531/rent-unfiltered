@@ -72,8 +72,8 @@ downloads/rent-unfiltered-capture-extension-v0.1.0.zip
 
 ### 使用方式
 
-1. 先確認 Rent Unfiltered 正在本機執行：`http://127.0.0.1:5500`。
-2. 開啟任一租屋頁面。
+1. 開啟任一租屋頁面。
+2. 確認 Rent Unfiltered 正式網站可開啟：`https://rent-unfiltered.vercel.app`。
 3. 點 Chrome 工具列的 `Rent Unfiltered Capture`。
 4. 按「擷取目前頁面」。
 5. 確認文字有抓到後，按「送到 Rent Unfiltered」。
@@ -82,8 +82,8 @@ downloads/rent-unfiltered-capture-extension-v0.1.0.zip
 ### 目前限制
 
 - 這是 demo 安裝方式，需要使用者開啟 Chrome 開發人員模式。
-- 目前插件送回網址是本機測試用的 `http://127.0.0.1:5500`。
-- 正式給一般使用者前，應改成正式部署網址，並上架 Chrome Web Store。
+- 目前插件送回網址是正式部署站：`https://rent-unfiltered.vercel.app`。
+- 正式給一般使用者前，仍建議上架 Chrome Web Store。
 - 插件只擷取使用者主動點擊時該頁面的可見文字，不會自動背景追蹤瀏覽內容。
 
 ## 正式公開下載的方向
