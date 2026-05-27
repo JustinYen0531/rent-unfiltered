@@ -141,11 +141,6 @@ function validateFormValues(values) {
     const label = spec.label || spec.key;
     const blank = isBlankFormValue(rawValue);
 
-    if (REQUIRED_FORM_KEYS.has(spec.key) && blank) {
-      errors[spec.key] = "這是必填欄位，請先填寫或選擇。";
-      return;
-    }
-
     if (blank) return;
 
     const allowed = FIELD_ALLOWED_VALUES[spec.key];
