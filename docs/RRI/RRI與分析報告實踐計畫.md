@@ -1306,4 +1306,114 @@ missing：完全沒有寵物政策資訊。
 
 ---
 
-*最後更新：2026-05-16*
+## 十一、此次需求更新：從 RRI 分析報告升級為 Evidence-aware Decision Support
+
+目前的 RRI 架構，已經能做到：
+
+* 以 RHIR 為輸入
+* 用 rule-based engine 產生可解釋的風險分數
+* 以模板結論與 AI Insight 補充閱讀性
+
+但若系統要進一步協助租客維權，只停在「分析」其實不夠。下一步要升級的，不是讓 AI 更自由地評論，而是讓整個分析報告長出一個受真實案例約束的證據層與建議層。
+
+### 11.1 新的輸出分層
+
+建議將既有流程：
+
+```text
+RHIR -> RRI -> AI Insight
+```
+
+調整為：
+
+```text
+RHIR
+-> RRI Rule Engine
+-> Case Evidence Engine
+-> Recommendation Engine
+-> AI Insight / Action Plan
+```
+
+各層角色如下：
+
+* **RRI Rule Engine**：負責判斷欄位風險、計分、排序，維持一致性與可解釋性
+* **Case Evidence Engine**：負責找出相似糾紛、裁判、社群痛點與統計依據
+* **Recommendation Engine**：負責把風險與案例轉成租客可執行的建議
+* **AI Insight**：只負責整理、翻譯、摘要，不直接自由決定法律或維權結論
+
+### 11.2 AI 不直接判斷，而是受證據層約束
+
+未來的 AI 輸出應遵守以下原則：
+
+* AI 不重算 RRI 分數
+* AI 不在沒有 Evidence 支撐時主動編造「歷史上常見」或「法院通常會怎樣」
+* AI 不直接宣稱「一定違法」或「一定勝訴」
+* AI 只能在 Case Evidence Engine 已找到相似證據時，將其整理成較好理解的說法
+
+因此，AI 的可信度來源，不是模型本身，而是它背後是否有可回溯的欄位、案例、法令與統計支撐。
+
+### 11.3 新的分析報告目標：從 Summary 改成 Action Plan
+
+目前 `plainLanguageSummary` 的功能主要是說明整體風險。未來建議保留摘要，但將最終輸出重點改為 `Action Plan`。
+
+每個高風險或高不確定性欄位，建議至少產出以下結構：
+
+```json
+{
+  "field": "leaseTerms.depositRefundTerms",
+  "riskSummary": "押金退還方式未揭露，屬於高不確定性風險。",
+  "relatedCases": [
+    "gov_case_deposit_001",
+    "court_case_deposit_014"
+  ],
+  "commonOutcome": "退租後發生扣押金爭議，且租客難以主張扣款標準。",
+  "whatToAsk": [
+    "押金會在退租後幾日內返還？",
+    "哪些情況可以扣款？",
+    "扣款標準是否會寫入契約？"
+  ],
+  "evidenceToKeep": [
+    "契約草稿",
+    "房東對押金返還的文字說明",
+    "入住與退租屋況照片"
+  ],
+  "nextAction": [
+    "要求把退還期限與扣款標準明確寫入契約",
+    "若房東拒絕明寫，將此項視為高爭議條件"
+  ]
+}
+```
+
+這代表系統輸出的重點，從「你這裡有風險」進一步變成「你現在應該怎麼做」。
+
+### 11.4 Evidence-aware 報告的最小落地範圍
+
+第一批適合優先升級的欄位如下：
+
+* `depositRefundTerms`
+* `electricityRate`
+* `repairResponsibility`
+* `earlyTerminationClause`
+* `taxRegistrationAllowed`
+
+原因是這些欄位同時具備：
+
+* 歷史上高頻發生糾紛
+* 使用者可理解
+* 現實上可追問、可談判、可留證
+* 與租客實際損失高度相關
+
+### 11.5 與現有 RRI 的關係
+
+這次升級不是要推翻既有 RRI 規則，而是要維持：
+
+* **RRI 負責判斷風險結構**
+* **Evidence 負責證明這些風險不是憑空想像**
+* **Recommendation 負責把風險轉成行動**
+* **AI 負責讓上述三層更容易被使用者吸收**
+
+也就是說，RRI 在未來仍然是核心骨架；只是它不再是終點，而是整個決策支援流程的起點。
+
+---
+
+*最後更新：2026-07-10*
