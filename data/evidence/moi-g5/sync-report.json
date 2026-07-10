@@ -1,11 +1,13 @@
 {
   "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
-  "syncedAt": "2026-07-10T11:45:40.050Z",
+  "syncedAt": "2026-07-10T11:55:03.601Z",
   "totalOfficialCases": 1807,
   "rentalCandidates": 93,
   "duplicateCandidatesRemoved": 8,
   "highRelevance": 68,
   "needsReview": 25,
+  "secondPassAccepted": 23,
+  "secondPassExcluded": 2,
   "byYear": {
     "2007": 1,
     "2008": 1,

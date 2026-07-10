@@ -316,6 +316,21 @@ ${cards}
 `;
 }
 
+function secondPassDecision(record) {
+  const description = record.rawSource.caseDescription;
+  if (description.includes("停車位")) {
+    return { status: "excluded", reason: "停車位租賃，不是住宅租屋案件。" };
+  }
+
+  const purchaseSignal = includesAny(description, ["購買", "買賣", "預售屋", "成屋", "出售", "建商"]);
+  const actualRentalSignal = includesAny(description, ["租屋", "租賃房屋", "承租房屋", "向房東租賃", "包租業者", "房東", "房客"]);
+  if (purchaseSignal && !actualRentalSignal) {
+    return { status: "excluded", reason: "案情主體是購屋、買賣或出售，不是住宅租屋。" };
+  }
+
+  return { status: "accepted", reason: "案情明確涉及住宅租屋、房東、房客或租賃契約，可先進入 draft 案例庫。" };
+}
+
 async function main() {
   const response = await fetch(SOURCE_URL, { headers: { "user-agent": "Rent-Unfiltered-Evidence-Sync/1.0" } });
   if (!response.ok) throw new Error(`MOI GetG5 request failed: ${response.status} ${response.statusText}`);
@@ -340,6 +355,8 @@ async function main() {
     duplicateCandidatesRemoved: candidatesWithDuplicates.length - candidates.length,
     highRelevance: candidates.filter((item) => item.automation.rentalRelevance === "high").length,
     needsReview: candidates.filter((item) => item.automation.rentalRelevance !== "high").length,
+    secondPassAccepted: null,
+    secondPassExcluded: null,
     byYear: Object.fromEntries(
       [...new Set(candidates.map((item) => item.year))]
         .filter(Boolean)
@@ -350,6 +367,25 @@ async function main() {
 
   const highRelevanceCandidates = candidates.filter((item) => item.automation.rentalRelevance === "high");
   const reviewQueue = candidates.filter((item) => item.automation.rentalRelevance !== "high");
+  const secondPass = reviewQueue.map((record) => ({ record, decision: secondPassDecision(record) }));
+  const secondPassAccepted = secondPass
+    .filter((item) => item.decision.status === "accepted")
+    .map((item) => ({
+      ...item.record,
+      automation: { ...item.record.automation, secondPass: "accepted" },
+      notes: `${item.record.notes} 第二次篩選：${item.decision.reason}`
+    }));
+  const secondPassExcluded = secondPass
+    .filter((item) => item.decision.status === "excluded")
+    .map((item) => ({
+      id: item.record.id,
+      title: item.record.title,
+      reason: item.decision.reason,
+      rawSource: item.record.rawSource
+    }));
+
+  report.secondPassAccepted = secondPassAccepted.length;
+  report.secondPassExcluded = secondPassExcluded.length;
 
   await mkdir(OUTPUT_ROOT, { recursive: true });
   await Promise.all([
@@ -358,6 +394,9 @@ async function main() {
     writeFile(path.join(OUTPUT_ROOT, "high-relevance.json"), `${JSON.stringify(highRelevanceCandidates, null, 2)}\n`, "utf8"),
     writeFile(path.join(OUTPUT_ROOT, "high-relevance.seed.sql"), toSeedSql(highRelevanceCandidates), "utf8"),
     writeFile(path.join(OUTPUT_ROOT, "needs-review.json"), `${JSON.stringify(reviewQueue, null, 2)}\n`, "utf8"),
+    writeFile(path.join(OUTPUT_ROOT, "needs-review-accepted.json"), `${JSON.stringify(secondPassAccepted, null, 2)}\n`, "utf8"),
+    writeFile(path.join(OUTPUT_ROOT, "needs-review-accepted.seed.sql"), toSeedSql(secondPassAccepted), "utf8"),
+    writeFile(path.join(OUTPUT_ROOT, "needs-review-excluded.json"), `${JSON.stringify(secondPassExcluded, null, 2)}\n`, "utf8"),
     writeFile(path.join(OUTPUT_ROOT, "all-candidates.md"), toCandidateIndexMarkdown(candidates, report), "utf8"),
     writeFile(path.join(OUTPUT_ROOT, "needs-review.md"), toReviewQueueMarkdown(reviewQueue, report), "utf8"),
     writeFile(path.join(OUTPUT_ROOT, "rental-candidates.seed.sql"), toSeedSql(candidates), "utf8"),
@@ -368,6 +407,9 @@ async function main() {
   console.log(`Rental candidates: ${report.rentalCandidates}`);
   console.log(`High relevance: ${report.highRelevance}`);
   console.log(`Needs review: ${report.needsReview}`);
+  console.log(`Second-pass accepted: ${secondPassAccepted.length}`);
+  console.log(`Second-pass excluded: ${secondPassExcluded.length}`);
+  console.log(`Accepted seed: ${path.join(OUTPUT_ROOT, "needs-review-accepted.seed.sql")}`);
   console.log(`High-relevance seed: ${path.join(OUTPUT_ROOT, "high-relevance.seed.sql")}`);
   console.log(`Review list: ${path.join(OUTPUT_ROOT, "needs-review.md")}`);
   console.log(`Output: ${OUTPUT_ROOT}`);

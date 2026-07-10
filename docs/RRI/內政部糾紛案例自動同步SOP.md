@@ -23,6 +23,9 @@ npm run evidence:sync:moi
 * `data/evidence/moi-g5/high-relevance.seed.sql`：只匯入 68 筆高度相關候選的 SQL
 * `data/evidence/moi-g5/needs-review.json`：需要人工確認的候選
 * `data/evidence/moi-g5/needs-review.md`：組員實際使用的審核清單
+* `data/evidence/moi-g5/needs-review-accepted.json`：第二次篩選後保留的 22 筆
+* `data/evidence/moi-g5/needs-review-accepted.seed.sql`：匯入這 22 筆的批次 SQL
+* `data/evidence/moi-g5/needs-review-excluded.json`：排除的 3 筆與排除理由
 * `data/evidence/moi-g5/rental-candidates.seed.sql`：Supabase 批次匯入 SQL
 * `data/evidence/moi-g5/sync-report.json`：本次同步統計
 
