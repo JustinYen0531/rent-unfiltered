@@ -4,6 +4,7 @@
 // 1. 到 https://supabase.com 建立免費專案
 //
 // 2. 在 Supabase SQL Editor 執行以下 SQL：
+//    案例證據資料表請改執行 docs/RRI/evidence_cases.sql
 //
 //    CREATE TABLE rhir_uploads (
 //      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
