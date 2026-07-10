@@ -1,6 +1,6 @@
 {
   "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
-  "syncedAt": "2026-07-10T10:39:47.132Z",
+  "syncedAt": "2026-07-10T11:45:40.050Z",
   "totalOfficialCases": 1807,
   "rentalCandidates": 93,
   "duplicateCandidatesRemoved": 8,

@@ -248,6 +248,74 @@ commit;
 `;
 }
 
+function markdownCell(value) {
+  return String(value ?? "—").replaceAll("|", "\\|").replace(/\s+/g, " ").trim();
+}
+
+function toCandidateIndexMarkdown(candidates, report) {
+  const rows = candidates.map((record, index) =>
+    `| ${index + 1} | \`${record.id}\` | ${markdownCell(record.title)} | ${record.automation.rentalRelevance} | ${markdownCell(record.riskTypes.join(", ") || "待配對")} | ${markdownCell(record.rhirFields.join(", ") || "待配對")} |`
+  ).join("\n");
+
+  return `# 內政部租屋候選總覽
+
+本次共讀取 ${report.totalOfficialCases} 筆官方案例，篩出 ${report.rentalCandidates} 筆租屋候選。此清單只是索引；需要人工判斷的完整內容請看 \`needs-review.md\`。
+
+| # | Case ID | 標題 | 關聯度 | Risk Type | RHIR 欄位 |
+|---:|---|---|---|---|---|
+${rows}
+
+## 資料來源與授權
+
+資料來源：內政部國土管理署「房地產消費糾紛案例」。原始資料依政府資料開放授權條款第 1 版提供。Rent Unfiltered 所作的租屋篩選、RHIR 分類與風險標籤為衍生整理，不代表原資料提供機關之立場或法律意見。
+`;
+}
+
+function toReviewQueueMarkdown(candidates, report) {
+  const cards = candidates.map((record, index) => `## ${index + 1}. ${record.title}
+
+- Case ID：\`${record.id}\`
+- 租屋關聯度：\`${record.automation.rentalRelevance}\`
+- 自動 Risk Type：\`${record.riskTypes[0] || "待配對"}\`
+- 自動 RHIR 欄位：\`${record.rhirFields[0] || "待配對"}\`
+- 原始分類：${record.rawSource.disputeCause || "未填"}
+- 縣市／來源：${record.rawSource.city || "未填"}／${record.rawSource.disputeOrigin || "未填"}
+
+**官方案例說明**
+
+${record.rawSource.caseDescription}
+
+**官方辦理情形與法令依據**
+
+${record.rawSource.handlingAndLegalBasis}
+
+**審核勾選**
+
+- [ ] 確認是住宅租屋案件
+- [ ] 確認 Risk Type 正確
+- [ ] 確認 RHIR 欄位正確
+- [ ] 確認摘要與建議沒有超出官方資料
+
+**審核決定**：\`verified / reject / revise\`
+
+**審核備註**：
+
+---`).join("\n\n");
+
+  return `# 內政部租屋候選待審核清單
+
+本次共有 ${report.needsReview} 筆需要人工確認。這些資料仍是 \`draft\`，不會直接成為 RRI 證據。
+
+審核時只需要確認租屋關聯、Risk Type、RHIR 欄位與措辭；不需要重新搜尋來源。
+
+${cards}
+
+## 資料來源與授權
+
+資料來源：內政部國土管理署「房地產消費糾紛案例」。原始資料依政府資料開放授權條款第 1 版提供。Rent Unfiltered 所作的租屋篩選、RHIR 分類與風險標籤為衍生整理，不代表原資料提供機關之立場或法律意見。
+`;
+}
+
 async function main() {
   const response = await fetch(SOURCE_URL, { headers: { "user-agent": "Rent-Unfiltered-Evidence-Sync/1.0" } });
   if (!response.ok) throw new Error(`MOI GetG5 request failed: ${response.status} ${response.statusText}`);
@@ -280,10 +348,17 @@ async function main() {
     )
   };
 
+  const highRelevanceCandidates = candidates.filter((item) => item.automation.rentalRelevance === "high");
+  const reviewQueue = candidates.filter((item) => item.automation.rentalRelevance !== "high");
+
   await mkdir(OUTPUT_ROOT, { recursive: true });
   await Promise.all([
     writeFile(path.join(OUTPUT_ROOT, "raw-latest.xml"), xml, "utf8"),
     writeFile(path.join(OUTPUT_ROOT, "rental-candidates.json"), `${JSON.stringify(candidates, null, 2)}\n`, "utf8"),
+    writeFile(path.join(OUTPUT_ROOT, "high-relevance.json"), `${JSON.stringify(highRelevanceCandidates, null, 2)}\n`, "utf8"),
+    writeFile(path.join(OUTPUT_ROOT, "needs-review.json"), `${JSON.stringify(reviewQueue, null, 2)}\n`, "utf8"),
+    writeFile(path.join(OUTPUT_ROOT, "all-candidates.md"), toCandidateIndexMarkdown(candidates, report), "utf8"),
+    writeFile(path.join(OUTPUT_ROOT, "needs-review.md"), toReviewQueueMarkdown(reviewQueue, report), "utf8"),
     writeFile(path.join(OUTPUT_ROOT, "rental-candidates.seed.sql"), toSeedSql(candidates), "utf8"),
     writeFile(path.join(OUTPUT_ROOT, "sync-report.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8")
   ]);
@@ -292,6 +367,7 @@ async function main() {
   console.log(`Rental candidates: ${report.rentalCandidates}`);
   console.log(`High relevance: ${report.highRelevance}`);
   console.log(`Needs review: ${report.needsReview}`);
+  console.log(`Review list: ${path.join(OUTPUT_ROOT, "needs-review.md")}`);
   console.log(`Output: ${OUTPUT_ROOT}`);
 }
 
