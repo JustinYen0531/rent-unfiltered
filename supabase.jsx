@@ -92,4 +92,17 @@ window.RU_SUPABASE = {
     if (error) throw error;
     return data.rhir_json;
   },
+
+  async getAllEvidenceCases() {
+    const client = _client();
+    if (!client) throw new Error("請先在 supabase.jsx 填入你的 Project URL 和 Anon Key，然後重新整理頁面。");
+
+    const { data, error } = await client
+      .from("evidence_cases")
+      .select("id, source_type, source_name, title, year, rhir_fields, risk_types, confidence, review_status, updated_at")
+      .order("updated_at", { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  },
 };

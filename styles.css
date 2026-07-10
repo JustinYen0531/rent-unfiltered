@@ -223,6 +223,34 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
 }
 .stat-value .delta { font-size: 12px; font-weight: 500; color: var(--ink-3); }
 
+.evidence-work-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.evidence-work-card {
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  padding: 14px;
+  background: var(--bg);
+}
+.evidence-work-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+.evidence-work-card h3 { margin: 2px 0 0; font-size: 14px; }
+.evidence-work-type { font-size: 10px; color: var(--ink-3); text-transform: uppercase; }
+.evidence-work-card p { color: var(--ink-2); font-size: 12px; min-height: 38px; margin: 12px 0 10px; }
+.evidence-progress { height: 5px; border-radius: 99px; background: var(--panel-2); overflow: hidden; }
+.evidence-progress span { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
+.evidence-work-meta { margin-top: 8px; color: var(--ink-3); font-size: 11px; }
+.evidence-source-link { display: inline-block; margin-top: 10px; color: var(--accent-ink); font-size: 11px; }
+.evidence-sop-step { display: grid; grid-template-columns: 34px 1fr; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--hairline); font-size: 12px; color: var(--ink-2); }
+.evidence-sop-step:last-child { border-bottom: 0; }
+.evidence-sop-number { color: var(--accent); font-family: "IBM Plex Mono", monospace; font-size: 11px; }
+
 /* ---------- Buttons ---------- */
 .btn {
   display: inline-flex; align-items: center; gap: 6px;
@@ -987,7 +1015,8 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
 
 @media (max-width: 900px) {
   .extension-grid,
-  .extension-options {
+  .extension-options,
+  .evidence-work-grid {
     grid-template-columns: 1fr;
   }
 }
