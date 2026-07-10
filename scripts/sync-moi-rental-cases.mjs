@@ -356,6 +356,7 @@ async function main() {
     writeFile(path.join(OUTPUT_ROOT, "raw-latest.xml"), xml, "utf8"),
     writeFile(path.join(OUTPUT_ROOT, "rental-candidates.json"), `${JSON.stringify(candidates, null, 2)}\n`, "utf8"),
     writeFile(path.join(OUTPUT_ROOT, "high-relevance.json"), `${JSON.stringify(highRelevanceCandidates, null, 2)}\n`, "utf8"),
+    writeFile(path.join(OUTPUT_ROOT, "high-relevance.seed.sql"), toSeedSql(highRelevanceCandidates), "utf8"),
     writeFile(path.join(OUTPUT_ROOT, "needs-review.json"), `${JSON.stringify(reviewQueue, null, 2)}\n`, "utf8"),
     writeFile(path.join(OUTPUT_ROOT, "all-candidates.md"), toCandidateIndexMarkdown(candidates, report), "utf8"),
     writeFile(path.join(OUTPUT_ROOT, "needs-review.md"), toReviewQueueMarkdown(reviewQueue, report), "utf8"),
@@ -367,6 +368,7 @@ async function main() {
   console.log(`Rental candidates: ${report.rentalCandidates}`);
   console.log(`High relevance: ${report.highRelevance}`);
   console.log(`Needs review: ${report.needsReview}`);
+  console.log(`High-relevance seed: ${path.join(OUTPUT_ROOT, "high-relevance.seed.sql")}`);
   console.log(`Review list: ${path.join(OUTPUT_ROOT, "needs-review.md")}`);
   console.log(`Output: ${OUTPUT_ROOT}`);
 }

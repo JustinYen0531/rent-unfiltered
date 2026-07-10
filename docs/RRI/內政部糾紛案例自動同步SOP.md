@@ -20,6 +20,7 @@ npm run evidence:sync:moi
 * `data/evidence/moi-g5/rental-candidates.json`：租屋候選案例
 * `data/evidence/moi-g5/all-candidates.md`：全部候選的人類可讀索引
 * `data/evidence/moi-g5/high-relevance.json`：高度相關候選
+* `data/evidence/moi-g5/high-relevance.seed.sql`：只匯入 68 筆高度相關候選的 SQL
 * `data/evidence/moi-g5/needs-review.json`：需要人工確認的候選
 * `data/evidence/moi-g5/needs-review.md`：組員實際使用的審核清單
 * `data/evidence/moi-g5/rental-candidates.seed.sql`：Supabase 批次匯入 SQL
