@@ -1,0 +1,4473 @@
+[
+  {
+    "id": "gov_moi_rental_e5b1ed4b181b",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "電費計價｜南投縣｜民國 114 年",
+    "year": 2025,
+    "keywords": [
+      "其他",
+      "電費計價",
+      "租賃",
+      "房東"
+    ],
+    "rhirFields": [
+      "cost.electricityRate"
+    ],
+    "riskTypes": [
+      "electricity_overcharge"
+    ],
+    "summary": "消費者向房東租賃房屋，請求房東電費收費標準以當期每度平均電價計算遭拒，衍生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經函請房東依消費者保護法第43條規定於15日內妥處",
+      "月8日公告之「住宅租賃定型化契約應記載及不得記載事項」之應記載事項第6點第3項規定辦理"
+    ],
+    "actionHints": [
+      "要求寫明電費計價方式",
+      "確認是否依當期電費單計算"
+    ],
+    "evidenceToKeep": [
+      "租賃契約電費條款",
+      "電費單",
+      "房東收費明細"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "electricity_overcharge"
+    },
+    "rawSource": {
+      "rocYear": "114",
+      "city": "南投縣",
+      "disputeOrigin": "其它",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向房東租賃房屋，請求房東電費收費標準以當期每度平均電價計算遭拒，衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請房東依消費者保護法第43條規定於15日內妥處，並依內政部113年7月8日公告之「住宅租賃定型化契約應記載及不得記載事項」之應記載事項第6點第3項規定辦理，即每度電費不得超過該租賃標的電費單「當期每度平均電價」。嗣房東表示因租賃契約係於113年7月以前簽訂，故未依最新規定辦理，已向消費者解釋說明，並同意嗣後電費收費標準以「當期每度平均電價」計算，雙方和解，消弭糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_aa9f42f7e8ac",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "看屋前付款｜苗栗縣｜民國 114 年",
+    "year": 2025,
+    "keywords": [
+      "「定金」返還(含斡旋金轉成定金返還)",
+      "看屋前付款",
+      "租賃",
+      "承租"
+    ],
+    "rhirFields": [
+      "leaseTerms.viewingPaymentRequirement"
+    ],
+    "riskTypes": [
+      "viewing_payment_scam"
+    ],
+    "summary": "消費者透過仲介業者租賃房屋，並於帶看前支付定金，惟至現場才發現屋內水管漏水、牆面有壁癌、屋外樓梯間堆放雜物及逃生設備指示不明等瑕疵，當場表示不承租並要求業者退還定金遭拒，認其權益受損，衍生糾紛。",
+    "commonOutcome": "經協調後退還全部或部分款項。",
+    "legalBasis": [
+      "案經函請仲介業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "看屋前不要支付名稱不明的預約金或押金",
+      "先確認出租人身分與出租權限"
+    ],
+    "evidenceToKeep": [
+      "租屋刊登截圖",
+      "付款要求對話",
+      "轉帳紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": "viewing_payment_scam"
+    },
+    "rawSource": {
+      "rocYear": "114",
+      "city": "苗栗縣",
+      "disputeOrigin": "仲介",
+      "disputeCause": "「定金」返還(含斡旋金轉成定金返還)",
+      "caseDescription": "消費者透過仲介業者租賃房屋，並於帶看前支付定金，惟至現場才發現屋內水管漏水、牆面有壁癌、屋外樓梯間堆放雜物及逃生設備指示不明等瑕疵，當場表示不承租並要求業者退還定金遭拒，認其權益受損，衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請仲介業者依消費者保護法第43條規定於15日內妥處，嗣業者表示已退還定金全額予消費者，消弭糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_b7c717ffa30e",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "提前終止｜新北市｜民國 114 年",
+    "year": 2025,
+    "keywords": [
+      "其他",
+      "提前終止",
+      "租賃",
+      "承租",
+      "包租"
+    ],
+    "rhirFields": [
+      "leaseTerms.earlyTerminationClause"
+    ],
+    "riskTypes": [
+      "early_termination_dispute"
+    ],
+    "summary": "消費者透過包租業者租賃房屋，承租期間因噪音問題無法解決，要求提前解除租賃契約，遭業者扣除1個月押金作為違約金，認其權益受損，損衍生糾紛。",
+    "commonOutcome": "租賃契約經協調後解除或終止。",
+    "legalBasis": [
+      "案經函請包租業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "簽約前確認提前終止條件與違約金",
+      "以書面留下終止通知與協議"
+    ],
+    "evidenceToKeep": [
+      "提前終止條款",
+      "書面通知",
+      "雙方協議紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "early_termination_dispute"
+    },
+    "rawSource": {
+      "rocYear": "114",
+      "city": "新北市",
+      "disputeOrigin": "其它",
+      "disputeCause": "其他",
+      "caseDescription": "消費者透過包租業者租賃房屋，承租期間因噪音問題無法解決，要求提前解除租賃契約，遭業者扣除1個月押金作為違約金，認其權益受損，損衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請包租業者依消費者保護法第43條規定於15日內妥處，嗣業者表示雙方達成協議，提前解除租賃契約並退還全額押金予消費者，消弭糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_54f87586c7d9",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "修繕責任｜新北市｜民國 114 年",
+    "year": 2025,
+    "keywords": [
+      "其他",
+      "修繕責任",
+      "租賃",
+      "包租"
+    ],
+    "rhirFields": [
+      "leaseTerms.repairResponsibility"
+    ],
+    "riskTypes": [
+      "repair_delay"
+    ],
+    "summary": "消費者透過包租業者租賃房屋，入住後發現屋內出現潮濕蟲，經向業者反映未獲處理，反受要求自費請除蟲公司清理，請求提前終止租賃契約並返還全額押金遭拒，認其權益受損，衍生糾紛。",
+    "commonOutcome": "租賃契約經協調後解除或終止。",
+    "legalBasis": [
+      "案經函請包租業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "要求契約寫明修繕責任與處理期限",
+      "入住前記錄屋況與既有瑕疵"
+    ],
+    "evidenceToKeep": [
+      "入住前屋況照片",
+      "報修對話",
+      "修繕估價或收據"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "repair_delay"
+    },
+    "rawSource": {
+      "rocYear": "114",
+      "city": "新北市",
+      "disputeOrigin": "其它",
+      "disputeCause": "其他",
+      "caseDescription": "消費者透過包租業者租賃房屋，入住後發現屋內出現潮濕蟲，經向業者反映未獲處理，反受要求自費請除蟲公司清理，請求提前終止租賃契約並返還全額押金遭拒，認其權益受損，衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請包租業者依消費者保護法第43條規定於15日內妥處，嗣業者同意無條件提前解除租賃契約並退還全額押金予消費者，消弭糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_e7c0edc524a3",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "寵物約定｜臺中市｜民國 114 年",
+    "year": 2025,
+    "keywords": [
+      "其他",
+      "寵物約定",
+      "租賃",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.petPolicy"
+    ],
+    "riskTypes": [
+      "pet_policy_conflict"
+    ],
+    "summary": "消費者透過仲介業者租賃房屋，經業者確認可飼養寵物後簽訂租賃契約，惟入住後鄰居檢舉飼養寵物，遭房東通知要求立即搬離並扣1個月押金，方知房東未同意可於租賃處飼養寵物。消費者主張業者資訊錯誤且未妥善協調，要求房東返還全額押金，並賠償因提前半個月搬離租賃處所衍生之費用遭拒，遂生糾紛。",
+    "commonOutcome": "經協調後返還全部或部分押金。",
+    "legalBasis": [
+      "案經函請仲介業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "要求房東以文字確認是否可飼養寵物",
+      "確認違反寵物約定的處理方式"
+    ],
+    "evidenceToKeep": [
+      "租賃契約寵物條款",
+      "房東或仲介文字確認"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "pet_policy_conflict"
+    },
+    "rawSource": {
+      "rocYear": "114",
+      "city": "臺中市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "其他",
+      "caseDescription": "消費者透過仲介業者租賃房屋，經業者確認可飼養寵物後簽訂租賃契約，惟入住後鄰居檢舉飼養寵物，遭房東通知要求立即搬離並扣1個月押金，方知房東未同意可於租賃處飼養寵物。消費者主張業者資訊錯誤且未妥善協調，要求房東返還全額押金，並賠償因提前半個月搬離租賃處所衍生之費用遭拒，遂生糾紛。",
+      "handlingAndLegalBasis": "案經函請仲介業者依消費者保護法第43條規定於15日內妥處，嗣業者表示雙方同意終止租賃契約，另房東返還全額押金，無需額外賠償消費者因提前半個月搬離租賃處所衍生之費用，雙方和解，消弭糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_c537bf518710",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "租屋補助｜臺中市｜民國 114 年",
+    "year": 2025,
+    "keywords": [
+      "其他",
+      "租屋補助",
+      "租屋",
+      "租賃",
+      "房東"
+    ],
+    "rhirFields": [
+      "rights.rentalSubsidyAllowed"
+    ],
+    "riskTypes": [
+      "rental_subsidy_restriction"
+    ],
+    "summary": "消費者向房東租賃房屋，契約期內原房東過世，需與繼承房屋之新房東重新簽約方可申請租屋補助，惟新房東要求調漲租金才願意重新簽約，消費者認其權益受損，衍生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經函請新房東依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "簽約前確認是否配合租金補貼或相關申報",
+      "要求將雙方約定寫入契約"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "房東文字回覆",
+      "補貼申請資料"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "rental_subsidy_restriction"
+    },
+    "rawSource": {
+      "rocYear": "114",
+      "city": "臺中市",
+      "disputeOrigin": "其它",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向房東租賃房屋，契約期內原房東過世，需與繼承房屋之新房東重新簽約方可申請租屋補助，惟新房東要求調漲租金才願意重新簽約，消費者認其權益受損，衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請新房東依消費者保護法第43條規定於15日內妥處，嗣新房東同意依原契約內容重新簽約，不另調漲租金，雙方和解，消弭糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_a7f7fc2f8c7f",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜臺北市｜民國 114 年",
+    "year": 2025,
+    "keywords": [
+      "「定金」返還(含斡旋金轉成定金返還)",
+      "押金返還",
+      "租賃",
+      "出租",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者透過仲介業者租賃房屋並支付定金予業者後，房東拒絕出租房屋，因租賃契約尚未簽訂，請求業者返還定金未果，衍生糾紛。",
+    "commonOutcome": "經協調後退還全部或部分款項。",
+    "legalBasis": [
+      "案經函請仲介業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "114",
+      "city": "臺北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "「定金」返還(含斡旋金轉成定金返還)",
+      "caseDescription": "消費者透過仲介業者租賃房屋並支付定金予業者後，房東拒絕出租房屋，因租賃契約尚未簽訂，請求業者返還定金未果，衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請仲介業者依消費者保護法第43條規定於15日內妥處，經地政局協調後達成和解，業者退還全額定金予消費者，消弭糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_160c6f82a746",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜臺北市｜民國 114 年",
+    "year": 2025,
+    "keywords": [
+      "其他",
+      "押金返還",
+      "租賃",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者向房東租賃成屋，於租約期滿後完成退租及房屋點交，房東原允諾返還2個月押金，嗣後卻以需等待下一位租客簽約為由延遲返還，主張房屋既已完整點交，應立即返還押金，認其權益受損，衍生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經函請房東依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "114",
+      "city": "臺北市",
+      "disputeOrigin": "其它",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向房東租賃成屋，於租約期滿後完成退租及房屋點交，房東原允諾返還2個月押金，嗣後卻以需等待下一位租客簽約為由延遲返還，主張房屋既已完整點交，應立即返還押金，認其權益受損，衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請房東依消費者保護法第43條規定於15日內妥處，經地政局多次協調後達成和解，房東退還全額押金，消弭糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_91b3e4a57ea5",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "修繕責任｜臺北市｜民國 114 年",
+    "year": 2025,
+    "keywords": [
+      "其他",
+      "修繕責任",
+      "租賃",
+      "包租"
+    ],
+    "rhirFields": [
+      "leaseTerms.repairResponsibility"
+    ],
+    "riskTypes": [
+      "repair_delay"
+    ],
+    "summary": "消費者向包租業者租賃房屋，退租點交屋況時，業者發現牆面壁紙有霉斑，要求自押金扣除壁紙更換費用，消費者認為居住期間已妥善使用除濕機維護居住環境，主張霉斑係因環境潮濕自然形成，非屬個人使用不當所致，不應由其承擔修繕費用，衍生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經函請包租業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "要求契約寫明修繕責任與處理期限",
+      "入住前記錄屋況與既有瑕疵"
+    ],
+    "evidenceToKeep": [
+      "入住前屋況照片",
+      "報修對話",
+      "修繕估價或收據"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": "repair_delay"
+    },
+    "rawSource": {
+      "rocYear": "114",
+      "city": "臺北市",
+      "disputeOrigin": "其它",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向包租業者租賃房屋，退租點交屋況時，業者發現牆面壁紙有霉斑，要求自押金扣除壁紙更換費用，消費者認為居住期間已妥善使用除濕機維護居住環境，主張霉斑係因環境潮濕自然形成，非屬個人使用不當所致，不應由其承擔修繕費用，衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請包租業者依消費者保護法第43條規定於15日內妥處，經地政局多次協調達成和解，業者同意自行吸收更換壁紙費用，消弭糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_3182f926126a",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "其他｜臺北市｜民國 114 年",
+    "year": 2025,
+    "keywords": [
+      "其他",
+      "租賃",
+      "包租"
+    ],
+    "rhirFields": [],
+    "riskTypes": [],
+    "summary": "消費者透過包租業者租賃房屋，雙方約定點交退租日後，業者因人力調配問題，向消費者表示需延後點交退租日，事後卻收取延後點交期間之租金，消費者認其權益受損，衍生爭議。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經函請包租業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "由第二位組員依官方案情補上可執行建議"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "雙方文字或通知紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": null
+    },
+    "rawSource": {
+      "rocYear": "114",
+      "city": "臺北市",
+      "disputeOrigin": "其它",
+      "disputeCause": "其他",
+      "caseDescription": "消費者透過包租業者租賃房屋，雙方約定點交退租日後，業者因人力調配問題，向消費者表示需延後點交退租日，事後卻收取延後點交期間之租金，消費者認其權益受損，衍生爭議。",
+      "handlingAndLegalBasis": "案經函請包租業者依消費者保護法第43條規定於15日內妥處，經地政局協調，業者同意不收取延後點交期間之租金，雙方和解，消弭紛爭。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_43cc630beb29",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "電費計價｜臺北市｜民國 114 年",
+    "year": 2025,
+    "keywords": [
+      "其他",
+      "電費計價",
+      "租賃",
+      "承租",
+      "房東"
+    ],
+    "rhirFields": [
+      "cost.electricityRate"
+    ],
+    "riskTypes": [
+      "electricity_overcharge"
+    ],
+    "summary": "消費者向房東承租房屋，於租賃契約內明訂租賃期間之電費以房東分設電錶所示度數乘以每度6.5元計收，嗣後消費者自行加總計算分電表電度數合計值，遂發現其超過臺電設置之總電表度數，認為房東溢收電費，請求退還超收之費用遭拒，衍生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經函請房東依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "要求寫明電費計價方式",
+      "確認是否依當期電費單計算"
+    ],
+    "evidenceToKeep": [
+      "租賃契約電費條款",
+      "電費單",
+      "房東收費明細"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "electricity_overcharge"
+    },
+    "rawSource": {
+      "rocYear": "114",
+      "city": "臺北市",
+      "disputeOrigin": "其它",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向房東承租房屋，於租賃契約內明訂租賃期間之電費以房東分設電錶所示度數乘以每度6.5元計收，嗣後消費者自行加總計算分電表電度數合計值，遂發現其超過臺電設置之總電表度數，認為房東溢收電費，請求退還超收之費用遭拒，衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請房東依消費者保護法第43條規定於15日內妥處，經地政局協調且適逢租約期滿，房東同意於退租日退還消費者租賃期間溢收之電費，雙方和解，消弭糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_7093dd36373b",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "租屋補助｜臺北市｜民國 114 年",
+    "year": 2025,
+    "keywords": [
+      "服務報酬爭議",
+      "租屋補助",
+      "租賃"
+    ],
+    "rhirFields": [
+      "rights.rentalSubsidyAllowed"
+    ],
+    "riskTypes": [
+      "rental_subsidy_restriction"
+    ],
+    "summary": "消費者透過仲介業者租賃房屋，於簽訂租賃契約前業者表示可申請租金補貼，嗣該屋因登記為「商業使用」而非住宅使用致無法申請租金補貼，遂要求業者賠償損失及退還仲介服務費遭拒，衍生爭議。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經函請仲介業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "簽約前確認是否配合租金補貼或相關申報",
+      "要求將雙方約定寫入契約"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "房東文字回覆",
+      "補貼申請資料"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "rental_subsidy_restriction"
+    },
+    "rawSource": {
+      "rocYear": "114",
+      "city": "臺北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "服務報酬爭議",
+      "caseDescription": "消費者透過仲介業者租賃房屋，於簽訂租賃契約前業者表示可申請租金補貼，嗣該屋因登記為「商業使用」而非住宅使用致無法申請租金補貼，遂要求業者賠償損失及退還仲介服務費遭拒，衍生爭議。",
+      "handlingAndLegalBasis": "案經函請仲介業者依消費者保護法第43條規定於15日內妥處，經地政局協調，業者同意退還全額仲介服務費予消費者作為補償，雙方和解，消弭紛爭。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_37e85d77b374",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "電費計價｜臺南市｜民國 114 年",
+    "year": 2025,
+    "keywords": [
+      "其他",
+      "電費計價",
+      "租屋",
+      "租賃",
+      "房東"
+    ],
+    "rhirFields": [
+      "cost.electricityRate"
+    ],
+    "riskTypes": [
+      "electricity_overcharge"
+    ],
+    "summary": "消費者向房東租賃房屋，入住後發現租賃契約記載地址與實際租屋處不符，認為房東未如實載明租屋地點，涉及資訊不實與誤導，請求房東修改租賃契約所載地址遭拒，認其權益受損，衍生糾紛。",
+    "commonOutcome": "經協調後返還全部或部分押金。",
+    "legalBasis": [
+      "案經函請房東依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "要求寫明電費計價方式",
+      "確認是否依當期電費單計算"
+    ],
+    "evidenceToKeep": [
+      "租賃契約電費條款",
+      "電費單",
+      "房東收費明細"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "electricity_overcharge"
+    },
+    "rawSource": {
+      "rocYear": "114",
+      "city": "臺南市",
+      "disputeOrigin": "其它",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向房東租賃房屋，入住後發現租賃契約記載地址與實際租屋處不符，認為房東未如實載明租屋地點，涉及資訊不實與誤導，請求房東修改租賃契約所載地址遭拒，認其權益受損，衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請房東依消費者保護法第43條規定於15日內妥處，嗣後房東表示租賃契約之地址係屬誤繕，經地政局協調，雙方協議不收取1個月租金，押金全額於扣除水電費用後返還，解除租賃契約，消弭糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_d0a21c8e1742",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "修繕責任｜南投縣｜民國 113 年",
+    "year": 2024,
+    "keywords": [
+      "房屋漏水問題",
+      "修繕責任",
+      "租屋",
+      "承租",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.repairResponsibility"
+    ],
+    "riskTypes": [
+      "repair_delay"
+    ],
+    "summary": "消費者向房東承租房屋，向房東反映所附冷氣漏水，未獲立即處理造成室內潮濕發霉影響居住環境品質，因而提早通知房東不續租，請求退還全額押金遭拒，衍生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經函請房東依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "要求契約寫明修繕責任與處理期限",
+      "入住前記錄屋況與既有瑕疵"
+    ],
+    "evidenceToKeep": [
+      "入住前屋況照片",
+      "報修對話",
+      "修繕估價或收據"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "repair_delay"
+    },
+    "rawSource": {
+      "rocYear": "113",
+      "city": "南投縣",
+      "disputeOrigin": "其它",
+      "disputeCause": "房屋漏水問題",
+      "caseDescription": "消費者向房東承租房屋，向房東反映所附冷氣漏水，未獲立即處理造成室內潮濕發霉影響居住環境品質，因而提早通知房東不續租，請求退還全額押金遭拒，衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請房東依消費者保護法第43條規定於15日內妥處，嗣後房東表示，已修繕冷氣漏水情形，且雙方達成協議，房東退還消費者全額押金，消費者搬離租屋處，消弭糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_2698aa58453c",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "提前終止｜屏東縣｜民國 113 年",
+    "year": 2024,
+    "keywords": [
+      "其他",
+      "提前終止",
+      "租賃",
+      "承租",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.earlyTerminationClause"
+    ],
+    "riskTypes": [
+      "early_termination_dispute"
+    ],
+    "summary": "消費者透過仲介業者承租房屋，與業者簽訂租賃契約入住後發現屋況不佳，無法達到居住需求，請求退還1個月租金並終止租賃契約遭拒，致生糾紛。",
+    "commonOutcome": "租賃契約經協調後解除或終止。",
+    "legalBasis": [
+      "案經函請仲介業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "簽約前確認提前終止條件與違約金",
+      "以書面留下終止通知與協議"
+    ],
+    "evidenceToKeep": [
+      "提前終止條款",
+      "書面通知",
+      "雙方協議紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": "early_termination_dispute"
+    },
+    "rawSource": {
+      "rocYear": "113",
+      "city": "屏東縣",
+      "disputeOrigin": "仲介",
+      "disputeCause": "其他",
+      "caseDescription": "消費者透過仲介業者承租房屋，與業者簽訂租賃契約入住後發現屋況不佳，無法達到居住需求，請求退還1個月租金並終止租賃契約遭拒，致生糾紛。",
+      "handlingAndLegalBasis": "案經函請仲介業者依消費者保護法第43條規定於15日內妥處，嗣後業者表示房東同意退還消費者半個月租金，並解除租賃契約，消弭紛爭。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_942411f2058b",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "修繕責任｜基隆市｜民國 113 年",
+    "year": 2024,
+    "keywords": [
+      "其他",
+      "修繕責任",
+      "租屋",
+      "租賃",
+      "承租",
+      "包租"
+    ],
+    "rhirFields": [
+      "leaseTerms.repairResponsibility"
+    ],
+    "riskTypes": [
+      "repair_delay"
+    ],
+    "summary": "消費者透過包租業者租屋，承租1個月後發現屋內有多處瑕疵及漏水情形遂請業者進行修繕，惟業者遲未完成修繕，故主張提前終止租賃契約、返還押金並扣還修繕期間不能居住使用之部分租金遭拒，衍生糾紛。",
+    "commonOutcome": "租賃契約經協調後解除或終止。",
+    "legalBasis": [
+      "案經函請包租業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "要求契約寫明修繕責任與處理期限",
+      "入住前記錄屋況與既有瑕疵"
+    ],
+    "evidenceToKeep": [
+      "入住前屋況照片",
+      "報修對話",
+      "修繕估價或收據"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "repair_delay"
+    },
+    "rawSource": {
+      "rocYear": "113",
+      "city": "基隆市",
+      "disputeOrigin": "其它",
+      "disputeCause": "其他",
+      "caseDescription": "消費者透過包租業者租屋，承租1個月後發現屋內有多處瑕疵及漏水情形遂請業者進行修繕，惟業者遲未完成修繕，故主張提前終止租賃契約、返還押金並扣還修繕期間不能居住使用之部分租金遭拒，衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請包租業者依消費者保護法第43條規定於15日內妥處，嗣業者表示，同意提前終止租賃契約，並退還全額押金，另消費者尚未繳納之租金不予收取，作為修繕期間不能居住使用之補償，雙方達成和解，消弭糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_26c1c7b747a7",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "提前終止｜新北市｜民國 113 年",
+    "year": 2024,
+    "keywords": [
+      "「定金」返還(含斡旋金轉成定金返還)",
+      "提前終止",
+      "租賃",
+      "承租"
+    ],
+    "rhirFields": [
+      "leaseTerms.earlyTerminationClause"
+    ],
+    "riskTypes": [
+      "early_termination_dispute"
+    ],
+    "summary": "消費者透過仲介業者承租房屋，於簽定租賃契約並支付定金入住後，發現屋內傢俱不符需求請求退租，惟業者僅同意取消租賃契約不退還定金，認其權益受損，衍生糾紛。",
+    "commonOutcome": "經協調後退還全部或部分款項。",
+    "legalBasis": [
+      "案經函請仲介業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "簽約前確認提前終止條件與違約金",
+      "以書面留下終止通知與協議"
+    ],
+    "evidenceToKeep": [
+      "提前終止條款",
+      "書面通知",
+      "雙方協議紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": "early_termination_dispute"
+    },
+    "rawSource": {
+      "rocYear": "113",
+      "city": "新北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "「定金」返還(含斡旋金轉成定金返還)",
+      "caseDescription": "消費者透過仲介業者承租房屋，於簽定租賃契約並支付定金入住後，發現屋內傢俱不符需求請求退租，惟業者僅同意取消租賃契約不退還定金，認其權益受損，衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請仲介業者依消費者保護法第43條規定於15日內妥處，嗣業者表示，已協議解除租賃契約，並由屋主退還消費者全額定金，雙方和解。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_e8edb81701fb",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "提前終止｜新北市｜民國 113 年",
+    "year": 2024,
+    "keywords": [
+      "契約審閱權",
+      "提前終止",
+      "租屋",
+      "租賃"
+    ],
+    "rhirFields": [
+      "leaseTerms.earlyTerminationClause"
+    ],
+    "riskTypes": [
+      "early_termination_dispute"
+    ],
+    "summary": "消費者透過仲介業者租賃房屋，支付定金並簽訂租賃契約，嗣後消費者因私人因素無法租屋，請求解除契約及返還定金遭拒，遂主張業者未給予租賃契約審閱期，認其權益受損，衍生糾紛。",
+    "commonOutcome": "經協調後退還全部或部分款項。",
+    "legalBasis": [
+      "案經函請仲介業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "簽約前確認提前終止條件與違約金",
+      "以書面留下終止通知與協議"
+    ],
+    "evidenceToKeep": [
+      "提前終止條款",
+      "書面通知",
+      "雙方協議紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "early_termination_dispute"
+    },
+    "rawSource": {
+      "rocYear": "113",
+      "city": "新北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "契約審閱權",
+      "caseDescription": "消費者透過仲介業者租賃房屋，支付定金並簽訂租賃契約，嗣後消費者因私人因素無法租屋，請求解除契約及返還定金遭拒，遂主張業者未給予租賃契約審閱期，認其權益受損，衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請仲介業者依消費者保護法第43條規定於15日內妥處，嗣後業者表示，已退還一半定金予消費者並解除租賃契約，雙方達成和解。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_3d075f22495c",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "租屋補助｜臺中市｜民國 113 年",
+    "year": 2024,
+    "keywords": [
+      "其他",
+      "租屋補助",
+      "租屋",
+      "租賃",
+      "包租"
+    ],
+    "rhirFields": [
+      "rights.rentalSubsidyAllowed"
+    ],
+    "riskTypes": [
+      "rental_subsidy_restriction"
+    ],
+    "summary": "消費者透過包租業者租賃房屋，於申請租屋補助後，業者即調漲租屋價格，消費者主張業者為惡意調漲，請求酌減租屋價格遭拒，衍生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案依消費者保護法第43條規定踐行申訴及調解程序後"
+    ],
+    "actionHints": [
+      "簽約前確認是否配合租金補貼或相關申報",
+      "要求將雙方約定寫入契約"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "房東文字回覆",
+      "補貼申請資料"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "rental_subsidy_restriction"
+    },
+    "rawSource": {
+      "rocYear": "113",
+      "city": "臺中市",
+      "disputeOrigin": "其他",
+      "disputeCause": "其他",
+      "caseDescription": "消費者透過包租業者租賃房屋，於申請租屋補助後，業者即調漲租屋價格，消費者主張業者為惡意調漲，請求酌減租屋價格遭拒，衍生糾紛。",
+      "handlingAndLegalBasis": "案依消費者保護法第43條規定踐行申訴及調解程序後，雙方達成協議，租金維持原金額，消弭糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_8852401f05b0",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "服務報酬爭議｜臺中市｜民國 113 年",
+    "year": 2024,
+    "keywords": [
+      "服務報酬爭議",
+      "租屋",
+      "租賃",
+      "房東"
+    ],
+    "rhirFields": [],
+    "riskTypes": [],
+    "summary": "消費者透過仲介業者租賃房屋，因與業者及房東認知不同，導致租屋契約無法成立，請求業者退還全額仲介服務費遭拒，衍生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經函請仲介業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "由第二位組員依官方案情補上可執行建議"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "雙方文字或通知紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": null
+    },
+    "rawSource": {
+      "rocYear": "113",
+      "city": "臺中市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "服務報酬爭議",
+      "caseDescription": "消費者透過仲介業者租賃房屋，因與業者及房東認知不同，導致租屋契約無法成立，請求業者退還全額仲介服務費遭拒，衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請仲介業者依消費者保護法第43條規定於15日內妥處，業者同意退還消費者部分仲介服務費，雙方和解，消弭糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_a78bc704f40f",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "提前終止｜臺北市｜民國 113 年",
+    "year": 2024,
+    "keywords": [
+      "「定金」返還(含斡旋金轉成定金返還)",
+      "提前終止",
+      "租賃",
+      "承租",
+      "出租",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.earlyTerminationClause"
+    ],
+    "riskTypes": [
+      "early_termination_dispute"
+    ],
+    "summary": "消費者透過仲介業者承租房屋，簽定租賃契約並支付定金，嗣後房東反悔不出租，退回定金，惟消費者主張應依民法第249條規定賠償1倍定金，及為等待房東簽約期間無法承租其他房屋之損失，請求未果，衍生糾紛。",
+    "commonOutcome": "經協調後退還全部或部分款項。",
+    "legalBasis": [
+      "案經函請仲介業者依消費者保護法第43條規定於15日內妥處",
+      "另由業者依民法第249條規定賠償消費者1倍定金作為等待簽約期間之損失補償"
+    ],
+    "actionHints": [
+      "簽約前確認提前終止條件與違約金",
+      "以書面留下終止通知與協議"
+    ],
+    "evidenceToKeep": [
+      "提前終止條款",
+      "書面通知",
+      "雙方協議紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "early_termination_dispute"
+    },
+    "rawSource": {
+      "rocYear": "113",
+      "city": "臺北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "「定金」返還(含斡旋金轉成定金返還)",
+      "caseDescription": "消費者透過仲介業者承租房屋，簽定租賃契約並支付定金，嗣後房東反悔不出租，退回定金，惟消費者主張應依民法第249條規定賠償1倍定金，及為等待房東簽約期間無法承租其他房屋之損失，請求未果，衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請仲介業者依消費者保護法第43條規定於15日內妥處，經協調後，業者表示三方達成協議，房東同意退還消費者全額定金並解除租賃契約，另由業者依民法第249條規定賠償消費者1倍定金作為等待簽約期間之損失補償，消弭糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_3b587fd6de24",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "修繕責任｜臺北市｜民國 113 年",
+    "year": 2024,
+    "keywords": [
+      "其他",
+      "修繕責任",
+      "租賃",
+      "承租",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.repairResponsibility"
+    ],
+    "riskTypes": [
+      "repair_delay"
+    ],
+    "summary": "消費者向房東承租房屋並簽定租賃契約，承租後發生陽台漏水、鄰居騷擾等情事，請房東立即處理遭拒，衍生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經函請房東依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "要求契約寫明修繕責任與處理期限",
+      "入住前記錄屋況與既有瑕疵"
+    ],
+    "evidenceToKeep": [
+      "入住前屋況照片",
+      "報修對話",
+      "修繕估價或收據"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "repair_delay"
+    },
+    "rawSource": {
+      "rocYear": "113",
+      "city": "臺北市",
+      "disputeOrigin": "其它",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向房東承租房屋並簽定租賃契約，承租後發生陽台漏水、鄰居騷擾等情事，請房東立即處理遭拒，衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請房東依消費者保護法第43條規定於15日內妥處，經地政局多次協調，房東同意支付消費者修繕漏水之全額費用及改善鄰居騷擾問題，雙方達成和解，消弭糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_2ac45baa48f9",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "租屋補助｜臺北市｜民國 113 年",
+    "year": 2024,
+    "keywords": [
+      "其他",
+      "租屋補助",
+      "租屋",
+      "租賃",
+      "包租"
+    ],
+    "rhirFields": [
+      "rights.rentalSubsidyAllowed"
+    ],
+    "riskTypes": [
+      "rental_subsidy_restriction"
+    ],
+    "summary": "消費者透過包租業者租賃房屋，簽立租賃契約時，業者表示可申請租金補貼，嗣後因房屋登記非住家使用不符合租金補貼條件，致消費者無法申領租金補貼，認其權益受損，衍生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經函請包租業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "簽約前確認是否配合租金補貼或相關申報",
+      "要求將雙方約定寫入契約"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "房東文字回覆",
+      "補貼申請資料"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "rental_subsidy_restriction"
+    },
+    "rawSource": {
+      "rocYear": "113",
+      "city": "臺北市",
+      "disputeOrigin": "其他",
+      "disputeCause": "其他",
+      "caseDescription": "消費者透過包租業者租賃房屋，簽立租賃契約時，業者表示可申請租金補貼，嗣後因房屋登記非住家使用不符合租金補貼條件，致消費者無法申領租金補貼，認其權益受損，衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請包租業者依消費者保護法第43條規定於15日內妥處，並經地政局協調達成協議，業者同意自消費者租屋起始日至到期日，為期1年時間，每月減免部分租金作為賠償，雙方和解，消弭糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_95bd68a295eb",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "提前終止｜臺北市｜民國 113 年",
+    "year": 2024,
+    "keywords": [
+      "其他",
+      "提前終止",
+      "租賃",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.earlyTerminationClause"
+    ],
+    "riskTypes": [
+      "early_termination_dispute"
+    ],
+    "summary": "消費者透過仲介業者租賃房屋，嗣後因地震造成頂樓坍塌破洞且屋內有龜裂情形，業者要求提前終止租約並請消費者立即搬離，致生糾紛。",
+    "commonOutcome": "經協調後返還全部或部分押金。",
+    "legalBasis": [
+      "案經函請仲介業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "簽約前確認提前終止條件與違約金",
+      "以書面留下終止通知與協議"
+    ],
+    "evidenceToKeep": [
+      "提前終止條款",
+      "書面通知",
+      "雙方協議紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": "early_termination_dispute"
+    },
+    "rawSource": {
+      "rocYear": "113",
+      "city": "臺北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "其他",
+      "caseDescription": "消費者透過仲介業者租賃房屋，嗣後因地震造成頂樓坍塌破洞且屋內有龜裂情形，業者要求提前終止租約並請消費者立即搬離，致生糾紛。",
+      "handlingAndLegalBasis": "案經函請仲介業者依消費者保護法第43條規定於15日內妥處，並經地政局協調達成協議，房東同意返還2個月押金並免收取搬離該月份之租金，另業者協助消費者退租且不收取仲介服務費，消弭糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_3ef717c7cdee",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "租屋補助｜臺北市｜民國 113 年",
+    "year": 2024,
+    "keywords": [
+      "其他",
+      "租屋補助",
+      "租屋",
+      "租賃",
+      "承租",
+      "房東"
+    ],
+    "rhirFields": [
+      "rights.rentalSubsidyAllowed"
+    ],
+    "riskTypes": [
+      "rental_subsidy_restriction"
+    ],
+    "summary": "消費者向房東承租房屋，嗣後申請租金補貼時，發現所簽訂之租賃契約之租賃地址有誤，致無法申請補貼，請求房東修正租賃契約內容遭拒，衍生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經函請房東依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "簽約前確認是否配合租金補貼或相關申報",
+      "要求將雙方約定寫入契約"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "房東文字回覆",
+      "補貼申請資料"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "rental_subsidy_restriction"
+    },
+    "rawSource": {
+      "rocYear": "113",
+      "city": "臺北市",
+      "disputeOrigin": "其他",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向房東承租房屋，嗣後申請租金補貼時，發現所簽訂之租賃契約之租賃地址有誤，致無法申請補貼，請求房東修正租賃契約內容遭拒，衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請房東依消費者保護法第43條規定於15日內妥處，並經地政局協調達成協議，房東同意修正房屋租賃契約之租屋地址，並調降每月租金至租期結束作為租金補貼之補償，消弭糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_6fa05e5af5d4",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "修繕責任｜臺北市｜民國 113 年",
+    "year": 2024,
+    "keywords": [
+      "房屋漏水問題",
+      "修繕責任",
+      "租賃",
+      "包租"
+    ],
+    "rhirFields": [
+      "leaseTerms.repairResponsibility"
+    ],
+    "riskTypes": [
+      "repair_delay"
+    ],
+    "summary": "消費者透過包租業者租賃房屋並簽定租賃契約，入住後屋內因雨造成嚴重漏水及財物損失，遂主張業者應賠償財物損失及減免租金遭拒，衍生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經函請包租業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "要求契約寫明修繕責任與處理期限",
+      "入住前記錄屋況與既有瑕疵"
+    ],
+    "evidenceToKeep": [
+      "入住前屋況照片",
+      "報修對話",
+      "修繕估價或收據"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "repair_delay"
+    },
+    "rawSource": {
+      "rocYear": "113",
+      "city": "臺北市",
+      "disputeOrigin": "其它",
+      "disputeCause": "房屋漏水問題",
+      "caseDescription": "消費者透過包租業者租賃房屋並簽定租賃契約，入住後屋內因雨造成嚴重漏水及財物損失，遂主張業者應賠償財物損失及減免租金遭拒，衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請包租業者依消費者保護法第43條規定於15日內妥處，並經地政局多次調解，業者同意減免1個月租金及全額賠償消費者因雨損失之財物，雙方達成和解，消弭糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_60d3532fefe1",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "提前終止｜新北市｜民國 112 年",
+    "year": 2023,
+    "keywords": [
+      "「定金」返還(含斡旋金轉成定金返還)",
+      "提前終止",
+      "租屋",
+      "租賃"
+    ],
+    "rhirFields": [
+      "leaseTerms.earlyTerminationClause"
+    ],
+    "riskTypes": [
+      "early_termination_dispute"
+    ],
+    "summary": "消費者透過仲介業者租屋，已交付定金，卻被告知無法如期交屋，致認其權益受損，衍生糾紛。",
+    "commonOutcome": "經協調後退還全部或部分款項。",
+    "legalBasis": [
+      "案經函請仲介業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "簽約前確認提前終止條件與違約金",
+      "以書面留下終止通知與協議"
+    ],
+    "evidenceToKeep": [
+      "提前終止條款",
+      "書面通知",
+      "雙方協議紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": "early_termination_dispute"
+    },
+    "rawSource": {
+      "rocYear": "112",
+      "city": "新北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "「定金」返還(含斡旋金轉成定金返還)",
+      "caseDescription": "消費者透過仲介業者租屋，已交付定金，卻被告知無法如期交屋，致認其權益受損，衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請仲介業者依消費者保護法第43條規定於15日內妥處，嗣後業者表示已退還定金，並解除租賃契約，達成和解。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_afd5105c79e3",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "提前終止｜新北市｜民國 112 年",
+    "year": 2023,
+    "keywords": [
+      "其他",
+      "提前終止",
+      "租屋",
+      "租賃",
+      "承租",
+      "包租"
+    ],
+    "rhirFields": [
+      "leaseTerms.earlyTerminationClause"
+    ],
+    "riskTypes": [
+      "early_termination_dispute"
+    ],
+    "summary": "消費者向包租業者租屋，因擅自將所承租住宅轉租，故業者要求賠償1個月違約金，承租人認其權益受損而衍生糾紛。",
+    "commonOutcome": "租賃契約經協調後解除或終止。",
+    "legalBasis": [
+      "案經函請包租業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "簽約前確認提前終止條件與違約金",
+      "以書面留下終止通知與協議"
+    ],
+    "evidenceToKeep": [
+      "提前終止條款",
+      "書面通知",
+      "雙方協議紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "early_termination_dispute"
+    },
+    "rawSource": {
+      "rocYear": "112",
+      "city": "新北市",
+      "disputeOrigin": "其它",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向包租業者租屋，因擅自將所承租住宅轉租，故業者要求賠償1個月違約金，承租人認其權益受損而衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請包租業者依消費者保護法第43條規定於15日內妥處，嗣後業者表示雙方解除租賃契約，並將1個月違約金退還承租人，消弭紛爭。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_d6f04516eff8",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "提前終止｜新北市｜民國 112 年",
+    "year": 2023,
+    "keywords": [
+      "房屋現況說明書內容與現況不符",
+      "提前終止",
+      "租屋",
+      "租賃",
+      "出租"
+    ],
+    "rhirFields": [
+      "leaseTerms.earlyTerminationClause"
+    ],
+    "riskTypes": [
+      "early_termination_dispute"
+    ],
+    "summary": "消費者透過仲介業者租屋，認為屋主未告知以原屋況出租，向業者反應處理未果，致消費者認其權益受損，衍生糾紛。",
+    "commonOutcome": "租賃契約經協調後解除或終止。",
+    "legalBasis": [
+      "案經函請仲介業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "簽約前確認提前終止條件與違約金",
+      "以書面留下終止通知與協議"
+    ],
+    "evidenceToKeep": [
+      "提前終止條款",
+      "書面通知",
+      "雙方協議紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "early_termination_dispute"
+    },
+    "rawSource": {
+      "rocYear": "112",
+      "city": "新北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "房屋現況說明書內容與現況不符",
+      "caseDescription": "消費者透過仲介業者租屋，認為屋主未告知以原屋況出租，向業者反應處理未果，致消費者認其權益受損，衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請仲介業者依消費者保護法第43條規定於15日內妥處，嗣後業者表示消費者與屋主終止租賃契約，並同意業者返還部分服務報酬費，達成和解。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_a667f6be2913",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "修繕責任｜臺北市｜民國 112 年",
+    "year": 2023,
+    "keywords": [
+      "「定金」返還(含斡旋金轉成定金返還)",
+      "修繕責任",
+      "租屋",
+      "租賃"
+    ],
+    "rhirFields": [
+      "leaseTerms.repairResponsibility"
+    ],
+    "riskTypes": [
+      "repair_delay"
+    ],
+    "summary": "消費者透過仲介業者租屋，於支付定金後發現屋內有漏水情事，主張業者未告知房屋瑕疵，拒絕簽訂租賃契約，並要求返還定金遭拒，遂生消費爭議。",
+    "commonOutcome": "經協調後退還全部或部分款項。",
+    "legalBasis": [
+      "案經函請仲介業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "要求契約寫明修繕責任與處理期限",
+      "入住前記錄屋況與既有瑕疵"
+    ],
+    "evidenceToKeep": [
+      "入住前屋況照片",
+      "報修對話",
+      "修繕估價或收據"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "repair_delay"
+    },
+    "rawSource": {
+      "rocYear": "112",
+      "city": "臺北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "「定金」返還(含斡旋金轉成定金返還)",
+      "caseDescription": "消費者透過仲介業者租屋，於支付定金後發現屋內有漏水情事，主張業者未告知房屋瑕疵，拒絕簽訂租賃契約，並要求返還定金遭拒，遂生消費爭議。",
+      "handlingAndLegalBasis": "案經函請仲介業者依消費者保護法第43條規定於15日內妥處，業者表示租賃契約不簽訂，而消費者同意屋主已沒入之定金由業者返還部分，另一部分之定金約定未來再次透過業者租屋時折讓，雙方達成和解。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_f0af746941fe",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "修繕責任｜臺北市｜民國 112 年",
+    "year": 2023,
+    "keywords": [
+      "其他",
+      "修繕責任",
+      "租屋",
+      "包租"
+    ],
+    "rhirFields": [
+      "leaseTerms.repairResponsibility"
+    ],
+    "riskTypes": [
+      "repair_delay"
+    ],
+    "summary": "消費者向包租業者租屋，租約期滿後，要求業者負擔其於租約期間自行修繕馬桶及加裝監視器費用遭拒，而衍生消費爭議。",
+    "commonOutcome": "官方資料記載處理結果，仍需組員確認可重複使用的結論。",
+    "legalBasis": [
+      "案經函請包租業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "要求契約寫明修繕責任與處理期限",
+      "入住前記錄屋況與既有瑕疵"
+    ],
+    "evidenceToKeep": [
+      "入住前屋況照片",
+      "報修對話",
+      "修繕估價或收據"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "repair_delay"
+    },
+    "rawSource": {
+      "rocYear": "112",
+      "city": "臺北市",
+      "disputeOrigin": "其它",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向包租業者租屋，租約期滿後，要求業者負擔其於租約期間自行修繕馬桶及加裝監視器費用遭拒，而衍生消費爭議。",
+      "handlingAndLegalBasis": "案經函請包租業者依消費者保護法第43條規定於15日內妥處，經協調後業者同意全額支付馬桶修繕費及安裝監視器費用，消弭爭議。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_eff684280d44",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "電費計價｜臺北市｜民國 112 年",
+    "year": 2023,
+    "keywords": [
+      "其他",
+      "電費計價",
+      "承租",
+      "房東"
+    ],
+    "rhirFields": [
+      "cost.electricityRate"
+    ],
+    "riskTypes": [
+      "electricity_overcharge"
+    ],
+    "summary": "消費者向房東承租房屋，主張租約期間浴室漏水，房東遲未修繕完成，要求提前終止租約遭拒，衍生消費爭議。",
+    "commonOutcome": "經協調後返還全部或部分押金。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "要求寫明電費計價方式",
+      "確認是否依當期電費單計算"
+    ],
+    "evidenceToKeep": [
+      "租賃契約電費條款",
+      "電費單",
+      "房東收費明細"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "electricity_overcharge"
+    },
+    "rawSource": {
+      "rocYear": "112",
+      "city": "臺北市",
+      "disputeOrigin": "其它",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向房東承租房屋，主張租約期間浴室漏水，房東遲未修繕完成，要求提前終止租約遭拒，衍生消費爭議。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請房東於15日內妥適處理，經地政局協調後，雙方達成和解解除契約，房東同意先前修繕期間租金以半價計算及不收取當月份租金，另押金部分則扣除水電費後返還，解決爭議。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_8ccb0c3063d0",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "提前終止｜臺南市｜民國 112 年",
+    "year": 2023,
+    "keywords": [
+      "交屋遲延",
+      "提前終止",
+      "租屋"
+    ],
+    "rhirFields": [
+      "leaseTerms.earlyTerminationClause"
+    ],
+    "riskTypes": [
+      "early_termination_dispute"
+    ],
+    "summary": "消費者向建商購買預售屋，建商使用未符預售屋買賣定型化契約應記載及不得記載事項之契約簽立買賣契約，且契約內容未填載取得使用執照期限，消費者主張以簽約前接待中心回復之取得使用執照日期計算，業者已交屋遲延，要求重新簽訂符合規定之契約，並請求租屋補貼，遂生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "依消費者保護法第43條規定踐行申訴及調解程序"
+    ],
+    "actionHints": [
+      "簽約前確認提前終止條件與違約金",
+      "以書面留下終止通知與協議"
+    ],
+    "evidenceToKeep": [
+      "提前終止條款",
+      "書面通知",
+      "雙方協議紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": "early_termination_dispute"
+    },
+    "rawSource": {
+      "rocYear": "112",
+      "city": "臺南市",
+      "disputeOrigin": "建商",
+      "disputeCause": "交屋遲延",
+      "caseDescription": "消費者向建商購買預售屋，建商使用未符預售屋買賣定型化契約應記載及不得記載事項之契約簽立買賣契約，且契約內容未填載取得使用執照期限，消費者主張以簽約前接待中心回復之取得使用執照日期計算，業者已交屋遲延，要求重新簽訂符合規定之契約，並請求租屋補貼，遂生糾紛。",
+      "handlingAndLegalBasis": "依消費者保護法第43條規定踐行申訴及調解程序，經調解雙方達成和解並同意解除買賣契約，建商返還已繳房地價款外，並再給付交屋遲延違約金，解決紛爭。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_542a34f03470",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "其他｜臺南市｜民國 112 年",
+    "year": 2023,
+    "keywords": [
+      "其他",
+      "租屋"
+    ],
+    "rhirFields": [],
+    "riskTypes": [],
+    "summary": "消費者透過仲介業者租屋，給付斡旋金後，因業者未給予斡旋書，遂主張解除租約並退還全額斡旋金遭拒，遂生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "依消費者保護法第43條規定踐行申訴及調解程序後"
+    ],
+    "actionHints": [
+      "由第二位組員依官方案情補上可執行建議"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "雙方文字或通知紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": null
+    },
+    "rawSource": {
+      "rocYear": "112",
+      "city": "臺南市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "其他",
+      "caseDescription": "消費者透過仲介業者租屋，給付斡旋金後，因業者未給予斡旋書，遂主張解除租約並退還全額斡旋金遭拒，遂生糾紛。",
+      "handlingAndLegalBasis": "依消費者保護法第43條規定踐行申訴及調解程序後，雙方達成協議解除租約，由業者退還7成斡旋金予消費者，解決紛爭。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_0cb98e2f7e61",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "電費計價｜花蓮縣｜民國 111 年",
+    "year": 2022,
+    "keywords": [
+      "其他",
+      "電費計價",
+      "承租",
+      "房東"
+    ],
+    "rhirFields": [
+      "cost.electricityRate"
+    ],
+    "riskTypes": [
+      "electricity_overcharge"
+    ],
+    "summary": "消費者透過仲介業者承租中古屋，租約到期時，房東要求賠償浴室鏡子、浴室置物櫃夾榫生鏽、電腦椅及未結算電費，除從押金扣除外，尚須賠償部分金額，消費者認其權益受損，遂生爭議。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [],
+    "actionHints": [
+      "要求寫明電費計價方式",
+      "確認是否依當期電費單計算"
+    ],
+    "evidenceToKeep": [
+      "租賃契約電費條款",
+      "電費單",
+      "房東收費明細"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "electricity_overcharge"
+    },
+    "rawSource": {
+      "rocYear": "111",
+      "city": "花蓮縣",
+      "disputeOrigin": "其他",
+      "disputeCause": "其他",
+      "caseDescription": "消費者透過仲介業者承租中古屋，租約到期時，房東要求賠償浴室鏡子、浴室置物櫃夾榫生鏽、電腦椅及未結算電費，除從押金扣除外，尚須賠償部分金額，消費者認其權益受損，遂生爭議。",
+      "handlingAndLegalBasis": "經花蓮縣政府依消費申訴程序辦理後，消費者與房東已達成協議，消費者同意不取回押金，房東同意不需支付賠償金，雙方達成和解。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_8359d63b6629",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "其他｜桃園市｜民國 111 年",
+    "year": 2022,
+    "keywords": [
+      "其他",
+      "租屋"
+    ],
+    "rhirFields": [],
+    "riskTypes": [],
+    "summary": "消費者透過仲介業者租屋並支付訂金，因雙方未完成簽約確定事宜，期間屋內設備搬運費用從訂金扣除，僅返還部分訂金而衍生爭議。",
+    "commonOutcome": "官方資料記載處理結果，仍需組員確認可重複使用的結論。",
+    "legalBasis": [
+      "案經消費者依消費者保護法第43條規定提出申訴"
+    ],
+    "actionHints": [
+      "由第二位組員依官方案情補上可執行建議"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "雙方文字或通知紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": null
+    },
+    "rawSource": {
+      "rocYear": "111",
+      "city": "桃園市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "其他",
+      "caseDescription": "消費者透過仲介業者租屋並支付訂金，因雙方未完成簽約確定事宜，期間屋內設備搬運費用從訂金扣除，僅返還部分訂金而衍生爭議。",
+      "handlingAndLegalBasis": "案經消費者依消費者保護法第43條規定提出申訴，地政局請仲介妥處，業者同意退還設備搬運費予消費者，解決紛爭。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_c85166804ce2",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜桃園市｜民國 111 年",
+    "year": 2022,
+    "keywords": [
+      "其他",
+      "押金返還",
+      "租屋",
+      "租賃",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者透過仲介業租屋，嗣後業者與房東因故未依照預定簽約日簽約，且房東沒收消費者定金，遂生爭議。",
+    "commonOutcome": "經協調後退還全部或部分款項。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "111",
+      "city": "桃園市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "其他",
+      "caseDescription": "消費者透過仲介業租屋，嗣後業者與房東因故未依照預定簽約日簽約，且房東沒收消費者定金，遂生爭議。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請仲介業者於15日內妥適處理，經地政局協調，租賃雙方及業者三方協商後，由房東返還定金1萬2,800元予消費者，達成和解。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_71ad744afc2b",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜新北市｜民國 111 年",
+    "year": 2022,
+    "keywords": [
+      "其他",
+      "押金返還",
+      "承租",
+      "房東",
+      "房客"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者向房東承租房屋，因屋內留有舊房客物品無法入住，主張解除租約，並退還租金1萬8,000元與2個月押金3萬6,000元，惟房東僅願退還1個月押金，致生消費糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經函請房東依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "111",
+      "city": "新北市",
+      "disputeOrigin": "其他",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向房東承租房屋，因屋內留有舊房客物品無法入住，主張解除租約，並退還租金1萬8,000元與2個月押金3萬6,000元，惟房東僅願退還1個月押金，致生消費糾紛。",
+      "handlingAndLegalBasis": "案經函請房東依消費者保護法第43條規定於15日內妥處，嗣洽消費者表示，雙方已達成和解，房東同意退還租金及2個月押金。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_05d726ebec8d",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "修繕責任｜臺北市｜民國 111 年",
+    "year": 2022,
+    "keywords": [
+      "其他",
+      "修繕責任",
+      "租屋",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.repairResponsibility"
+    ],
+    "riskTypes": [
+      "repair_delay"
+    ],
+    "summary": "消費者向房東租屋，租約期滿退租點交時，房東表示屋內木地板有受損，只退回部分押金，經消費者自行詢問修繕業者報價希望房東退還更多押金遭拒，遂生爭議。",
+    "commonOutcome": "官方資料記載處理結果，仍需組員確認可重複使用的結論。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "要求契約寫明修繕責任與處理期限",
+      "入住前記錄屋況與既有瑕疵"
+    ],
+    "evidenceToKeep": [
+      "入住前屋況照片",
+      "報修對話",
+      "修繕估價或收據"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "repair_delay"
+    },
+    "rawSource": {
+      "rocYear": "111",
+      "city": "臺北市",
+      "disputeOrigin": "其他",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向房東租屋，租約期滿退租點交時，房東表示屋內木地板有受損，只退回部分押金，經消費者自行詢問修繕業者報價希望房東退還更多押金遭拒，遂生爭議。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請房東於15日內妥適處理，經雙方協調後，保留修繕費價金額度後，解決爭議。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_8cc295f8311f",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "電費計價｜臺北市｜民國 111 年",
+    "year": 2022,
+    "keywords": [
+      "其他",
+      "電費計價",
+      "租屋",
+      "房東"
+    ],
+    "rhirFields": [
+      "cost.electricityRate"
+    ],
+    "riskTypes": [
+      "electricity_overcharge"
+    ],
+    "summary": "消費者向房東租屋，租約期滿退租後，房東以未結清水電費、屋況有髒汙需負擔修繕費用等理由拒絕退還押金，遂生爭議。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "要求寫明電費計價方式",
+      "確認是否依當期電費單計算"
+    ],
+    "evidenceToKeep": [
+      "租賃契約電費條款",
+      "電費單",
+      "房東收費明細"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "electricity_overcharge"
+    },
+    "rawSource": {
+      "rocYear": "111",
+      "city": "臺北市",
+      "disputeOrigin": "其他",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向房東租屋，租約期滿退租後，房東以未結清水電費、屋況有髒汙需負擔修繕費用等理由拒絕退還押金，遂生爭議。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請房東妥適處理，經雙方透過法院簡易調解庭達成協議，房東扣除應繳水電費用後退還，消弭糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_a943f5d2ab98",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "租屋補助｜臺北市｜民國 111 年",
+    "year": 2022,
+    "keywords": [
+      "其他",
+      "租屋補助",
+      "租屋",
+      "租賃",
+      "房東"
+    ],
+    "rhirFields": [
+      "rights.rentalSubsidyAllowed"
+    ],
+    "riskTypes": [
+      "rental_subsidy_restriction"
+    ],
+    "summary": "消費者向房東租屋，欲遷入戶籍遭拒，且房東要求提前解約，要求消費者於111年5月底前搬離，因租賃期間至111年10月31日才期滿，消費者遂主張需退還2個月押金，惟房東僅願退還1個月押金，遂生爭議。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "簽約前確認是否配合租金補貼或相關申報",
+      "要求將雙方約定寫入契約"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "房東文字回覆",
+      "補貼申請資料"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "rental_subsidy_restriction"
+    },
+    "rawSource": {
+      "rocYear": "111",
+      "city": "臺北市",
+      "disputeOrigin": "其他",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向房東租屋，欲遷入戶籍遭拒，且房東要求提前解約，要求消費者於111年5月底前搬離，因租賃期間至111年10月31日才期滿，消費者遂主張需退還2個月押金，惟房東僅願退還1個月押金，遂生爭議。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請房東於15日內妥適處理，經由地政局協調後，雙方達成協議，消費者5月底前搬離，房東退還2個月押金計1萬5,600元予消費者。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_c49be66dce6c",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜臺北市｜民國 111 年",
+    "year": 2022,
+    "keywords": [
+      "其他",
+      "押金返還",
+      "租屋",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者向房東租屋，租約期滿時要求返還押金事宜，但房東頻列諸多理由，要求其他不合理之費用，拒退押金，遂生爭議。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "111",
+      "city": "臺北市",
+      "disputeOrigin": "其他",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向房東租屋，租約期滿時要求返還押金事宜，但房東頻列諸多理由，要求其他不合理之費用，拒退押金，遂生爭議。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請房東妥適處理，雙方已達成協議，房東扣除應繳費用後退還1,034元。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_ad3226735167",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜臺北市｜民國 111 年",
+    "year": 2022,
+    "keywords": [
+      "其他",
+      "押金返還",
+      "租屋",
+      "承租"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者透過仲介業租屋並給付定金1萬元，嗣後屋主突表示不願承租，消費者主張應依民法之規定雙倍賠償定金，衍生爭議。",
+    "commonOutcome": "經協調後退還全部或部分款項。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "111",
+      "city": "臺北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "其他",
+      "caseDescription": "消費者透過仲介業租屋並給付定金1萬元，嗣後屋主突表示不願承租，消費者主張應依民法之規定雙倍賠償定金，衍生爭議。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請仲介業者妥適處理，調解後買賣雙方達成和解，並退還定金1萬元。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_6e70d9c42ccb",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "服務報酬爭議｜臺北市｜民國 111 年",
+    "year": 2022,
+    "keywords": [
+      "服務報酬爭議",
+      "租屋",
+      "租賃",
+      "房東"
+    ],
+    "rhirFields": [],
+    "riskTypes": [],
+    "summary": "消費者透過仲介公司租屋，原給付斡旋金1萬2千元委託議價，如有成交轉成服務報酬，後因與房東對租賃時間點有爭議，未簽立契約書，業者雖口頭同意返還斡旋金，但遲未給付，衍生爭議。",
+    "commonOutcome": "官方資料記載處理結果，仍需組員確認可重複使用的結論。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "由第二位組員依官方案情補上可執行建議"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "雙方文字或通知紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": null
+    },
+    "rawSource": {
+      "rocYear": "111",
+      "city": "臺北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "服務報酬爭議",
+      "caseDescription": "消費者透過仲介公司租屋，原給付斡旋金1萬2千元委託議價，如有成交轉成服務報酬，後因與房東對租賃時間點有爭議，未簽立契約書，業者雖口頭同意返還斡旋金，但遲未給付，衍生爭議。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請仲介業者於15日內妥適處理，雙方調解成立，業者於斡旋金中退還5,000元，另7,000元沒入作為服務報酬費。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_bd68b1f28e60",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜花蓮縣｜民國 110 年",
+    "year": 2021,
+    "keywords": [
+      "其他",
+      "押金返還",
+      "租賃",
+      "承租",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者向房東承租房屋，主張所承租之房屋，於搬遷入住的過程發現屋內有跳蚤問題，請求終止租約並返還2個月押金未果，遂生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "依消費者保護法第43條規定踐行申訴後及調解程序後"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "110",
+      "city": "花蓮縣",
+      "disputeOrigin": "其他",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向房東承租房屋，主張所承租之房屋，於搬遷入住的過程發現屋內有跳蚤問題，請求終止租約並返還2個月押金未果，遂生糾紛。",
+      "handlingAndLegalBasis": "依消費者保護法第43條規定踐行申訴後及調解程序後，雙方達成協議，房東遵守內政部訂頒之房屋租賃定型化契約應記載及不得記載事項之相關規範，退還消費者1個月押金並終止租約，消弭紛爭。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_ee95cb3893e3",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "提前終止｜高雄市｜民國 110 年",
+    "year": 2021,
+    "keywords": [
+      "終止委售或買賣契約",
+      "提前終止",
+      "租屋"
+    ],
+    "rhirFields": [
+      "leaseTerms.earlyTerminationClause"
+    ],
+    "riskTypes": [
+      "early_termination_dispute"
+    ],
+    "summary": "消費者透過仲介業者購屋，主張於給付備證用印款項後，地政士未即時辦理且賣方有延遲提供辦理文件情形，業者也未積極處理，導致成交時間延長，消費者必須再找租屋，增加額外損失，請求解約並給付違約金遭拒，遂生爭議。",
+    "commonOutcome": "官方資料記載處理結果，仍需組員確認可重複使用的結論。",
+    "legalBasis": [
+      "依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "簽約前確認提前終止條件與違約金",
+      "以書面留下終止通知與協議"
+    ],
+    "evidenceToKeep": [
+      "提前終止條款",
+      "書面通知",
+      "雙方協議紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "early_termination_dispute"
+    },
+    "rawSource": {
+      "rocYear": "110",
+      "city": "高雄市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "終止委售或買賣契約",
+      "caseDescription": "消費者透過仲介業者購屋，主張於給付備證用印款項後，地政士未即時辦理且賣方有延遲提供辦理文件情形，業者也未積極處理，導致成交時間延長，消費者必須再找租屋，增加額外損失，請求解約並給付違約金遭拒，遂生爭議。",
+      "handlingAndLegalBasis": "依消費者保護法第43條規定，函請仲介公司於15日內妥適處理，並經地政局與業者及消費者協調後，雙方簽訂協議書，由業者退還仲介服務費3萬5,000元予消費者作為補償，消弭紛爭。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_51afedd65dd3",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "修繕責任｜臺北市｜民國 110 年",
+    "year": 2021,
+    "keywords": [
+      "其他",
+      "修繕責任",
+      "租賃",
+      "承租",
+      "房東",
+      "房客"
+    ],
+    "rhirFields": [
+      "leaseTerms.repairResponsibility"
+    ],
+    "riskTypes": [
+      "repair_delay"
+    ],
+    "summary": "消費者向房東承租房屋，租約計6個月，並簽訂租賃契約書和生活公約及支付押金2個月計2萬1,600元，且約定不得提前終止租約及不得有男性友人訪視，然消費者於租賃期間發現其他房客違反公約規定，攜帶男性友人入住，遂欲提前終止契約，房東爰主張依契約規定，提前解約須沒入所繳押金，且點交時發現電視損壞、環境不潔等現象，遂要求消費者須再給付修繕費及清潔費計7,256元，共計2萬8,856元整，消費者認為歸責於房東之因素，不應沒入押金，遂生爭議。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "要求契約寫明修繕責任與處理期限",
+      "入住前記錄屋況與既有瑕疵"
+    ],
+    "evidenceToKeep": [
+      "入住前屋況照片",
+      "報修對話",
+      "修繕估價或收據"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "repair_delay"
+    },
+    "rawSource": {
+      "rocYear": "110",
+      "city": "臺北市",
+      "disputeOrigin": "其他",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向房東承租房屋，租約計6個月，並簽訂租賃契約書和生活公約及支付押金2個月計2萬1,600元，且約定不得提前終止租約及不得有男性友人訪視，然消費者於租賃期間發現其他房客違反公約規定，攜帶男性友人入住，遂欲提前終止契約，房東爰主張依契約規定，提前解約須沒入所繳押金，且點交時發現電視損壞、環境不潔等現象，遂要求消費者須再給付修繕費及清潔費計7,256元，共計2萬8,856元整，消費者認為歸責於房東之因素，不應沒入押金，遂生爭議。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請房東於15日內妥適處理，並由地政局多次電話與消費者及房東溝通協調後，雙方達成協議，房東同意退還押金1個月計1萬800元予消費者，並同意其他賠償金額降為1,756元，結算後房東退還9千餘元予消費者，圓滿解決爭議。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_75a31cedcaba",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "提前終止｜臺北市｜民國 110 年",
+    "year": 2021,
+    "keywords": [
+      "其他",
+      "提前終止",
+      "租賃",
+      "承租",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.earlyTerminationClause"
+    ],
+    "riskTypes": [
+      "early_termination_dispute"
+    ],
+    "summary": "消費者向房東承租房屋，主張入住後該屋油漆氣味造成身體不適，要求終止租賃契約並退還全額押金2萬7,000元及半個月租金6,750元，惟房東認為違約應沒收押金，遂生爭議。",
+    "commonOutcome": "官方資料記載處理結果，仍需組員確認可重複使用的結論。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "簽約前確認提前終止條件與違約金",
+      "以書面留下終止通知與協議"
+    ],
+    "evidenceToKeep": [
+      "提前終止條款",
+      "書面通知",
+      "雙方協議紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "early_termination_dispute"
+    },
+    "rawSource": {
+      "rocYear": "110",
+      "city": "臺北市",
+      "disputeOrigin": "其他",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向房東承租房屋，主張入住後該屋油漆氣味造成身體不適，要求終止租賃契約並退還全額押金2萬7,000元及半個月租金6,750元，惟房東認為違約應沒收押金，遂生爭議。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請房東於15日內妥適處理，並由地政局多次電話與消費者及房東溝通聯繫後，消費者與房東簽訂終止房屋租賃協議書，房東退還全額押金2萬7,000元，圓滿解決爭議。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_b289369bbde2",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "其他｜臺北市｜民國 110 年",
+    "year": 2021,
+    "keywords": [
+      "其他",
+      "承租",
+      "房東"
+    ],
+    "rhirFields": [],
+    "riskTypes": [],
+    "summary": "消費者向房東承租房屋，簽約時房東告知早上會有光照，屋內不至昏暗不明，嗣後白天再次查看屋況，發現屋內幾乎沒有光照，請求解除租約遭拒，遂生爭議。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "由第二位組員依官方案情補上可執行建議"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "雙方文字或通知紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": null
+    },
+    "rawSource": {
+      "rocYear": "110",
+      "city": "臺北市",
+      "disputeOrigin": "其他",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向房東承租房屋，簽約時房東告知早上會有光照，屋內不至昏暗不明，嗣後白天再次查看屋況，發現屋內幾乎沒有光照，請求解除租約遭拒，遂生爭議。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請房東妥適處理，嗣經雙方協調達成協議，房東同意無條件解約，圓滿解決爭議。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_1f7b9f935e50",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜花蓮縣｜民國 109 年",
+    "year": 2020,
+    "keywords": [
+      "其他",
+      "押金返還",
+      "承租",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者向房東承租房屋，主張居住環境吵雜不堪居住，提出解約要求，惟房東表示除需扣除1個月押金外，尚須補房屋租金價差，致生爭議。",
+    "commonOutcome": "官方資料記載處理結果，仍需組員確認可重複使用的結論。",
+    "legalBasis": [
+      "依消費者保護法第43條以下規定踐行申訴後"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "109",
+      "city": "花蓮縣",
+      "disputeOrigin": "仲介",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向房東承租房屋，主張居住環境吵雜不堪居住，提出解約要求，惟房東表示除需扣除1個月押金外，尚須補房屋租金價差，致生爭議。",
+      "handlingAndLegalBasis": "依消費者保護法第43條以下規定踐行申訴後，房東同意僅扣除1個月押金，圓滿解決爭執。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_c8e920756481",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜新北市｜民國 109 年",
+    "year": 2020,
+    "keywords": [
+      "其他",
+      "押金返還",
+      "承租",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者向房東承租房屋，退租點交時，房東以牆壁等損壞扣留押金，致消費者認其權益受損衍生糾紛。",
+    "commonOutcome": "官方資料記載處理結果，仍需組員確認可重複使用的結論。",
+    "legalBasis": [],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "109",
+      "city": "新北市",
+      "disputeOrigin": "其他",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向房東承租房屋，退租點交時，房東以牆壁等損壞扣留押金，致消費者認其權益受損衍生糾紛。",
+      "handlingAndLegalBasis": "案經邀集消費者及房東於地政局召開協調會議，經雙方協商成立，於會議中由房東退還押金2千元予消費者，圓滿解決紛爭。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_3a4e59a5df3a",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜新北市｜民國 109 年",
+    "year": 2020,
+    "keywords": [
+      "其他",
+      "押金返還",
+      "租屋"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者透過仲介業者租屋，繳付定金後因個人因素暫緩租屋計畫，要求退還定金遭拒，致生消費糾紛。",
+    "commonOutcome": "經協調後退還全部或部分款項。",
+    "legalBasis": [
+      "案經函請仲介業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "109",
+      "city": "新北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "其他",
+      "caseDescription": "消費者透過仲介業者租屋，繳付定金後因個人因素暫緩租屋計畫，要求退還定金遭拒，致生消費糾紛。",
+      "handlingAndLegalBasis": "案經函請仲介業者依消費者保護法第43條規定於15日內妥處，嗣洽業者與消費者均回復表示，雙方已達成協議，業者已退還消費者定金5千元，圓滿解決紛爭。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_4255bb712d61",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜新北市｜民國 109 年",
+    "year": 2020,
+    "keywords": [
+      "其他",
+      "押金返還",
+      "租屋",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者透過仲介業者租屋，主張尚未與房東正式簽約，要求退還定金遭拒，致生消費糾紛。",
+    "commonOutcome": "經協調後退還全部或部分款項。",
+    "legalBasis": [
+      "案經函請仲介業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "109",
+      "city": "新北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "其他",
+      "caseDescription": "消費者透過仲介業者租屋，主張尚未與房東正式簽約，要求退還定金遭拒，致生消費糾紛。",
+      "handlingAndLegalBasis": "案經函請仲介業者依消費者保護法第43條規定於15日內妥處，嗣洽業者與消費者均回復表示，雙方已達成協議，由業者退還消費者定金5千元，圓滿解決紛爭。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_14d410063b52",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "隱瞞重要資訊｜新北市｜民國 109 年",
+    "year": 2020,
+    "keywords": [
+      "隱瞞重要資訊",
+      "租屋"
+    ],
+    "rhirFields": [],
+    "riskTypes": [],
+    "summary": "消費者透過仲介業者租屋並簽訂契約，嗣後發現房間隔間牆上方鏤空和窗戶被堵住等問題，訴求退還訂金未果，致消費者認其權益受損衍生消費糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經函請仲介業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "由第二位組員依官方案情補上可執行建議"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "雙方文字或通知紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": null
+    },
+    "rawSource": {
+      "rocYear": "109",
+      "city": "新北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "隱瞞重要資訊",
+      "caseDescription": "消費者透過仲介業者租屋並簽訂契約，嗣後發現房間隔間牆上方鏤空和窗戶被堵住等問題，訴求退還訂金未果，致消費者認其權益受損衍生消費糾紛。",
+      "handlingAndLegalBasis": "案經函請仲介業者依消費者保護法第43條規定於15日內妥處，嗣洽業者與消費者均回應表示，雙方達成協議，已解除契約並收到業者退還訂金7千元及2千元補償金，圓滿解決紛爭。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_cd6f6a3eb827",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "提前終止｜臺北市｜民國 109 年",
+    "year": 2020,
+    "keywords": [
+      "其他",
+      "提前終止",
+      "租賃",
+      "承租",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.earlyTerminationClause"
+    ],
+    "riskTypes": [
+      "early_termination_dispute"
+    ],
+    "summary": "消費者透過仲介公司承租房屋，簽訂租賃契約並已支付2個月押金，事後業者表示房東片面解約，且未支付提前解約之違約金，消費者主張業者應協調依約入住或房東依約賠償，遂生爭議。",
+    "commonOutcome": "經協調後退還全部或部分款項。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "簽約前確認提前終止條件與違約金",
+      "以書面留下終止通知與協議"
+    ],
+    "evidenceToKeep": [
+      "提前終止條款",
+      "書面通知",
+      "雙方協議紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "early_termination_dispute"
+    },
+    "rawSource": {
+      "rocYear": "109",
+      "city": "臺北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "其他",
+      "caseDescription": "消費者透過仲介公司承租房屋，簽訂租賃契約並已支付2個月押金，事後業者表示房東片面解約，且未支付提前解約之違約金，消費者主張業者應協調依約入住或房東依約賠償，遂生爭議。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請仲介公司於15日內妥適處理，並由地政局向消費者與業者溝通聯繫後，業者協調消費者與房東簽訂終止房屋租賃協議書，由房東退還押金、提前終止租約違約金及購買傢俱費用等計7萬4千元予消費者，圓滿解決爭議。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_5ecefeee4f77",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜臺北市｜民國 109 年",
+    "year": 2020,
+    "keywords": [
+      "其他",
+      "押金返還",
+      "租屋",
+      "租賃",
+      "承租",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者向房東承租房屋，已給付2千元押金，並於簽約時同意加註未住滿1年需扣1個月押金，然消費者入住後發現租屋環境不潔，鼠滿為患，未住滿1年即請求解約並退還押金遭拒，遂主張房東應賠償租賃期間所自行支付之清潔費用980元及其他損失1萬餘元，共計2萬元。",
+    "commonOutcome": "官方資料記載處理結果，仍需組員確認可重複使用的結論。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "109",
+      "city": "臺北市",
+      "disputeOrigin": "其他",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向房東承租房屋，已給付2千元押金，並於簽約時同意加註未住滿1年需扣1個月押金，然消費者入住後發現租屋環境不潔，鼠滿為患，未住滿1年即請求解約並退還押金遭拒，遂主張房東應賠償租賃期間所自行支付之清潔費用980元及其他損失1萬餘元，共計2萬元。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請房東於15日內妥適處理，並由地政局多次電話與房東溝通聯繫後，房東願意退還租賃期間所支付之清潔費計980元予消費者，圓滿解決爭議。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_5060ebe6f41b",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜臺北市｜民國 109 年",
+    "year": 2020,
+    "keywords": [
+      "其他",
+      "押金返還",
+      "承租",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者向房東承租雅房並支付押金4千500元，主張承租未滿1個月，房東已多次打擾，且其他租客吵鬧，環境不佳，遂請求終止租約並退還押金遭拒，致生爭議。",
+    "commonOutcome": "官方資料記載處理結果，仍需組員確認可重複使用的結論。",
+    "legalBasis": [
+      "依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "109",
+      "city": "臺北市",
+      "disputeOrigin": "其他",
+      "disputeCause": "其他",
+      "caseDescription": "消費者向房東承租雅房並支付押金4千500元，主張承租未滿1個月，房東已多次打擾，且其他租客吵鬧，環境不佳，遂請求終止租約並退還押金遭拒，致生爭議。",
+      "handlingAndLegalBasis": "依消費者保護法第43條規定，函請房東於15日內妥適處理，經地政局多次電話溝通聯繫後，房東同意退租及退還押金4千500元，圓滿解決爭議。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_3d98aa65d60a",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜臺北市｜民國 109 年",
+    "year": 2020,
+    "keywords": [
+      "隱瞞重要資訊",
+      "押金返還",
+      "租屋",
+      "承租"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者透過仲介公司租屋並支付押金9千500元，主張承租2個月多期間，每日半夜噪音吵雜無法正常睡眠，且租屋前業者與屋主均未告知樓下為KTV，請求終止租約，遂生爭議。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "109",
+      "city": "臺北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "隱瞞重要資訊",
+      "caseDescription": "消費者透過仲介公司租屋並支付押金9千500元，主張承租2個月多期間，每日半夜噪音吵雜無法正常睡眠，且租屋前業者與屋主均未告知樓下為KTV，請求終止租約，遂生爭議。",
+      "handlingAndLegalBasis": "依消費者保護法第43條規定，函請仲介公司於15日內妥適處理，經業者與雙方協調後簽立和解書，由屋主退還50%押金計4千750元，並解除契約，圓滿解決消費爭議。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_74cbbd18017e",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜高雄市｜民國 108 年",
+    "year": 2019,
+    "keywords": [
+      "其他",
+      "押金返還",
+      "承租",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者透過仲介業者承租房屋，入住後發現業者隱瞞有狗吠、手機訊號不佳、屋內不通風等情形，請求解約並返還租金、押金、仲介費用23,800及支付搬遷費用6,000元遭拒，遂生爭議。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "本案依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "108",
+      "city": "高雄市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "其他",
+      "caseDescription": "消費者透過仲介業者承租房屋，入住後發現業者隱瞞有狗吠、手機訊號不佳、屋內不通風等情形，請求解約並返還租金、押金、仲介費用23,800及支付搬遷費用6,000元遭拒，遂生爭議。",
+      "handlingAndLegalBasis": "本案依消費者保護法第43條規定，函請仲介公司於15日內妥適處理，經業者、房東與消費者協調後達成共識終止契約，房東並已退還押金予消費者，圓滿解決糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_80cf08e4525e",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "終止委售或買賣契約｜高雄市｜民國 108 年",
+    "year": 2019,
+    "keywords": [
+      "終止委售或買賣契約",
+      "出租"
+    ],
+    "rhirFields": [],
+    "riskTypes": [],
+    "summary": "委託房仲出售房屋，但因為屋主發現當初在重新裝潢時，並沒有向裝潢公司領取收據，怕出售後，因無憑證可以抵扣，會被政府課房地合一稅之疑慮，希望能解約，或者改出租。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "本案依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "由第二位組員依官方案情補上可執行建議"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "雙方文字或通知紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": null
+    },
+    "rawSource": {
+      "rocYear": "108",
+      "city": "高雄市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "終止委售或買賣契約",
+      "caseDescription": "委託房仲出售房屋，但因為屋主發現當初在重新裝潢時，並沒有向裝潢公司領取收據，怕出售後，因無憑證可以抵扣，會被政府課房地合一稅之疑慮，希望能解約，或者改出租。",
+      "handlingAndLegalBasis": "本案依消費者保護法第43條規定，函請仲介公司於15日內妥適處理，經業者與賣方與消費者協調後達成共識，以無條件方式解除契約圓滿解決糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_9a465c6010e5",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜新北市｜民國 108 年",
+    "year": 2019,
+    "keywords": [
+      "「定金」返還(含斡旋金轉成定金返還)",
+      "押金返還",
+      "租屋",
+      "出租",
+      "房東",
+      "房客"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者(房客)委由仲介業者租屋，於房東同意出租且收取定金後，並未繼續履行簽訂租約，致消費者認其權益受損衍生消費糾紛。",
+    "commonOutcome": "經協調後退還全部或部分款項。",
+    "legalBasis": [
+      "案經函請仲介業者依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "108",
+      "city": "新北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "「定金」返還(含斡旋金轉成定金返還)",
+      "caseDescription": "消費者(房客)委由仲介業者租屋，於房東同意出租且收取定金後，並未繼續履行簽訂租約，致消費者認其權益受損衍生消費糾紛。",
+      "handlingAndLegalBasis": "案經函請仲介業者依消費者保護法第43條規定於15日內妥處，嗣公司回復表示，於定金收據已載明，如無法簽訂租約，則僅返還定金之金額，並已返還定金予消費者(房客)。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_74e06c2c3a71",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜新北市｜民國 108 年",
+    "year": 2019,
+    "keywords": [
+      "「定金」返還(含斡旋金轉成定金返還)",
+      "押金返還",
+      "租屋"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者委由仲介公司租屋，主張房屋未依約定時間完成裝修，致消費者認其權益受損，要求退還定金遭拒，衍生消費糾紛。",
+    "commonOutcome": "經協調後退還全部或部分款項。",
+    "legalBasis": [
+      "案經函請仲介公司依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "108",
+      "city": "新北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "「定金」返還(含斡旋金轉成定金返還)",
+      "caseDescription": "消費者委由仲介公司租屋，主張房屋未依約定時間完成裝修，致消費者認其權益受損，要求退還定金遭拒，衍生消費糾紛。",
+      "handlingAndLegalBasis": "案經函請仲介公司依消費者保護法第43條規定於15日內妥處，嗣公司回復表示，雙方達成和解，已退還定金3仟元予消費者，圓滿解決紛爭。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_71d7bb266cf6",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜新北市｜民國 108 年",
+    "year": 2019,
+    "keywords": [
+      "其他",
+      "押金返還",
+      "承租",
+      "房東",
+      "房客"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者(房客)向房東承租房屋，因冷氣、熱水器等設備有瑕疵，要求解約退還押金、租金未獲同意，致消費者(房客)認其權益受損衍生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經函請房東依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "108",
+      "city": "新北市",
+      "disputeOrigin": "其他",
+      "disputeCause": "其他",
+      "caseDescription": "消費者(房客)向房東承租房屋，因冷氣、熱水器等設備有瑕疵，要求解約退還押金、租金未獲同意，致消費者(房客)認其權益受損衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請房東依消費者保護法第43條規定於15日內妥處，嗣洽房東與消費者(房客)均回應表示，本案雙方已達成協議，並已退還押、租金。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_997210780c47",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "電費計價｜新北市｜民國 108 年",
+    "year": 2019,
+    "keywords": [
+      "其他",
+      "電費計價",
+      "承租",
+      "房東",
+      "房客"
+    ],
+    "rhirFields": [
+      "cost.electricityRate"
+    ],
+    "riskTypes": [
+      "electricity_overcharge"
+    ],
+    "summary": "消費者(房客)向房東承租房屋，電費從5元起算，最高為8元，超過台電計費級距規定，經向管理人員反映未獲回應，致消費者(房客)認其權益受損衍生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經函請房東依消費者保護法第43條規定於15日內妥處"
+    ],
+    "actionHints": [
+      "要求寫明電費計價方式",
+      "確認是否依當期電費單計算"
+    ],
+    "evidenceToKeep": [
+      "租賃契約電費條款",
+      "電費單",
+      "房東收費明細"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "electricity_overcharge"
+    },
+    "rawSource": {
+      "rocYear": "108",
+      "city": "新北市",
+      "disputeOrigin": "其他",
+      "disputeCause": "其他",
+      "caseDescription": "消費者(房客)向房東承租房屋，電費從5元起算，最高為8元，超過台電計費級距規定，經向管理人員反映未獲回應，致消費者(房客)認其權益受損衍生糾紛。",
+      "handlingAndLegalBasis": "案經函請房東依消費者保護法第43條規定於15日內妥處，嗣洽房東與消費者(房客)均回應表示，雙方已達成協議，電費計費不超過台電夏季用電最高級距。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_9e24ce289e3f",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "修繕責任｜臺北市｜民國 108 年",
+    "year": 2019,
+    "keywords": [
+      "「定金」返還(含斡旋金轉成定金返還)",
+      "修繕責任",
+      "承租",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.repairResponsibility"
+    ],
+    "riskTypes": [
+      "repair_delay"
+    ],
+    "summary": "消費者向房東承租房屋，看屋後確認租期及租金，並支付1個月租金和2個月押金(共2.1萬元)後旋即入住，入住後發現房屋有嚴重滲漏水，於居住第5天決定退租，並告知房東提前終止租約，同時與房東協議退還押金與未到期之租金，並經房東同意退還，惟房東遲未退還，且無法取得聯繫，遂生爭議。",
+    "commonOutcome": "官方資料記載處理結果，仍需組員確認可重複使用的結論。",
+    "legalBasis": [],
+    "actionHints": [
+      "要求契約寫明修繕責任與處理期限",
+      "入住前記錄屋況與既有瑕疵"
+    ],
+    "evidenceToKeep": [
+      "入住前屋況照片",
+      "報修對話",
+      "修繕估價或收據"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "repair_delay"
+    },
+    "rawSource": {
+      "rocYear": "108",
+      "city": "臺北市",
+      "disputeOrigin": "其他",
+      "disputeCause": "「定金」返還(含斡旋金轉成定金返還)",
+      "caseDescription": "消費者向房東承租房屋，看屋後確認租期及租金，並支付1個月租金和2個月押金(共2.1萬元)後旋即入住，入住後發現房屋有嚴重滲漏水，於居住第5天決定退租，並告知房東提前終止租約，同時與房東協議退還押金與未到期之租金，並經房東同意退還，惟房東遲未退還，且無法取得聯繫，遂生爭議。",
+      "handlingAndLegalBasis": "經本局邀請雙方到場協商成立，雙方協議解約，並由房東退回押金及未到期之租金(共1.5萬元)予承租人，圓滿解決爭議。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_9b5426a4d7ba",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "租屋補助｜臺北市｜民國 108 年",
+    "year": 2019,
+    "keywords": [
+      "服務報酬爭議",
+      "租屋補助",
+      "承租",
+      "房東",
+      "房客"
+    ],
+    "rhirFields": [
+      "rights.rentalSubsidyAllowed"
+    ],
+    "riskTypes": [
+      "rental_subsidy_restriction"
+    ],
+    "summary": "消費者透過仲介公司承租房屋，並已支付1個月租金和2個月押金共6.6萬元，入住後發現房東未依簽約前約定准其遷入戶籍，於居住1個月後決定退租，請求仲介退還服務費2萬元、房東退還2個月押金及負擔搬遷費未果，遂生爭議。",
+    "commonOutcome": "官方資料記載處理結果，仍需組員確認可重複使用的結論。",
+    "legalBasis": [
+      "案經本局依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "簽約前確認是否配合租金補貼或相關申報",
+      "要求將雙方約定寫入契約"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "房東文字回覆",
+      "補貼申請資料"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "rental_subsidy_restriction"
+    },
+    "rawSource": {
+      "rocYear": "108",
+      "city": "臺北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "服務報酬爭議",
+      "caseDescription": "消費者透過仲介公司承租房屋，並已支付1個月租金和2個月押金共6.6萬元，入住後發現房東未依簽約前約定准其遷入戶籍，於居住1個月後決定退租，請求仲介退還服務費2萬元、房東退還2個月押金及負擔搬遷費未果，遂生爭議。",
+      "handlingAndLegalBasis": "案經本局依消費者保護法第43條規定，函請仲介公司於15日內妥適處理後，雙方協議提前終止租約，並由房東退還2個月押金4.4萬元、仲介公司退還服務費2萬元予房客，並簽立解約協議書，圓滿解決消費爭議。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_517eff4bb4a1",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜臺北市｜民國 108 年",
+    "year": 2019,
+    "keywords": [
+      "服務報酬爭議",
+      "押金返還",
+      "承租"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者透過仲介公司承租房屋，議定租金後，立即支付1.5萬元予仲介，其中1萬元為仲介服務報酬費用，餘5千元為房屋定金，事後消費者因個人因素無法承租，並向仲介請求退回服務費1萬元，惟仲介表示消費者支付之1.5萬元皆為定金，無法退還，遂生爭議。",
+    "commonOutcome": "官方資料記載處理結果，仍需組員確認可重複使用的結論。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "108",
+      "city": "臺北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "服務報酬爭議",
+      "caseDescription": "消費者透過仲介公司承租房屋，議定租金後，立即支付1.5萬元予仲介，其中1萬元為仲介服務報酬費用，餘5千元為房屋定金，事後消費者因個人因素無法承租，並向仲介請求退回服務費1萬元，惟仲介表示消費者支付之1.5萬元皆為定金，無法退還，遂生爭議。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請仲介公司於15日內妥適處理，經仲介與消費者協調結果不成後，由本局主動聯繫並釐清消費者所支付之1.5萬元實際性質後，仲介同意退還1萬元服務費予消費者，圓滿解決消費爭議。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_e90b868b2327",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "隱瞞重要資訊｜高雄市｜民國 107 年",
+    "year": 2018,
+    "keywords": [
+      "隱瞞重要資訊",
+      "承租",
+      "房東"
+    ],
+    "rhirFields": [],
+    "riskTypes": [],
+    "summary": "消費者透過房仲承租不動產，事後發現簽約對象並非房東本人，而是二房東，感覺房仲隱瞞重要資訊，覺得受欺騙，希望能退還5000仲介費用",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "由第二位組員依官方案情補上可執行建議"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "雙方文字或通知紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": null
+    },
+    "rawSource": {
+      "rocYear": "107",
+      "city": "高雄市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "隱瞞重要資訊",
+      "caseDescription": "消費者透過房仲承租不動產，事後發現簽約對象並非房東本人，而是二房東，感覺房仲隱瞞重要資訊，覺得受欺騙，希望能退還5000仲介費用",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請仲介公司於15日內妥適處理，嗣經業者表示一開始即有告知，不解消費者為何說不知情，但願意退回消費者5000元仲介費用並已達成協議，圓滿解決糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_ab7f2b9d0e03",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "租屋補助｜新北市｜民國 107 年",
+    "year": 2018,
+    "keywords": [
+      "仲介「斡旋金」返還",
+      "租屋補助",
+      "租屋",
+      "房東"
+    ],
+    "rhirFields": [
+      "rights.rentalSubsidyAllowed"
+    ],
+    "riskTypes": [
+      "rental_subsidy_restriction"
+    ],
+    "summary": "消費者委託仲介租屋，但經完成簽約入住後，房東表示不准遷入戶籍，於是要求另尋他屋，惟仲介公司卻要求再次付費，致當事人認其權益受損衍生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定函請仲介公司於15日內妥處"
+    ],
+    "actionHints": [
+      "簽約前確認是否配合租金補貼或相關申報",
+      "要求將雙方約定寫入契約"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "房東文字回覆",
+      "補貼申請資料"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "rental_subsidy_restriction"
+    },
+    "rawSource": {
+      "rocYear": "107",
+      "city": "新北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "仲介「斡旋金」返還",
+      "caseDescription": "消費者委託仲介租屋，但經完成簽約入住後，房東表示不准遷入戶籍，於是要求另尋他屋，惟仲介公司卻要求再次付費，致當事人認其權益受損衍生糾紛。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定函請仲介公司於15日內妥處，嗣公司檢附退款證明並回復表示，經過協調後，本案已達成協議並退還服務費，圓滿解決紛爭。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_52e271d9244f",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜新北市｜民國 107 年",
+    "year": 2018,
+    "keywords": [
+      "其他",
+      "押金返還",
+      "房東",
+      "房客"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "房客退租後，因房屋清潔問題與房東認知不同，主張房東所退押金數額不足。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "107",
+      "city": "新北市",
+      "disputeOrigin": "其他",
+      "disputeCause": "其他",
+      "caseDescription": "房客退租後，因房屋清潔問題與房東認知不同，主張房東所退押金數額不足。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請房東於15日內妥處逕復消費者，經電洽房東與房客，嗣房客回傳和解書表示雙方已達成和解，屋主已退還押金共1萬5仟元。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_8ceb9d7f7427",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜新北市｜民國 107 年",
+    "year": 2018,
+    "keywords": [
+      "其他",
+      "押金返還",
+      "房東",
+      "房客"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者提前中止租約，認為房東多收取租金及押金，致認有損其權益，衍生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "107",
+      "city": "新北市",
+      "disputeOrigin": "其他",
+      "disputeCause": "其他",
+      "caseDescription": "消費者提前中止租約，認為房東多收取租金及押金，致認有損其權益，衍生糾紛。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請房東於15日內妥處逕復消費者，嗣房東回復表示，本案已與房客達成協議終止租約，並退還半個月租金及半個月押金，雙方達成和解，圓滿解決糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_3eb14383087a",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜臺北市｜民國 107 年",
+    "year": 2018,
+    "keywords": [
+      "「定金」返還(含斡旋金轉成定金返還)",
+      "押金返還",
+      "租賃",
+      "承租"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者透過仲介公司租賃房屋，並支付定金25,500元予仲介，惟尚未簽訂租賃契約，消費者嗣後決定不承租，請求仲介退還定金，惟仲介公司認為應按民法第249條第2款予以沒收，雙方協議不成，遂生爭議。",
+    "commonOutcome": "經協調後退還全部或部分款項。",
+    "legalBasis": [
+      "本局依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "107",
+      "city": "臺北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "「定金」返還(含斡旋金轉成定金返還)",
+      "caseDescription": "消費者透過仲介公司租賃房屋，並支付定金25,500元予仲介，惟尚未簽訂租賃契約，消費者嗣後決定不承租，請求仲介退還定金，惟仲介公司認為應按民法第249條第2款予以沒收，雙方協議不成，遂生爭議。",
+      "handlingAndLegalBasis": "本局依消費者保護法第43條規定，函請仲介公司於15日內妥適處理，經該公司多次聯繫消費者未果，後經本局聯繫消費者，並由仲介公司退還25,500元定金予消費者後，雙方達成和解，圓滿解決消費爭議。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_3692d1f58072",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "仲介「斡旋金」返還｜臺北市｜民國 107 年",
+    "year": 2018,
+    "keywords": [
+      "仲介「斡旋金」返還",
+      "租屋",
+      "承租",
+      "房東"
+    ],
+    "rhirFields": [],
+    "riskTypes": [],
+    "summary": "消費者透過仲介公司帶看租屋，消費者向仲介表示該屋內有4處須改善，改善後即有意願承租，仲介表示會請屋主改善並要求先支付半個月租金(7500元)當作斡旋金，並表示案件談不成時會將斡旋金返還。之後房東表示可以改善其中三項，故消費者表示沒有意願承租，請求仲介返還斡旋金，但仲介表示斡旋金已付給房東無法退還，遂生爭議。",
+    "commonOutcome": "官方資料記載處理結果，仍需組員確認可重複使用的結論。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "由第二位組員依官方案情補上可執行建議"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "雙方文字或通知紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": null
+    },
+    "rawSource": {
+      "rocYear": "107",
+      "city": "臺北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "仲介「斡旋金」返還",
+      "caseDescription": "消費者透過仲介公司帶看租屋，消費者向仲介表示該屋內有4處須改善，改善後即有意願承租，仲介表示會請屋主改善並要求先支付半個月租金(7500元)當作斡旋金，並表示案件談不成時會將斡旋金返還。之後房東表示可以改善其中三項，故消費者表示沒有意願承租，請求仲介返還斡旋金，但仲介表示斡旋金已付給房東無法退還，遂生爭議。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請仲介公司於15日內妥適處理，經公司向屋主與消費者協調，協議屋主返還訂金的2分之1(3750元)予消費者，消費者同意接受，圓滿解決消費爭議。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_8cbfd61b5dae",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "坪數不足｜臺北市｜民國 107 年",
+    "year": 2018,
+    "keywords": [
+      "坪數不足",
+      "租賃"
+    ],
+    "rhirFields": [],
+    "riskTypes": [],
+    "summary": "消費者透過仲介公司租賃房屋，並已支付訂金，且於看屋時曾與仲介確認房屋權狀面積為13坪，嗣後丈量發現該屋面積只有8坪，故消費者請求仲介退還全數訂金，仲介退還訂金後隔日反悔，要求消費者返還訂金，遂生爭議。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "本局依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "由第二位組員依官方案情補上可執行建議"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "雙方文字或通知紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": null
+    },
+    "rawSource": {
+      "rocYear": "107",
+      "city": "臺北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "坪數不足",
+      "caseDescription": "消費者透過仲介公司租賃房屋，並已支付訂金，且於看屋時曾與仲介確認房屋權狀面積為13坪，嗣後丈量發現該屋面積只有8坪，故消費者請求仲介退還全數訂金，仲介退還訂金後隔日反悔，要求消費者返還訂金，遂生爭議。",
+      "handlingAndLegalBasis": "本局依消費者保護法第43條規定，函請仲介公司於15日內妥適處理，仲介業者同意不再請消費者返還訂金，達成和解，圓滿解決消費爭議。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_2f1ee2bfc5eb",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "修繕責任｜宜蘭縣｜民國 106 年",
+    "year": 2017,
+    "keywords": [
+      "其他",
+      "修繕責任",
+      "承租"
+    ],
+    "rhirFields": [
+      "leaseTerms.repairResponsibility"
+    ],
+    "riskTypes": [
+      "repair_delay"
+    ],
+    "summary": "消費者透過仲介業者承租房屋，發現陽台排水管阻塞、紗窗破損無法開啟和廚房水龍頭漏水等問題，告知業者竟回應請消費者自行處理，消費者主張業者未盡督促屋主修繕責任及瑕疵告知責任，致生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經依消保法第43條規定"
+    ],
+    "actionHints": [
+      "要求契約寫明修繕責任與處理期限",
+      "入住前記錄屋況與既有瑕疵"
+    ],
+    "evidenceToKeep": [
+      "入住前屋況照片",
+      "報修對話",
+      "修繕估價或收據"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": "repair_delay"
+    },
+    "rawSource": {
+      "rocYear": "106",
+      "city": "宜蘭縣",
+      "disputeOrigin": "仲介",
+      "disputeCause": "其他",
+      "caseDescription": "消費者透過仲介業者承租房屋，發現陽台排水管阻塞、紗窗破損無法開啟和廚房水龍頭漏水等問題，告知業者竟回應請消費者自行處理，消費者主張業者未盡督促屋主修繕責任及瑕疵告知責任，致生糾紛。",
+      "handlingAndLegalBasis": "案經依消保法第43條規定，函請仲介業於15日內妥處，經縣政府地政處邀集業者及消費者協調，雙方達成協議，業者給付新臺幣3千元整和解金予消費者，由消費者自行處理水管阻塞等問題，圓滿解決紛爭。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_649e6079a100",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜臺北市｜民國 106 年",
+    "year": 2017,
+    "keywords": [
+      "「定金」返還(含斡旋金轉成定金返還)",
+      "押金返還",
+      "承租"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者透過仲介公司承租房屋，看屋後即要求消費者支付4千元定金，消費者與家人討論2天後，向業者表示不欲簽訂租約，請求退還定金，但仲介公司相應不理，遂生爭議。",
+    "commonOutcome": "經協調後退還全部或部分款項。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "106",
+      "city": "臺北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "「定金」返還(含斡旋金轉成定金返還)",
+      "caseDescription": "消費者透過仲介公司承租房屋，看屋後即要求消費者支付4千元定金，消費者與家人討論2天後，向業者表示不欲簽訂租約，請求退還定金，但仲介公司相應不理，遂生爭議。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請仲介公司於15日內妥適處理，臺北市政府地政局於此期間內亦多次詢問仲介公司處理進度，並邀集雙方召開協商會，協調結果仲介公司同意全數退還消費者已支付定金新臺幣4千元整，雙方達成和解。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_e7c2fba39a4b",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "修繕責任｜臺北市｜民國 106 年",
+    "year": 2017,
+    "keywords": [
+      "房屋漏水問題",
+      "修繕責任",
+      "租賃",
+      "承租",
+      "出租"
+    ],
+    "rhirFields": [
+      "leaseTerms.repairResponsibility"
+    ],
+    "riskTypes": [
+      "repair_delay"
+    ],
+    "summary": "消費者承租的房屋發生漏水，消費者請出租人修繕並要求出租人尋找專業修繕漏水公司處理，出租人請漏水師傅進行抓漏以進行後續修繕事宜，因消費者與出租人對於抓漏師傅之專業性意見不一致，致生爭議。",
+    "commonOutcome": "經協調後返還全部或部分押金。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "要求契約寫明修繕責任與處理期限",
+      "入住前記錄屋況與既有瑕疵"
+    ],
+    "evidenceToKeep": [
+      "入住前屋況照片",
+      "報修對話",
+      "修繕估價或收據"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": "repair_delay"
+    },
+    "rawSource": {
+      "rocYear": "106",
+      "city": "臺北市",
+      "disputeOrigin": "其他",
+      "disputeCause": "房屋漏水問題",
+      "caseDescription": "消費者承租的房屋發生漏水，消費者請出租人修繕並要求出租人尋找專業修繕漏水公司處理，出租人請漏水師傅進行抓漏以進行後續修繕事宜，因消費者與出租人對於抓漏師傅之專業性意見不一致，致生爭議。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請出租人於15日內妥適處理，出租人向消費者提出解除租約以解決此爭議，惟對於解約金意見不一致，遂由臺北市政府地政局召開協商會，協議出租人就近3個月之租金，前2個月租金以5折計算，剩下1個月不收取租金方式作為解約金(共計36,000元)，承租人應於約定時間搬離並完成戶籍遷出及清空個人物品，承租人原已支付之(不收租金月份之部分租金)新臺幣8,127元，以及押金(2個月租金)新臺幣36,000元，扣除未繳納之水電瓦斯費用，於完成搬離時一併退還承租人，但租賃標的內物品、家具及器具等於返還房屋驗收時，查有可歸責於承租人之損壞時，仍優先以押金扣抵之，雙方達成和解。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_669506fa6712",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "修繕責任｜臺北市｜民國 106 年",
+    "year": 2017,
+    "keywords": [
+      "房屋漏水問題",
+      "修繕責任",
+      "租賃",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.repairResponsibility"
+    ],
+    "riskTypes": [
+      "repair_delay"
+    ],
+    "summary": "消費者透過仲介公司租賃房屋，入住後發現房屋漏水嚴重，屋內設備無法正常使用，屋主另提供未整頓之套房休息，並提出更換房型(A房型與原房型相同需自行補貼差價，B房型為目前暫時居住之套房，雖不用補差價但屋況不佳)或解約(僅退還履約保證金)等解決方案，消費者主張房東需給明確修繕期限與進程，且提供簽約對等房型換房，於修繕期間住宿差價應由房東自行吸收，若房東想單方強行提前解約需給付兩個月租金為賠償金，未獲共識，遂生爭議。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "要求契約寫明修繕責任與處理期限",
+      "入住前記錄屋況與既有瑕疵"
+    ],
+    "evidenceToKeep": [
+      "入住前屋況照片",
+      "報修對話",
+      "修繕估價或收據"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "repair_delay"
+    },
+    "rawSource": {
+      "rocYear": "106",
+      "city": "臺北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "房屋漏水問題",
+      "caseDescription": "消費者透過仲介公司租賃房屋，入住後發現房屋漏水嚴重，屋內設備無法正常使用，屋主另提供未整頓之套房休息，並提出更換房型(A房型與原房型相同需自行補貼差價，B房型為目前暫時居住之套房，雖不用補差價但屋況不佳)或解約(僅退還履約保證金)等解決方案，消費者主張房東需給明確修繕期限與進程，且提供簽約對等房型換房，於修繕期間住宿差價應由房東自行吸收，若房東想單方強行提前解約需給付兩個月租金為賠償金，未獲共識，遂生爭議。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請仲介公司於15日內妥適處理，經仲介公司及消費者至財團法人崔媽媽基金會協調，協調結果雙方同意終止租約，並退還2個月押金，雙方達成和解。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_b38b73d4d3fe",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "修繕責任｜花蓮縣｜民國 105 年",
+    "year": 2016,
+    "keywords": [
+      "房屋漏水問題",
+      "修繕責任",
+      "租賃",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.repairResponsibility"
+    ],
+    "riskTypes": [
+      "repair_delay"
+    ],
+    "summary": "消費者透過仲介業者居間租賃中古屋，入住後陸續發現屋內多間房間有嚴重漏水問題，請求房東合意終止租約遭拒，遂生爭執。",
+    "commonOutcome": "官方資料記載處理結果，仍需組員確認可重複使用的結論。",
+    "legalBasis": [
+      "依消費者保護法第43條以下規定踐行申訴及調解程序後"
+    ],
+    "actionHints": [
+      "要求契約寫明修繕責任與處理期限",
+      "入住前記錄屋況與既有瑕疵"
+    ],
+    "evidenceToKeep": [
+      "入住前屋況照片",
+      "報修對話",
+      "修繕估價或收據"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "repair_delay"
+    },
+    "rawSource": {
+      "rocYear": "105",
+      "city": "花蓮縣",
+      "disputeOrigin": "仲介",
+      "disputeCause": "房屋漏水問題",
+      "caseDescription": "消費者透過仲介業者居間租賃中古屋，入住後陸續發現屋內多間房間有嚴重漏水問題，請求房東合意終止租約遭拒，遂生爭執。",
+      "handlingAndLegalBasis": "依消費者保護法第43條以下規定踐行申訴及調解程序後，房東同意合意終止租約，並全數退還押金2萬4千元，圓滿解決爭執。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_ddee4273854f",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜桃園市｜民國 105 年",
+    "year": 2016,
+    "keywords": [
+      "「定金」返還(含斡旋金轉成定金返還)",
+      "押金返還",
+      "租屋"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者委託仲介業者租屋，於簽訂斡旋合約書並支付定金15,000元後，消費者因家庭因素考量主張解除契約，並請求業者退回全數定金未果，遂生爭議。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "105",
+      "city": "桃園市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "「定金」返還(含斡旋金轉成定金返還)",
+      "caseDescription": "消費者委託仲介業者租屋，於簽訂斡旋合約書並支付定金15,000元後，消費者因家庭因素考量主張解除契約，並請求業者退回全數定金未果，遂生爭議。",
+      "handlingAndLegalBasis": "依內政部102年內授中辦地字第1026650099號函頒直轄市、縣（市）政府地政機關不動產消費爭議處理作業程序規定，主動召開協商會。歷經兩次協商會後，雙方達成協議，仲介業者願退回消費者11,250元定金，順利解決爭議。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_875166feaf99",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "寵物約定｜新北市｜民國 105 年",
+    "year": 2016,
+    "keywords": [
+      "房屋漏水問題",
+      "寵物約定",
+      "租屋",
+      "承租",
+      "房東",
+      "房客"
+    ],
+    "rhirFields": [
+      "leaseTerms.petPolicy"
+    ],
+    "riskTypes": [
+      "pet_policy_conflict"
+    ],
+    "summary": "消費者(房客)透過仲介業者租屋並告知飼養寵物，惟退租後房東卻以房間髒亂為由，從房客預付的7千元房租扣除2千元清潔費，消費者請求返還遭拒，衍生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "經依消費者保護法第43條規定函請業者妥處"
+    ],
+    "actionHints": [
+      "要求房東以文字確認是否可飼養寵物",
+      "確認違反寵物約定的處理方式"
+    ],
+    "evidenceToKeep": [
+      "租賃契約寵物條款",
+      "房東或仲介文字確認"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "pet_policy_conflict"
+    },
+    "rawSource": {
+      "rocYear": "105",
+      "city": "新北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "房屋漏水問題",
+      "caseDescription": "消費者(房客)透過仲介業者租屋並告知飼養寵物，惟退租後房東卻以房間髒亂為由，從房客預付的7千元房租扣除2千元清潔費，消費者請求返還遭拒，衍生糾紛。",
+      "handlingAndLegalBasis": "經依消費者保護法第43條規定函請業者妥處，經業者協請房東妥適處理後達成和解，房東願退還承租人預繳之7千元房租，圓滿解決糾紛。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_c94b92484a14",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "服務報酬爭議｜新竹市｜民國 105 年",
+    "year": 2016,
+    "keywords": [
+      "服務報酬爭議",
+      "租屋",
+      "承租",
+      "出租",
+      "房客"
+    ],
+    "rhirFields": [],
+    "riskTypes": [],
+    "summary": "消費者(屋主)委託仲介業者出租房屋，已成交並支付服務報酬，另支付油漆工程費用請業者處理牆面粉刷事宜，惟消費者(屋主)表示，業者未依其要求挑選承租人(房客)，致發生承租人於租屋處發生意外而難以繼續承租，且發現業者施作油漆粉刷工程品質不佳，遂衍生退服務費及油漆工程費爭議。",
+    "commonOutcome": "經協調後退還全部或部分款項。",
+    "legalBasis": [
+      "依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "由第二位組員依官方案情補上可執行建議"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "雙方文字或通知紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": null
+    },
+    "rawSource": {
+      "rocYear": "105",
+      "city": "新竹市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "服務報酬爭議",
+      "caseDescription": "消費者(屋主)委託仲介業者出租房屋，已成交並支付服務報酬，另支付油漆工程費用請業者處理牆面粉刷事宜，惟消費者(屋主)表示，業者未依其要求挑選承租人(房客)，致發生承租人於租屋處發生意外而難以繼續承租，且發現業者施作油漆粉刷工程品質不佳，遂衍生退服務費及油漆工程費爭議。",
+      "handlingAndLegalBasis": "依消費者保護法第43條規定，函請業者於15日內妥處，業者主動到府解說案情，並積極聯繫相關人等，最後由消保官召開消費糾紛協商會議，協商後達成協議，業者同意退還部分仲介服務費及油漆工程費用計新臺幣2萬2千5百元予屋主，雙方達成和解，爭議圓滿解決。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_9f982b198264",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "寵物約定｜臺中市｜民國 104 年",
+    "year": 2015,
+    "keywords": [
+      "其他",
+      "寵物約定",
+      "租賃",
+      "承租",
+      "出租",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.petPolicy"
+    ],
+    "riskTypes": [
+      "pet_policy_conflict"
+    ],
+    "summary": "消費者委託仲介業者承租房屋，入住後房東告知不得飼養寵物或須多付1個月押金，消費者不從欲搬離竟遭房東沒收所有押金，請求房東及業者協助退還押金及搬遷費用未果，致生糾紛。",
+    "commonOutcome": "經協調後退還全部或部分款項。",
+    "legalBasis": [],
+    "actionHints": [
+      "要求房東以文字確認是否可飼養寵物",
+      "確認違反寵物約定的處理方式"
+    ],
+    "evidenceToKeep": [
+      "租賃契約寵物條款",
+      "房東或仲介文字確認"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "pet_policy_conflict"
+    },
+    "rawSource": {
+      "rocYear": "104",
+      "city": "臺中市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "其他",
+      "caseDescription": "消費者委託仲介業者承租房屋，入住後房東告知不得飼養寵物或須多付1個月押金，消費者不從欲搬離竟遭房東沒收所有押金，請求房東及業者協助退還押金及搬遷費用未果，致生糾紛。",
+      "handlingAndLegalBasis": "案經地政局邀集消費者(承租方)、出租方(房東)及業者召開協調會議，經協調達成協議，房東退還所有押金，消費者(承租方)於7日內搬離現居，搬遷費用自付，解除租賃契約，圓滿解決爭議。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_86f4ddedb39c",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "提前終止｜臺中市｜民國 104 年",
+    "year": 2015,
+    "keywords": [
+      "服務報酬爭議",
+      "提前終止",
+      "租屋",
+      "租賃",
+      "承租",
+      "出租",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.earlyTerminationClause"
+    ],
+    "riskTypes": [
+      "early_termination_dispute"
+    ],
+    "summary": "消費者委託仲介業者租屋，於簽訂租賃契約後，因家人反對、租金太貴、格局、廁所居中等問題，隔日告知業候確定不予承租，要求業者退還服務費(1個月租金9500元)及向房東請求退還全部押金(2個月租金19000元)遭拒，致生糾紛。",
+    "commonOutcome": "租賃契約經協調後解除或終止。",
+    "legalBasis": [
+      "本案依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "簽約前確認提前終止條件與違約金",
+      "以書面留下終止通知與協議"
+    ],
+    "evidenceToKeep": [
+      "提前終止條款",
+      "書面通知",
+      "雙方協議紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "early_termination_dispute"
+    },
+    "rawSource": {
+      "rocYear": "104",
+      "city": "臺中市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "服務報酬爭議",
+      "caseDescription": "消費者委託仲介業者租屋，於簽訂租賃契約後，因家人反對、租金太貴、格局、廁所居中等問題，隔日告知業候確定不予承租，要求業者退還服務費(1個月租金9500元)及向房東請求退還全部押金(2個月租金19000元)遭拒，致生糾紛。",
+      "handlingAndLegalBasis": "本案依消費者保護法第43條規定，函請消費者(承租方)與出租方及仲介業者於指定日期至臺中市政府地政局召開協調會。經協調後，消費者與仲介業者達成協議，由業者退還服務費9500元，另房東退還部分押金4000元，其餘沒收後解除租賃契約，圓滿解決爭議。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_20e7d78d7ee6",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "修繕責任｜桃園市｜民國 103 年",
+    "year": 2014,
+    "keywords": [
+      "房屋漏水問題",
+      "修繕責任",
+      "租屋",
+      "租賃",
+      "承租",
+      "房東"
+    ],
+    "rhirFields": [
+      "leaseTerms.repairResponsibility"
+    ],
+    "riskTypes": [
+      "repair_delay"
+    ],
+    "summary": "消費者(承租人)委託仲介業者租屋，於公證租約後經裝潢師傅發現為漏水屋，消費者亦錄影查證確有漏水情形，主張房東應返還已支付之租金及押金並終止租賃契約遭拒，惟房東僅願退還部分押金並要求消費者支付公證費用，遂生爭議。",
+    "commonOutcome": "租賃契約經協調後解除或終止。",
+    "legalBasis": [
+      "依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "要求契約寫明修繕責任與處理期限",
+      "入住前記錄屋況與既有瑕疵"
+    ],
+    "evidenceToKeep": [
+      "入住前屋況照片",
+      "報修對話",
+      "修繕估價或收據"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "repair_delay"
+    },
+    "rawSource": {
+      "rocYear": "103",
+      "city": "桃園市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "房屋漏水問題",
+      "caseDescription": "消費者(承租人)委託仲介業者租屋，於公證租約後經裝潢師傅發現為漏水屋，消費者亦錄影查證確有漏水情形，主張房東應返還已支付之租金及押金並終止租賃契約遭拒，惟房東僅願退還部分押金並要求消費者支付公證費用，遂生爭議。",
+      "handlingAndLegalBasis": "依消費者保護法第43條規定，函請業者於15日內妥適處理逕復消費者(承租人)，嗣經業者回函表示退費部分已和解，業以公證方式終止該房屋租賃契約，解決紛爭。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_1e502bd24d11",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜新北市｜民國 103 年",
+    "year": 2014,
+    "keywords": [
+      "停車位使用權",
+      "押金返還",
+      "租賃",
+      "承租"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者(承租人)向建設公司承租停車位，嗣後因建設公司將車位產權讓與另一業者，惟該業者不承認原租賃契約，致消費者(承租人)認為其權益受損，衍生消費糾紛。",
+    "commonOutcome": "租賃契約經協調後解除或終止。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "103",
+      "city": "新北市",
+      "disputeOrigin": "建商",
+      "disputeCause": "停車位使用權",
+      "caseDescription": "消費者(承租人)向建設公司承租停車位，嗣後因建設公司將車位產權讓與另一業者，惟該業者不承認原租賃契約，致消費者(承租人)認為其權益受損，衍生消費糾紛。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請公司業者於15日內妥處逕復消費者，經公司業者回函表示，本案依強制執行法規定辦理。已協助消費者(承租人)向建設公司請求退還押租金及解除契約，原停車位租賃契約增加註記解約日期，並退還所餘租金及保證金，解決紛爭。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_20c2e572c8a9",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "提前終止｜高雄市｜民國 101 年",
+    "year": 2012,
+    "keywords": [
+      "服務報酬爭議",
+      "提前終止",
+      "租屋",
+      "租賃"
+    ],
+    "rhirFields": [
+      "leaseTerms.earlyTerminationClause"
+    ],
+    "riskTypes": [
+      "early_termination_dispute"
+    ],
+    "summary": "消費者委託仲介業者租屋，並已簽定房屋租賃契約，後因故要求解約並經屋主同意，因認為仲介要求服務報酬不合理，致生爭議。",
+    "commonOutcome": "租賃契約經協調後解除或終止。",
+    "legalBasis": [
+      "本案依消保法第43條規定"
+    ],
+    "actionHints": [
+      "簽約前確認提前終止條件與違約金",
+      "以書面留下終止通知與協議"
+    ],
+    "evidenceToKeep": [
+      "提前終止條款",
+      "書面通知",
+      "雙方協議紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "early_termination_dispute"
+    },
+    "rawSource": {
+      "rocYear": "101",
+      "city": "高雄市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "服務報酬爭議",
+      "caseDescription": "消費者委託仲介業者租屋，並已簽定房屋租賃契約，後因故要求解約並經屋主同意，因認為仲介要求服務報酬不合理，致生爭議。",
+      "handlingAndLegalBasis": "本案依消保法第43條規定，函請仲介業者於15日內妥處逕復消費者，經協調業者同意服務報酬酌減，並協調雙方解除租賃契約，達成和解。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_2352104f44a0",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "修繕責任｜桃園縣｜民國 099 年",
+    "year": 2010,
+    "keywords": [
+      "「定金」返還(含斡旋金轉成定金返還)",
+      "修繕責任",
+      "租屋",
+      "租賃"
+    ],
+    "rhirFields": [
+      "leaseTerms.repairResponsibility"
+    ],
+    "riskTypes": [
+      "repair_delay"
+    ],
+    "summary": "消費者委託仲介業租屋，經支付定金新臺幣0.3萬元，成立租賃契約，發現該屋有漏水及地磚隆起情形，遂請求解除斡旋契約及定金返還遭拒，致生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經依消保法第43條規定"
+    ],
+    "actionHints": [
+      "要求契約寫明修繕責任與處理期限",
+      "入住前記錄屋況與既有瑕疵"
+    ],
+    "evidenceToKeep": [
+      "入住前屋況照片",
+      "報修對話",
+      "修繕估價或收據"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 high。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "high",
+      "matchedRule": "repair_delay"
+    },
+    "rawSource": {
+      "rocYear": "099",
+      "city": "桃園縣",
+      "disputeOrigin": "仲介",
+      "disputeCause": "「定金」返還(含斡旋金轉成定金返還)",
+      "caseDescription": "消費者委託仲介業租屋，經支付定金新臺幣0.3萬元，成立租賃契約，發現該屋有漏水及地磚隆起情形，遂請求解除斡旋契約及定金返還遭拒，致生糾紛。",
+      "handlingAndLegalBasis": "案經依消保法第43條規定，函請代銷業者於15日內妥處逕復消費者，於期限內達成協議，仲介退回新臺幣0.3萬元予消費者，雙方解除契約。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_5fa0fde0559a",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "仲介「斡旋金」返還｜宜蘭縣｜民國 098 年",
+    "year": 2009,
+    "keywords": [
+      "仲介「斡旋金」返還",
+      "租屋"
+    ],
+    "rhirFields": [],
+    "riskTypes": [],
+    "summary": "消費者委託仲介業者租屋，支付斡旋金新臺幣3千元，成立斡旋契約，嗣後因租金及管理費事宜，未完成斡旋，遂請求斡旋金返還及解除契約遭拒，致生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "由第二位組員依官方案情補上可執行建議"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "雙方文字或通知紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": null
+    },
+    "rawSource": {
+      "rocYear": "098",
+      "city": "宜蘭縣",
+      "disputeOrigin": "仲介",
+      "disputeCause": "仲介「斡旋金」返還",
+      "caseDescription": "消費者委託仲介業者租屋，支付斡旋金新臺幣3千元，成立斡旋契約，嗣後因租金及管理費事宜，未完成斡旋，遂請求斡旋金返還及解除契約遭拒，致生糾紛。",
+      "handlingAndLegalBasis": "案經依消費者保護法第43條規定，函請仲介業者於15日內妥處逕復消費者，於期限內達成協議，仲介業者退回新臺幣3千元予消費者，雙方解除斡旋契約。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_4f41af73a269",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜新北市｜民國 098 年",
+    "year": 2009,
+    "keywords": [
+      "「定金」返還(含斡旋金轉成定金返還)",
+      "押金返還",
+      "租屋"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者委託仲介業者租屋，支付斡旋金新臺幣5千元，成立斡旋契約，嗣後因故不租，遂向業者請求斡旋金返還及解除斡旋契約遭拒，致生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [
+      "案經地政處依消費者保護法第43條規定"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "098",
+      "city": "新北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "「定金」返還(含斡旋金轉成定金返還)",
+      "caseDescription": "消費者委託仲介業者租屋，支付斡旋金新臺幣5千元，成立斡旋契約，嗣後因故不租，遂向業者請求斡旋金返還及解除斡旋契約遭拒，致生糾紛。",
+      "handlingAndLegalBasis": "案經地政處依消費者保護法第43條規定，函請仲介業者於15日內妥處逕復消費者，於期限內達成協議，由屋主退回新臺幣2千元予消費者，解除斡旋契約。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_7909be024e4a",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "仲介「斡旋金」返還｜臺南市｜民國 098 年",
+    "year": 2009,
+    "keywords": [
+      "仲介「斡旋金」返還",
+      "租屋",
+      "出租"
+    ],
+    "rhirFields": [],
+    "riskTypes": [],
+    "summary": "消費者仲介業者租屋，支付斡旋金新臺幣2千元，成立斡旋契約，嗣後誤認該屋不出租，遂請求斡旋金返還及解除契約遭拒，致生糾紛。",
+    "commonOutcome": "官方資料記載處理結果，仍需組員確認可重複使用的結論。",
+    "legalBasis": [
+      "案經消保官依消費者保護法第43條規定調解成立"
+    ],
+    "actionHints": [
+      "由第二位組員依官方案情補上可執行建議"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "雙方文字或通知紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": null
+    },
+    "rawSource": {
+      "rocYear": "098",
+      "city": "臺南市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "仲介「斡旋金」返還",
+      "caseDescription": "消費者仲介業者租屋，支付斡旋金新臺幣2千元，成立斡旋契約，嗣後誤認該屋不出租，遂請求斡旋金返還及解除契約遭拒，致生糾紛。",
+      "handlingAndLegalBasis": "案經消保官依消費者保護法第43條規定調解成立，仲介業者退回新臺幣1千元予消費者，雙方解除斡旋契約。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_669a7a8031e6",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "仲介「斡旋金」返還｜新北市｜民國 097 年",
+    "year": 2008,
+    "keywords": [
+      "仲介「斡旋金」返還",
+      "租屋"
+    ],
+    "rhirFields": [],
+    "riskTypes": [],
+    "summary": "消費者透過仲介業者租屋，支付斡旋金新臺幣10萬元，成立斡旋契約，嗣後於斡旋期間，因故無租屋意願，請求斡旋金返還及解除租屋斡旋契約遭拒，致生糾紛。",
+    "commonOutcome": "案件經協調後達成和解或協議。",
+    "legalBasis": [],
+    "actionHints": [
+      "由第二位組員依官方案情補上可執行建議"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "雙方文字或通知紀錄"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": null
+    },
+    "rawSource": {
+      "rocYear": "097",
+      "city": "新北市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "仲介「斡旋金」返還",
+      "caseDescription": "消費者透過仲介業者租屋，支付斡旋金新臺幣10萬元，成立斡旋契約，嗣後於斡旋期間，因故無租屋意願，請求斡旋金返還及解除租屋斡旋契約遭拒，致生糾紛。",
+      "handlingAndLegalBasis": "案經地政局實地對該者作業務檢查，並請其妥處本案。嗣後雙方達成協議，由仲介業者返還斡旋金新臺幣10萬元予消費者，雙方解除斡旋契約。"
+    }
+  },
+  {
+    "id": "gov_moi_rental_864bfc6a7d65",
+    "sourceType": "gov",
+    "sourceName": "內政部不動產資訊平台 GetG5／地方政府糾紛案例",
+    "sourceUrl": "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause=",
+    "title": "押金返還｜高雄市｜民國 096 年",
+    "year": 2007,
+    "keywords": [
+      "其他",
+      "押金返還",
+      "租賃",
+      "承租"
+    ],
+    "rhirFields": [
+      "leaseTerms.depositRefundTerms"
+    ],
+    "riskTypes": [
+      "deposit_dispute"
+    ],
+    "summary": "消費者委託仲介業者承租房屋，經支付定金新臺幣3,000元後，始發現業者未依其租賃條件幫其承租房屋，遂請求定金返還及解除委託租賃契約遭拒，致生糾紛。",
+    "commonOutcome": "經協調後退還全部或部分款項。",
+    "legalBasis": [
+      "案經依消保法第43條規定"
+    ],
+    "actionHints": [
+      "要求寫明押金或定金的性質與返還條件",
+      "付款前確認解約時的退款規則"
+    ],
+    "evidenceToKeep": [
+      "租賃契約",
+      "押金或定金收據",
+      "退還款項對話"
+    ],
+    "confidence": "high",
+    "notes": "自動同步候選；租屋關聯度為 medium。來源為官方混合型房地產糾紛資料，尚未人工確認 RHIR 對應與法律措辭，不得直接升為 verified。",
+    "automation": {
+      "status": "draft",
+      "rentalRelevance": "medium",
+      "matchedRule": "deposit_dispute"
+    },
+    "rawSource": {
+      "rocYear": "096",
+      "city": "高雄市",
+      "disputeOrigin": "仲介",
+      "disputeCause": "其他",
+      "caseDescription": "消費者委託仲介業者承租房屋，經支付定金新臺幣3,000元後，始發現業者未依其租賃條件幫其承租房屋，遂請求定金返還及解除委託租賃契約遭拒，致生糾紛。",
+      "handlingAndLegalBasis": "案經依消保法第43條規定，函請仲介業者於15日內妥處逕復消費者，於限期內達成協議，業者同意退還定金新臺幣3,000元，及解除委託租賃契約。"
+    }
+  }
+]

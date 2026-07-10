@@ -6,23 +6,23 @@ const EVIDENCE_WORKPLAN = [
   {
     sourceType: "research",
     sourceName: "崔媽媽基金會",
-    target: 3,
-    focus: "看屋前付款、押金返還、修繕 / 漏水",
+    target: 6,
+    focus: "看屋前付款、押金、修繕、契約與租客行動",
     note: "適合整理具體情境、租客行動與應保留證據。",
     url: "https://www.tmm.org.tw/"
   },
   {
     sourceType: "gov",
-    sourceName: "內政部不動產資訊平台",
-    target: 5,
-    focus: "押金、電費、修繕、提前終止、租賃權益",
-    note: "優先使用糾紛案例；糾紛統計只做背景數據，不直接當案例卡。",
-    url: "https://pip.moi.gov.tw/Publicize/Info/G2020"
+    sourceName: "官方 GetG5 租屋候選",
+    target: 20,
+    focus: "自動篩選押金、電費、修繕、提前終止與資訊揭露",
+    note: "來源是混合型官方案例；程式自動抓取，組員只審核租屋關聯與 RHIR 對應。",
+    url: "https://pip.moi.gov.tw/asmx/WS1.asmx/GetG5?Year=&City=&DisputeOrigin=&DisputeCause="
   },
   {
     sourceType: "court",
     sourceName: "司法院裁判書查詢",
-    target: 2,
+    target: 4,
     focus: "押金扣款、電費或修繕責任",
     note: "等前兩類資料格式穩定後再加入，避免一開始被判決文字拖慢。",
     url: "https://judgment.judicial.gov.tw/FJUD/default.aspx"
@@ -40,14 +40,19 @@ const EVIDENCE_SOP = [
 ];
 
 function EvidenceWorkBoard({ cases, loading, error }) {
-  const bySource = cases.reduce((counts, item) => {
+  const verifiedCases = cases.filter(item => item.review_status === "verified");
+  const draftCases = cases.filter(item => item.review_status === "draft");
+  const verifiedBySource = verifiedCases.reduce((counts, item) => {
+    counts[item.source_type] = (counts[item.source_type] || 0) + 1;
+    return counts;
+  }, {});
+  const draftBySource = draftCases.reduce((counts, item) => {
     counts[item.source_type] = (counts[item.source_type] || 0) + 1;
     return counts;
   }, {});
   const totalTarget = EVIDENCE_WORKPLAN.reduce((sum, item) => sum + item.target, 0);
-  const totalDone = cases.filter(item => item.review_status !== "archived").length;
+  const totalDone = verifiedCases.length;
   const remaining = Math.max(totalTarget - totalDone, 0);
-  const percent = Math.min(Math.round((totalDone / totalTarget) * 100), 100);
 
   return (
     <section style={{ marginBottom: 28 }}>
@@ -59,7 +64,7 @@ function EvidenceWorkBoard({ cases, loading, error }) {
           </p>
         </div>
         <span className="mono" style={{ fontSize: 12, color: "var(--ink-3)" }}>
-          {loading ? "讀取案例中..." : `${totalDone}/${totalTarget} · 還差 ${remaining} 筆`}
+          {loading ? "讀取案例中..." : `${totalDone}/${totalTarget} 已確認 · ${draftCases.length} 筆待審`}
         </span>
       </div>
 
@@ -69,16 +74,16 @@ function EvidenceWorkBoard({ cases, loading, error }) {
           <div className="stat-value">{totalTarget}<span className="delta mono">筆</span></div>
         </div>
         <div className="stat">
-          <div className="stat-label">已入庫</div>
+          <div className="stat-label">已確認</div>
           <div className="stat-value">{totalDone}<span className="delta mono">筆</span></div>
         </div>
         <div className="stat">
-          <div className="stat-label">待補資料</div>
-          <div className="stat-value">{remaining}<span className="delta mono">筆</span></div>
+          <div className="stat-label">自動候選待審</div>
+          <div className="stat-value">{draftCases.length}<span className="delta mono">筆</span></div>
         </div>
         <div className="stat">
-          <div className="stat-label">完成度</div>
-          <div className="stat-value">{percent}<span className="delta mono">%</span></div>
+          <div className="stat-label">還需確認</div>
+          <div className="stat-value">{remaining}<span className="delta mono">筆</span></div>
         </div>
       </div>
 
@@ -94,7 +99,8 @@ function EvidenceWorkBoard({ cases, loading, error }) {
 
       <div className="evidence-work-grid">
         {EVIDENCE_WORKPLAN.map(item => {
-          const done = bySource[item.sourceType] || 0;
+          const done = verifiedBySource[item.sourceType] || 0;
+          const draft = draftBySource[item.sourceType] || 0;
           const left = Math.max(item.target - done, 0);
           return (
             <div className="evidence-work-card" key={item.sourceType}>
@@ -107,7 +113,7 @@ function EvidenceWorkBoard({ cases, loading, error }) {
               </div>
               <p>{item.focus}</p>
               <div className="evidence-progress"><span style={{ width: `${Math.min((done / item.target) * 100, 100)}%` }} /></div>
-              <div className="evidence-work-meta">還需 {left} 筆 · {item.note}</div>
+              <div className="evidence-work-meta">還需確認 {left} 筆 · 待審 {draft} 筆 · {item.note}</div>
               <a href={item.url} target="_blank" rel="noreferrer" className="evidence-source-link">開啟來源入口 ↗</a>
             </div>
           );
