@@ -234,6 +234,7 @@ function EvidenceReviewList({ cases, onReviewed }) {
               <p><strong>建議行動：</strong>{(viewingCase.action_hints || []).join("；") || "—"}</p>
               <p><strong>應保留證據：</strong>{(viewingCase.evidence_to_keep || []).join("；") || "—"}</p>
               <p><strong>備註：</strong>{viewingCase.notes || "—"}</p>
+              <p><strong>上次審核備註：</strong>{viewingCase.review_notes || "尚未留下審核備註"}</p>
               <label style={{ display: "block", marginTop: 16 }}>
                 <strong>審核備註</strong>
                 <textarea
