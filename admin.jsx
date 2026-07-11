@@ -138,6 +138,92 @@ function EvidenceWorkBoard({ cases, loading, error }) {
   );
 }
 
+function EvidenceReviewList({ cases }) {
+  const [query, setQuery] = useStateAD("");
+  const [riskFilter, setRiskFilter] = useStateAD("all");
+  const [viewingCase, setViewingCase] = useStateAD(null);
+  const risks = [...new Set(cases.flatMap(item => item.risk_types || []))].sort();
+  const normalizedQuery = query.trim().toLowerCase();
+  const filtered = cases.filter(item => {
+    const haystack = [item.id, item.title, item.summary, ...(item.keywords || [])].join(" ").toLowerCase();
+    const matchesQuery = !normalizedQuery || haystack.includes(normalizedQuery);
+    const matchesRisk = riskFilter === "all" || (item.risk_types || []).includes(riskFilter);
+    return matchesQuery && matchesRisk;
+  });
+
+  return (
+    <section style={{ marginBottom: 28 }}>
+      <div className="page-header" style={{ marginBottom: 14 }}>
+        <div>
+          <h2 style={{ margin: 0, fontSize: 18 }}>案例檢查</h2>
+          <p className="page-sub" style={{ margin: "4px 0 0" }}>
+            先查看自動整理結果；目前全部是 draft，尚未作為正式建議引用。
+          </p>
+        </div>
+        <span className="mono" style={{ fontSize: 12, color: "var(--ink-3)" }}>{filtered.length} / {cases.length} 筆</span>
+      </div>
+
+      <div className="toolbar">
+        <input
+          className="search"
+          style={{ width: 280 }}
+          value={query}
+          onChange={event => setQuery(event.target.value)}
+          placeholder="搜尋案例、縣市或關鍵詞"
+        />
+        <select className="chip" value={riskFilter} onChange={event => setRiskFilter(event.target.value)}>
+          <option value="all">全部風險類型</option>
+          {risks.map(risk => <option key={risk} value={risk}>{risk}</option>)}
+        </select>
+      </div>
+
+      <div className="tablewrap">
+        <table className="table">
+          <thead>
+            <tr><th>案例</th><th>年份 / 地區</th><th>Risk Type</th><th>RHIR 欄位</th><th>狀態</th><th></th></tr>
+          </thead>
+          <tbody>
+            {filtered.map(item => (
+              <tr key={item.id}>
+                <td>
+                  <div className="t-title">{item.title}</div>
+                  <div className="t-meta">{item.id}</div>
+                </td>
+                <td>{item.year || "—"}</td>
+                <td><span className="mono" style={{ fontSize: 11 }}>{(item.risk_types || []).join(", ") || "待配對"}</span></td>
+                <td><span className="mono" style={{ fontSize: 11 }}>{(item.rhir_fields || []).join(", ") || "待配對"}</span></td>
+                <td><span className="badge badge-partial"><span className="dot" />{item.review_status}</span></td>
+                <td><button className="btn btn-ghost btn-sm" onClick={() => setViewingCase(item)}>查看</button></td>
+              </tr>
+            ))}
+            {filtered.length === 0 && <tr><td colSpan={6} style={{ textAlign: "center", padding: 32, color: "var(--ink-4)" }}>找不到符合的案例</td></tr>}
+          </tbody>
+        </table>
+      </div>
+
+      {viewingCase && (
+        <div className="modal-back" onClick={() => setViewingCase(null)}>
+          <div className="modal" style={{ width: "min(820px, calc(100vw - 32px))" }} onClick={event => event.stopPropagation()}>
+            <div className="modal-head"><h3>{viewingCase.title}</h3></div>
+            <div className="modal-body" style={{ maxHeight: "70vh", overflow: "auto" }}>
+              <p className="t-meta mono">{viewingCase.id} · {viewingCase.source_name} · {viewingCase.year || "年份未載"}</p>
+              <div className="callout" style={{ margin: "14px 0" }}>{viewingCase.summary}</div>
+              <p><strong>常見結果：</strong>{viewingCase.common_outcome || "—"}</p>
+              <p><strong>Risk Type：</strong><span className="mono">{(viewingCase.risk_types || []).join(", ") || "待配對"}</span></p>
+              <p><strong>RHIR 欄位：</strong><span className="mono">{(viewingCase.rhir_fields || []).join(", ") || "待配對"}</span></p>
+              <p><strong>建議行動：</strong>{(viewingCase.action_hints || []).join("；") || "—"}</p>
+              <p><strong>應保留證據：</strong>{(viewingCase.evidence_to_keep || []).join("；") || "—"}</p>
+              <p><strong>備註：</strong>{viewingCase.notes || "—"}</p>
+              <a href={viewingCase.source_url} target="_blank" rel="noreferrer">查看原始來源 ↗</a>
+            </div>
+            <div className="modal-foot"><button className="btn" onClick={() => setViewingCase(null)}>關閉</button></div>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
 function AdminPage({ setRoute }) {
   const { Icon, highlightJSON, downloadJSON } = window.RU;
   const [uploads, setUploads]           = useStateAD([]);
@@ -204,6 +290,7 @@ function AdminPage({ setRoute }) {
       </div>
 
       <EvidenceWorkBoard cases={evidenceCases} loading={evidenceLoading} error={evidenceError} />
+      {!evidenceLoading && !evidenceError && <EvidenceReviewList cases={evidenceCases} />}
 
       {loading && (
         <div style={{ padding: "48px 0", textAlign: "center", color: "var(--ink-3)" }}>
