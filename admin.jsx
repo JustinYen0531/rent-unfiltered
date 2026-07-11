@@ -39,6 +39,31 @@ const EVIDENCE_SOP = [
   "通過檢查後才產生 seed SQL，寫入 Supabase 並標記 verified"
 ];
 
+const REVIEW_STATUS_META = {
+  draft: { label: "草稿", className: "badge-draft" },
+  verified: { label: "已驗證", className: "badge-verified" },
+  revise: { label: "需修改", className: "badge-revise" },
+  rejected: { label: "已排除", className: "badge-rejected" }
+};
+
+function ReviewStatusBadge({ status }) {
+  const meta = REVIEW_STATUS_META[status] || { label: status || "草稿", className: "badge-unknown" };
+  return <span className={`badge ${meta.className}`}><span className="dot" />{meta.label}</span>;
+}
+
+function parseTagList(value) {
+  return [...new Set(value.split(/[,;，；\n]/).map(item => item.trim()).filter(Boolean))];
+}
+
+function safeHttpUrl(value) {
+  try {
+    const url = new URL(value.trim());
+    return url.protocol === "https:" || url.protocol === "http:" ? url.href : "";
+  } catch {
+    return "";
+  }
+}
+
 function EvidenceWorkBoard({ cases, loading, error }) {
   const verifiedCases = cases.filter(item => item.review_status === "verified");
   const draftCases = cases.filter(item => item.review_status === "draft");
@@ -143,6 +168,10 @@ function EvidenceReviewList({ cases, onReviewed }) {
   const [riskFilter, setRiskFilter] = useStateAD("all");
   const [viewingCase, setViewingCase] = useStateAD(null);
   const [reviewNote, setReviewNote] = useStateAD("");
+  const [riskTypeInput, setRiskTypeInput] = useStateAD("");
+  const [rhirInput, setRhirInput] = useStateAD("");
+  const [mappingNote, setMappingNote] = useStateAD("");
+  const [sourceReferenceUrl, setSourceReferenceUrl] = useStateAD("");
   const [savingReview, setSavingReview] = useStateAD(false);
   const [reviewMessage, setReviewMessage] = useStateAD(null);
   const risks = [...new Set(cases.flatMap(item => item.risk_types || []))].sort();
@@ -154,16 +183,37 @@ function EvidenceReviewList({ cases, onReviewed }) {
     return matchesQuery && matchesRisk;
   });
 
+  function openCase(item) {
+    setViewingCase(item);
+    setReviewNote(item.review_notes || "");
+    setRiskTypeInput((item.risk_types || []).join(", "));
+    setRhirInput((item.rhir_fields || []).join(", "));
+    setMappingNote(item.mapping_notes || "");
+    setSourceReferenceUrl(item.source_reference_url || "");
+    setReviewMessage(null);
+  }
+
   async function handleReview(decision) {
     if (!viewingCase) return;
+    const safeReferenceUrl = sourceReferenceUrl.trim() ? safeHttpUrl(sourceReferenceUrl) : "";
+    if (sourceReferenceUrl.trim() && !safeReferenceUrl) {
+      setReviewMessage("補充來源連結請貼完整網址，例如 https://example.com");
+      return;
+    }
     setSavingReview(true);
     setReviewMessage(null);
     try {
-      const updated = await window.RU_SUPABASE.updateEvidenceReview(viewingCase.id, decision, reviewNote);
-      setReviewMessage(`已標記為 ${updated.review_status}`);
+      const updated = await window.RU_SUPABASE.updateEvidenceReview(viewingCase.id, {
+        decision,
+        reviewNotes: reviewNote,
+        riskTypes: parseTagList(riskTypeInput),
+        rhirFields: parseTagList(rhirInput),
+        mappingNotes: mappingNote,
+        sourceReferenceUrl: safeReferenceUrl
+      });
+      setReviewMessage(`已儲存為 ${REVIEW_STATUS_META[updated.review_status]?.label || updated.review_status}`);
       onReviewed?.(updated);
       setViewingCase(current => current ? { ...current, ...updated } : current);
-      setReviewNote("");
     } catch (error) {
       setReviewMessage(`無法更新：${error.message}`);
     } finally {
@@ -210,10 +260,10 @@ function EvidenceReviewList({ cases, onReviewed }) {
                   <div className="t-meta">{item.id}</div>
                 </td>
                 <td>{item.year || "—"}</td>
-                <td><span className="mono" style={{ fontSize: 11 }}>{(item.risk_types || []).join(", ") || "待配對"}</span></td>
-                <td><span className="mono" style={{ fontSize: 11 }}>{(item.rhir_fields || []).join(", ") || "待配對"}</span></td>
-                <td><span className="badge badge-partial"><span className="dot" />{item.review_status}</span></td>
-                <td><button className="btn btn-ghost btn-sm" onClick={() => setViewingCase(item)}>查看</button></td>
+                <td><span className="mono" style={{ fontSize: 11 }}>{(item.risk_types || []).join(", ") || "待配對"}</span><div className="t-meta">{item.mapping_notes || "可填暫定對應，之後再審核"}</div></td>
+                <td><span className="mono" style={{ fontSize: 11 }}>{(item.rhir_fields || []).join(", ") || "待配對"}</span><div className="t-meta">{item.mapping_notes || "可填暫定對應，之後再審核"}</div></td>
+                <td><ReviewStatusBadge status={item.review_status} /></td>
+                <td><button className="btn btn-ghost btn-sm" onClick={() => openCase(item)}>查看</button></td>
               </tr>
             ))}
             {filtered.length === 0 && <tr><td colSpan={6} style={{ textAlign: "center", padding: 32, color: "var(--ink-4)" }}>找不到符合的案例</td></tr>}
@@ -229,12 +279,28 @@ function EvidenceReviewList({ cases, onReviewed }) {
               <p className="t-meta mono">{viewingCase.id} · {viewingCase.source_name} · {viewingCase.year || "年份未載"}</p>
               <div className="callout" style={{ margin: "14px 0" }}>{viewingCase.summary}</div>
               <p><strong>常見結果：</strong>{viewingCase.common_outcome || "—"}</p>
-              <p><strong>Risk Type：</strong><span className="mono">{(viewingCase.risk_types || []).join(", ") || "待配對"}</span></p>
-              <p><strong>RHIR 欄位：</strong><span className="mono">{(viewingCase.rhir_fields || []).join(", ") || "待配對"}</span></p>
+              <p><strong>目前狀態：</strong><ReviewStatusBadge status={viewingCase.review_status} /></p>
               <p><strong>建議行動：</strong>{(viewingCase.action_hints || []).join("；") || "—"}</p>
               <p><strong>應保留證據：</strong>{(viewingCase.evidence_to_keep || []).join("；") || "—"}</p>
               <p><strong>備註：</strong>{viewingCase.notes || "—"}</p>
-              <p><strong>上次審核備註：</strong>{viewingCase.review_notes || "尚未留下審核備註"}</p>
+              <div style={{ marginTop: 12 }}><strong>上次審核備註：</strong><div style={{ whiteSpace: "pre-wrap", marginTop: 4 }}>{viewingCase.review_notes || "尚未留下審核備註"}</div></div>
+              <label style={{ display: "block", marginTop: 16 }}>
+                <strong>Risk Type（可手動修改）</strong>
+                <input value={riskTypeInput} onChange={event => setRiskTypeInput(event.target.value)} placeholder="例如：deposit_dispute" style={{ display: "block", width: "100%", marginTop: 6, padding: 8, border: "1px solid var(--hairline)", borderRadius: 4 }} />
+              </label>
+              <label style={{ display: "block", marginTop: 12 }}>
+                <strong>RHIR 欄位（可手動修改）</strong>
+                <input value={rhirInput} onChange={event => setRhirInput(event.target.value)} placeholder="例如：leaseTerms.depositRefundTerms" style={{ display: "block", width: "100%", marginTop: 6, padding: 8, border: "1px solid var(--hairline)", borderRadius: 4 }} />
+              </label>
+              <label style={{ display: "block", marginTop: 12 }}>
+                <strong>暫定對應備註</strong>
+                <textarea value={mappingNote} onChange={event => setMappingNote(event.target.value)} placeholder="例如：這是暫定 RHIR 對應，下一輪請確認是否要新增正式欄位" style={{ display: "block", width: "100%", minHeight: 58, marginTop: 6, padding: 8, border: "1px solid var(--hairline)", borderRadius: 4 }} />
+              </label>
+              <label style={{ display: "block", marginTop: 12 }}>
+                <strong>補充來源連結</strong>
+                <input value={sourceReferenceUrl} onChange={event => setSourceReferenceUrl(event.target.value)} placeholder="貼上你找到這筆資料的網址" style={{ display: "block", width: "100%", marginTop: 6, padding: 8, border: "1px solid var(--hairline)", borderRadius: 4 }} />
+                {safeHttpUrl(sourceReferenceUrl) && <a href={safeHttpUrl(sourceReferenceUrl)} target="_blank" rel="noreferrer" style={{ display: "inline-block", marginTop: 6 }}>開啟補充來源 ↗</a>}
+              </label>
               <label style={{ display: "block", marginTop: 16 }}>
                 <strong>審核備註</strong>
                 <textarea
@@ -246,9 +312,11 @@ function EvidenceReviewList({ cases, onReviewed }) {
               </label>
               {reviewMessage && <div className="callout" style={{ marginTop: 12 }}>{reviewMessage}</div>}
               <a href={viewingCase.source_url} target="_blank" rel="noreferrer">查看原始來源 ↗</a>
+              {viewingCase.source_reference_url && <><span style={{ color: "var(--ink-4)" }}>　</span><a href={viewingCase.source_reference_url} target="_blank" rel="noreferrer">查看補充來源 ↗</a></>}
             </div>
             <div className="modal-foot" style={{ justifyContent: "space-between", flexWrap: "wrap" }}>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button className="btn" disabled={savingReview} onClick={() => handleReview(viewingCase.review_status)}>儲存欄位</button>
                 <button className="btn btn-primary" disabled={savingReview} onClick={() => handleReview("verified")}>通過</button>
                 <button className="btn" disabled={savingReview} onClick={() => handleReview("revise")}>需要修改</button>
                 <button className="btn btn-danger" disabled={savingReview} onClick={() => handleReview("rejected")}>排除</button>

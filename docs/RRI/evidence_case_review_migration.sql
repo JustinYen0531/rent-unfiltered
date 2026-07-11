@@ -18,6 +18,12 @@ alter table public.evidence_cases
 alter table public.evidence_cases
   add column if not exists reviewed_by text;
 
+alter table public.evidence_cases
+  add column if not exists mapping_notes text;
+
+alter table public.evidence_cases
+  add column if not exists source_reference_url text;
+
 alter table public.evidence_cases enable row level security;
 
 drop policy if exists "prototype review evidence cases" on public.evidence_cases;
@@ -26,7 +32,7 @@ create policy "prototype review evidence cases"
   using (true)
   with check (review_status in ('draft', 'verified', 'revise', 'rejected', 'archived'));
 
-grant update (review_status, review_notes, reviewed_at, reviewed_by)
+grant update (review_status, review_notes, reviewed_at, reviewed_by, risk_types, rhir_fields, mapping_notes, source_reference_url)
   on table public.evidence_cases to anon;
 
 -- Ask PostgREST to reload the new columns immediately.

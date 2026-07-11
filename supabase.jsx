@@ -99,27 +99,31 @@ window.RU_SUPABASE = {
 
     const { data, error } = await client
       .from("evidence_cases")
-      .select("id, source_type, source_name, source_url, title, year, keywords, rhir_fields, risk_types, summary, common_outcome, action_hints, evidence_to_keep, confidence, review_status, review_notes, reviewed_at, reviewed_by, notes, updated_at")
+      .select("id, source_type, source_name, source_url, source_reference_url, title, year, keywords, rhir_fields, risk_types, summary, common_outcome, action_hints, evidence_to_keep, confidence, review_status, review_notes, reviewed_at, reviewed_by, mapping_notes, notes, updated_at")
       .order("updated_at", { ascending: false });
 
     if (error) throw error;
     return data || [];
   },
 
-  async updateEvidenceReview(id, decision, notes = "") {
+  async updateEvidenceReview(id, changes) {
     const client = _client();
     if (!client) throw new Error("請先在 supabase.jsx 填入你的 Project URL 和 Anon Key，然後重新整理頁面。");
 
     const { data, error } = await client
       .from("evidence_cases")
       .update({
-        review_status: decision,
-        review_notes: notes || null,
+        review_status: changes.decision,
+        review_notes: changes.reviewNotes || null,
         reviewed_at: new Date().toISOString(),
-        reviewed_by: "team"
+        reviewed_by: "team",
+        risk_types: changes.riskTypes,
+        rhir_fields: changes.rhirFields,
+        mapping_notes: changes.mappingNotes || null,
+        source_reference_url: changes.sourceReferenceUrl || null
       })
       .eq("id", id)
-      .select("id, review_status, review_notes, reviewed_at, reviewed_by")
+      .select("id, review_status, review_notes, reviewed_at, reviewed_by, risk_types, rhir_fields, mapping_notes, source_reference_url")
       .single();
 
     if (error) throw error;

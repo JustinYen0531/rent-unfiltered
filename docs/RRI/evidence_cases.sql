@@ -22,6 +22,8 @@ create table if not exists public.evidence_cases (
   review_notes text,
   reviewed_at timestamptz,
   reviewed_by text,
+  mapping_notes text,
+  source_reference_url text,
   notes text,
   case_record jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
@@ -68,7 +70,7 @@ create policy "prototype review evidence cases"
   on public.evidence_cases for update
   using (true)
   with check (review_status in ('draft', 'verified', 'revise', 'rejected', 'archived'));
-grant update (review_status, review_notes, reviewed_at, reviewed_by)
+grant update (review_status, review_notes, reviewed_at, reviewed_by, risk_types, rhir_fields, mapping_notes, source_reference_url)
   on table public.evidence_cases to anon;
 
 notify pgrst, 'reload schema';

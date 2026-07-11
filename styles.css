@@ -356,6 +356,14 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
 .badge-supplemented{ background: var(--s-supplemented-bg);color: var(--s-supplemented-ink); }
 .badge-supplemented.dot { background: var(--s-supplemented-ink); }
 .badge-unknown     { background: var(--s-unknown-bg);     color: var(--s-unknown-ink); }
+.badge-draft       { background: #fbf0d8; color: #8a5a0b; }
+.badge-draft .dot  { background: #8a5a0b; }
+.badge-verified    { background: #e3f3ee; color: #0f6b55; }
+.badge-verified .dot { background: #0f6b55; }
+.badge-revise      { background: #ede5f8; color: #5b2da0; }
+.badge-revise .dot { background: #5b2da0; }
+.badge-rejected    { background: #fbe5e6; color: #a02327; }
+.badge-rejected .dot { background: #a02327; }
 .badge-unknown     .dot { background: var(--s-unknown-ink); }
 
 .badge-outline {
