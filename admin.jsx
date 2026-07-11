@@ -138,10 +138,13 @@ function EvidenceWorkBoard({ cases, loading, error }) {
   );
 }
 
-function EvidenceReviewList({ cases }) {
+function EvidenceReviewList({ cases, onReviewed }) {
   const [query, setQuery] = useStateAD("");
   const [riskFilter, setRiskFilter] = useStateAD("all");
   const [viewingCase, setViewingCase] = useStateAD(null);
+  const [reviewNote, setReviewNote] = useStateAD("");
+  const [savingReview, setSavingReview] = useStateAD(false);
+  const [reviewMessage, setReviewMessage] = useStateAD(null);
   const risks = [...new Set(cases.flatMap(item => item.risk_types || []))].sort();
   const normalizedQuery = query.trim().toLowerCase();
   const filtered = cases.filter(item => {
@@ -150,6 +153,23 @@ function EvidenceReviewList({ cases }) {
     const matchesRisk = riskFilter === "all" || (item.risk_types || []).includes(riskFilter);
     return matchesQuery && matchesRisk;
   });
+
+  async function handleReview(decision) {
+    if (!viewingCase) return;
+    setSavingReview(true);
+    setReviewMessage(null);
+    try {
+      const updated = await window.RU_SUPABASE.updateEvidenceReview(viewingCase.id, decision, reviewNote);
+      setReviewMessage(`已標記為 ${updated.review_status}`);
+      onReviewed?.(updated);
+      setViewingCase(current => current ? { ...current, ...updated } : current);
+      setReviewNote("");
+    } catch (error) {
+      setReviewMessage(`無法更新：${error.message}`);
+    } finally {
+      setSavingReview(false);
+    }
+  }
 
   return (
     <section style={{ marginBottom: 28 }}>
@@ -214,9 +234,26 @@ function EvidenceReviewList({ cases }) {
               <p><strong>建議行動：</strong>{(viewingCase.action_hints || []).join("；") || "—"}</p>
               <p><strong>應保留證據：</strong>{(viewingCase.evidence_to_keep || []).join("；") || "—"}</p>
               <p><strong>備註：</strong>{viewingCase.notes || "—"}</p>
+              <label style={{ display: "block", marginTop: 16 }}>
+                <strong>審核備註</strong>
+                <textarea
+                  value={reviewNote}
+                  onChange={event => setReviewNote(event.target.value)}
+                  placeholder="例如：確定是租屋，但 RHIR 欄位要改成 leaseTerms.repairResponsibility"
+                  style={{ display: "block", width: "100%", minHeight: 72, marginTop: 6, padding: 8, border: "1px solid var(--hairline)", borderRadius: 4 }}
+                />
+              </label>
+              {reviewMessage && <div className="callout" style={{ marginTop: 12 }}>{reviewMessage}</div>}
               <a href={viewingCase.source_url} target="_blank" rel="noreferrer">查看原始來源 ↗</a>
             </div>
-            <div className="modal-foot"><button className="btn" onClick={() => setViewingCase(null)}>關閉</button></div>
+            <div className="modal-foot" style={{ justifyContent: "space-between", flexWrap: "wrap" }}>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button className="btn btn-primary" disabled={savingReview} onClick={() => handleReview("verified")}>通過</button>
+                <button className="btn" disabled={savingReview} onClick={() => handleReview("revise")}>需要修改</button>
+                <button className="btn btn-danger" disabled={savingReview} onClick={() => handleReview("rejected")}>排除</button>
+              </div>
+              <button className="btn" onClick={() => setViewingCase(null)}>關閉</button>
+            </div>
           </div>
         </div>
       )}
@@ -290,7 +327,12 @@ function AdminPage({ setRoute }) {
       </div>
 
       <EvidenceWorkBoard cases={evidenceCases} loading={evidenceLoading} error={evidenceError} />
-      {!evidenceLoading && !evidenceError && <EvidenceReviewList cases={evidenceCases} />}
+      {!evidenceLoading && !evidenceError && (
+        <EvidenceReviewList
+          cases={evidenceCases}
+          onReviewed={updated => setEvidenceCases(current => current.map(item => item.id === updated.id ? { ...item, ...updated } : item))}
+        />
+      )}
 
       {loading && (
         <div style={{ padding: "48px 0", textAlign: "center", color: "var(--ink-3)" }}>

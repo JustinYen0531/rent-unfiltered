@@ -105,4 +105,24 @@ window.RU_SUPABASE = {
     if (error) throw error;
     return data || [];
   },
+
+  async updateEvidenceReview(id, decision, notes = "") {
+    const client = _client();
+    if (!client) throw new Error("請先在 supabase.jsx 填入你的 Project URL 和 Anon Key，然後重新整理頁面。");
+
+    const { data, error } = await client
+      .from("evidence_cases")
+      .update({
+        review_status: decision,
+        review_notes: notes || null,
+        reviewed_at: new Date().toISOString(),
+        reviewed_by: "team"
+      })
+      .eq("id", id)
+      .select("id, review_status, review_notes, reviewed_at, reviewed_by")
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
 };

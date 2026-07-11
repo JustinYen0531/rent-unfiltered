@@ -18,7 +18,10 @@ create table if not exists public.evidence_cases (
   action_hints text[] not null default '{}',
   evidence_to_keep text[] not null default '{}',
   confidence text not null default 'medium' check (confidence in ('high', 'medium', 'low')),
-  review_status text not null default 'draft' check (review_status in ('draft', 'verified', 'archived')),
+  review_status text not null default 'draft' check (review_status in ('draft', 'verified', 'revise', 'rejected', 'archived')),
+  review_notes text,
+  reviewed_at timestamptz,
+  reviewed_by text,
   notes text,
   case_record jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
@@ -57,3 +60,13 @@ create policy "prototype read evidence cases"
 drop policy if exists "prototype read evidence mappings" on public.evidence_mappings;
 create policy "prototype read evidence mappings"
   on public.evidence_mappings for select using (true);
+
+-- Prototype review policy for the current no-login team workflow.
+-- Run the migration file separately when upgrading an existing table.
+drop policy if exists "prototype review evidence cases" on public.evidence_cases;
+create policy "prototype review evidence cases"
+  on public.evidence_cases for update
+  using (true)
+  with check (review_status in ('draft', 'verified', 'revise', 'rejected', 'archived'));
+grant update (review_status, review_notes, reviewed_at, reviewed_by)
+  on table public.evidence_cases to anon;
