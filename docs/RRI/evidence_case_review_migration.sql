@@ -28,3 +28,6 @@ create policy "prototype review evidence cases"
 
 grant update (review_status, review_notes, reviewed_at, reviewed_by)
   on table public.evidence_cases to anon;
+
+-- Ask PostgREST to reload the new columns immediately.
+notify pgrst, 'reload schema';

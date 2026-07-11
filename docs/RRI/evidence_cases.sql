@@ -70,3 +70,5 @@ create policy "prototype review evidence cases"
   with check (review_status in ('draft', 'verified', 'revise', 'rejected', 'archived'));
 grant update (review_status, review_notes, reviewed_at, reviewed_by)
   on table public.evidence_cases to anon;
+
+notify pgrst, 'reload schema';
