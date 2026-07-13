@@ -1,81 +1,72 @@
 function ProjectGuidePage({ setRoute }) {
   const { Crumbs, Icon } = window.RU;
 
-  const motivePoints = [
-    "租屋資訊常常分散、模糊、難比較。",
-    "很多人看了房源，還是不知道哪些地方有風險。",
-    "Rent Unfiltered 想做的，是把資訊攤開、整理清楚、讓風險更容易被看見。",
-    "使用者可以用更少的時間，理解一間房子的租屋條件。",
-  ];
-
-  const problemPoints = [
-    "房源資訊常有缺漏，重要條件不一定先寫清楚。",
-    "使用者常靠截圖、對話、筆記自己整理資料。",
-    "同一物件補充資訊後，很難追蹤前後差異。",
-    "想做分析時，原始資料通常不夠結構化。",
-  ];
-
-  const solutionPoints = [
-    "用表單先把租屋資訊整理成固定欄位。",
-    "把資料轉成可追蹤的 RHIR 結構。",
-    "一筆物件先建立初始版本，再往下延伸子版本。",
-    "分析報告和表單儲存拆開，避免每次小改都重跑。",
-    "讓使用者能同時看到欄位、結構化資料、分析結果。",
-  ];
-
-  const positioningPoints = [
-    "這是一個比賽型 MVP，不是完整商業產品。",
-    "目前重點是驗證「租屋資訊透明化」能不能被做成清楚流程。",
-    "核心價值是整理資訊、保留版本、輔助判讀。",
-    "RHIR 是專案的重要基礎，方便後續分析、下載與擴充。",
-    "這不是法律認定工具，也不是最終簽約保證。",
-    "它比較像是一個租屋資訊整理與風險輔助閱讀工具。",
-  ];
-
-  const stages = [
+  const guideBlocks = [
     {
-      number: "01",
-      title: "找房與刊登資訊初篩",
-      subtitle: "FIND · LISTING REVIEW",
-      goal: "把 591 等平台的房源資訊整理成可比較、可追蹤的候選物件。",
-      flow: "591 刊登頁 → 欄位擷取 → 缺漏、矛盾與初步風險",
-      rhir: "RHIR 在這裡是資料骨架：把租金、押金、電費、房型、地區與揭露狀態固定下來，保存原始來源與初始版本。",
-      rri: "RRI 在這裡是初步篩檢：根據已揭露、部分揭露、未揭露與衝突欄位，指出哪些風險需要進一步確認。",
-      ai: "AI 在這裡不是替使用者做決定，而是協助整理刊登文字、產生白話摘要與第一批追問清單。",
-      output: "候選物件、RHIR 初始版本、RRI 初步風險與待確認欄位。",
+      title: "專案摘要",
+      meta: "PROJECT SUMMARY",
+      lead: "Rent Unfiltered 不是另一個租屋刊登平台，而是一套面向租客的租屋資訊透明化與風險輔助判讀工具。",
+      points: [
+        "把 591、房東回覆、契約與看屋紀錄整理成可記錄、可比較、可追溯的資料。",
+        "用 RHIR 保存欄位值、揭露狀態、資料來源與版本差異。",
+        "用 RRI 把契約透明度、費用透明度、居住安全與租客權益轉成可閱讀的風險訊號。",
+        "用 AI Insight 將結構化結果轉成白話說明、待追問事項與簽約前檢查方向。",
+      ],
     },
     {
-      number: "02A",
-      title: "條款與費用談判",
-      subtitle: "NEGOTIATION · ACTION PLAN",
-      goal: "把案例與風險轉成簽約前可以直接使用的詢問、談判與證據保存行動。",
-      flow: "房東／仲介回覆 → 條件補充 → 談判前後版本比較",
-      rhir: "RHIR 在這裡是版本紀錄：保留房東回覆、談判結果、來源與時間，形成物件的談判子版本，不覆蓋刊登初始資料。",
-      rri: "RRI 在這裡是風險聚焦：重新計算押金、電費、修繕、提前解約、報稅與遷戶籍等欄位在補充資訊後的風險狀態。",
-      ai: "AI 在這裡是溝通助手：根據 RRI 與已確認案例產生要問的問題、應保留的證據與可複製的詢問話術。",
-      output: "談判清單、條件紅線、證據保存清單與 Action Plan。",
+      title: "理念與動機",
+      meta: "WHY THIS EXISTS",
+      lead: "租屋不是單純比較租金，而是一段持續的居住服務關係；對學生、新鮮人與第一次租屋者來說，查核成本與承擔風險往往更高。",
+      points: [
+        "自住者通常能投入更多時間評估房屋品質與長期風險，租屋者卻常受限於預算、時間與經驗。",
+        "押金、電費、修繕責任、報稅、遷戶籍與居住安全等資訊，常被藏在零散對話與複雜條款中。",
+        "專案希望讓租屋變得更安全、更容易理解，也更容易被理性比較。",
+        "Unfiltered 的意思不是毫無篩選，而是不讓廣告、流量與市場權力替租客過濾重要資訊。",
+      ],
     },
     {
-      number: "02B",
-      title: "契約審閱與簽約前確認",
-      subtitle: "CONTRACT · CONSISTENCY REVIEW",
-      goal: "確認刊登內容、房東／仲介說法與契約條文是否一致，找出簽約前仍需修改的地方。",
-      flow: "刊登內容 + 對話紀錄 + 契約草稿 → 三方欄位比對 → 簽約前決策",
-      rhir: "RHIR 在這裡是契約版本：把契約條文與來源文件掛回同一組欄位，保留 X（刊登）、N（談判）、C（契約）版本差異。",
-      rri: "RRI 在這裡是條款一致性檢查：若押金返還、電費或修繕責任在不同來源中不一致，就標記為 conflict，而不是自行判定違法。",
-      ai: "AI 在這裡是解釋與整理層：說明衝突位置、整理簽約前追問與修改建議，但不取代法律專業或替使用者簽約。",
-      output: "已確認條件、尚未寫明條款、衝突欄位與簽約前 Action Plan。",
+      title: "問題分析",
+      meta: "WHAT IS BROKEN",
+      lead: "租屋市場存在資訊不對稱，品質與風險雖然存在差異，租客卻常難以在簽約前準確判斷。",
+      points: [
+        "刊登頁面常強調價格、地點與照片，但水電計價、押金返還、修繕責任與提前解約等關鍵條件未必完整揭露。",
+        "搜尋成本不平均，風險容易落在經驗較少、預算較低或時間有限的租客身上。",
+        "便宜不一定合理，昂貴也不一定安全；真正的居住成本還包含資訊不透明所帶來的風險成本。",
+        "當租客無法分辨風險時，劣質物件可能靠包裝取得交易機會，透明且條件合理的物件也不一定被看見。",
+      ],
     },
     {
-      number: "03",
-      title: "入住、租期與退租追蹤",
-      subtitle: "TENANCY · HANDOVER · MOVE-OUT",
-      goal: "把簽約後的屋況、修繕、費用與押金返還紀錄保存下來，形成可追溯的租屋歷程。",
-      flow: "簽約交屋 → 租期事件 → 退租點交與押金結算",
-      rhir: "RHIR 在這裡是事件與證據紀錄：保存入住照片、設備狀態、報修通知、電表與退租點交資料。",
-      rri: "RRI 在這裡是持續風險追蹤：根據實際發生的修繕、費用或押金事件更新風險脈絡，不只停留在簽約前預測。",
-      ai: "AI 在這裡是紀錄整理助手：協助整理事件時間線、提醒應保存的證據與說明可能的下一步，但不自行作法律判斷。",
-      output: "交屋紀錄、租期事件時間線、退租檢查清單與押金爭議證據包。",
+      title: "解決方案",
+      meta: "HOW WE RESPOND",
+      lead: "以固定資料結構、可解釋規則與受證據約束的 AI，建立從找房到簽約前確認的決策支援流程。",
+      points: [
+        "RHIR：把分散資訊轉成固定欄位，標記 disclosed、missing、partial、conflict 等狀態，並保留來源與版本。",
+        "RRI：根據 RHIR 欄位計算風險訊號與分面向結果，讓租客看見租金之外的契約、費用、安全與權益風險。",
+        "AI Insight：將 RHIR、RRI 與已確認案例整理成白話報告、待追問清單、談判話術與簽約前 Action Plan。",
+        "案例證據層：讓押金、電費、修繕與提前解約等風險能回溯到真實來源，而不是只給一個沒有脈絡的分數。",
+      ],
+    },
+    {
+      title: "可行性評估",
+      meta: "FEASIBILITY",
+      lead: "專案採漸進式資料與產品策略，先完成可操作的 MVP，再逐步擴充資料來源與服務場景。",
+      points: [
+        "技術上已具備表單、RHIR JSON、RRI v0.1 規則引擎、AI Insight、版本管理、Chrome 擴充插件與 Supabase 保存雛形。",
+        "資料上先使用使用者主動輸入、租屋頁可見文字、房東或仲介提供的資訊，再逐步接入契約、政府公開資料與租賃糾紛統計。",
+        "成本上先由規則引擎處理固定風險，AI 只負責解釋與追問，不需要一開始建置大型平台或大量模型服務。",
+        "倫理與法律上，系統定位為資訊整理與風險輔助判讀，不提供法律判決、安全保證或交易背書。",
+      ],
+    },
+    {
+      title: "社會影響力",
+      meta: "SOCIAL IMPACT",
+      lead: "讓租客在租金之外看見契約、費用、安全與權益，降低資訊落差帶來的不合理居住風險。",
+      points: [
+        "協助學生、新鮮人與第一次租屋者，在簽約前理解哪些條件需要確認、哪些證據需要保留。",
+        "讓透明、安全且條件合理的出租方更容易被看見，增加供給端主動揭露資訊的誘因。",
+        "降低搜尋成本與資訊不對稱，讓租屋選擇從只看價格，轉向租金加風險的綜合判斷。",
+        "呼應 SDG 11.1 對安全、適足與可負擔住宅的追求，也以降低租屋資訊落差回應 SDG 10。",
+      ],
     },
   ];
 
@@ -92,139 +83,44 @@ function ProjectGuidePage({ setRoute }) {
       <div className="page">
         <div className="page-header">
           <div>
-            <div
-              className="mono"
-              style={{
-                fontSize: 11,
-                color: "#5a6573",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                marginBottom: 6,
-              }}
-            >
-              PROJECT GUIDE · QUICK START
+            <div className="mono" style={{ fontSize: 11, color: "#5a6573", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 6 }}>
+              PROJECT GUIDE · PROJECT PLAN
             </div>
             <h1 className="page-title">專案導引</h1>
             <p className="page-sub">
-              這一頁說明 Rent Unfiltered 如何從找房初篩，延伸到條款談判、契約審閱與租期追蹤，以及 RHIR、RRI、AI 在每個階段的分工。
+              從計畫書的摘要、問題、解法與影響出發，快速理解 Rent Unfiltered 為什麼存在，以及 RHIR、RRI、AI Insight 如何共同支援租屋決策。
             </p>
           </div>
           <div style={{ display: "flex", gap: 8 }}>
             <button className="btn" onClick={() => setRoute({ name: "glossary", tab: "rhir" })}>
               <Icon name="book" size={14} />
-              前往名詞解釋
+              查看名詞與階段
             </button>
           </div>
         </div>
 
         <div className="stat-row">
-          <div className="stat">
-            <div className="stat-label">文件用途</div>
-            <div className="stat-value" style={{ fontSize: 18 }}>快速理解專案</div>
-          </div>
-          <div className="stat">
-            <div className="stat-label">適合誰看</div>
-            <div className="stat-value" style={{ fontSize: 18 }}>第一次使用者</div>
-          </div>
-          <div className="stat">
-            <div className="stat-label">閱讀風格</div>
-            <div className="stat-value" style={{ fontSize: 18 }}>簡單短句</div>
-          </div>
-          <div className="stat">
-            <div className="stat-label">下一步</div>
-            <div className="stat-value" style={{ fontSize: 18 }}>看三階段流程</div>
-          </div>
+          <div className="stat"><div className="stat-label">計畫書板塊</div><div className="stat-value" style={{ fontSize: 18 }}>6 個</div></div>
+          <div className="stat"><div className="stat-label">核心資料格式</div><div className="stat-value" style={{ fontSize: 18 }}>RHIR</div></div>
+          <div className="stat"><div className="stat-label">風險判讀</div><div className="stat-value" style={{ fontSize: 18 }}>RRI</div></div>
+          <div className="stat"><div className="stat-label">說明與行動</div><div className="stat-value" style={{ fontSize: 18 }}>AI Insight</div></div>
         </div>
 
         <div style={{ display: "grid", gap: 18, marginTop: 18 }}>
-          <section className="fg">
-            <div className="fg-head">
-              <h3>動機與理念</h3>
-              <span className="meta mono">why this exists</span>
-            </div>
-            <div style={{ padding: "16px 18px", fontSize: 14, lineHeight: 1.8, color: "#2a313b" }}>
-              <ul style={{ margin: 0, paddingLeft: 18 }}>
-                {motivePoints.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          </section>
-
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
-            <section className="fg">
+          {guideBlocks.map((block) => (
+            <section className="fg" key={block.title}>
               <div className="fg-head">
-                <h3>問題</h3>
-                <span className="meta mono">what is broken</span>
+                <h3>{block.title}</h3>
+                <span className="meta mono">{block.meta}</span>
               </div>
               <div style={{ padding: "16px 18px", fontSize: 14, lineHeight: 1.8, color: "#2a313b" }}>
+                <p style={{ margin: "0 0 10px" }}>{block.lead}</p>
                 <ul style={{ margin: 0, paddingLeft: 18 }}>
-                  {problemPoints.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-          </section>
-
-          <section className="fg">
-            <div className="fg-head">
-              <h3>三階段產品流程</h3>
-              <span className="meta mono">product stages · RHIR · RRI · AI</span>
-            </div>
-            <div style={{ display: "grid", gap: 14, padding: 18 }}>
-              <p style={{ margin: 0, color: "#2a313b", lineHeight: 1.8 }}>
-                目前的 591 匯入與欄位審查主要是第一階段。完整流程會一路延伸到談判、契約審閱、簽約與租期追蹤；每一階段都使用 RHIR、RRI 與 AI，但三者的任務不同。
-              </p>
-              {stages.map((stage) => (
-                <article key={stage.number} style={{ border: "1px solid #e2e5e9", borderRadius: 6, overflow: "hidden" }}>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: 10, padding: "13px 16px", background: "#f7f8fa", borderBottom: "1px solid #e2e5e9" }}>
-                    <span className="mono" style={{ color: "var(--accent)", fontSize: 12 }}>{stage.number}</span>
-                    <h4 style={{ margin: 0, fontSize: 16, color: "#1f2933" }}>{stage.title}</h4>
-                    <span className="meta mono">{stage.subtitle}</span>
-                  </div>
-                  <div style={{ padding: "14px 16px", display: "grid", gap: 10, color: "#2a313b", lineHeight: 1.75 }}>
-                    <div><strong>這一階段要做什麼：</strong>{stage.goal}</div>
-                    <div><strong>流程：</strong><span className="mono" style={{ fontSize: 12 }}>{stage.flow}</span></div>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
-                      <div style={{ padding: "10px 12px", background: "#f7fbff", borderLeft: "3px solid #5b8def" }}><strong>RHIR</strong><br />{stage.rhir}</div>
-                      <div style={{ padding: "10px 12px", background: "#f8fbf8", borderLeft: "3px solid #4f9d69" }}><strong>RRI</strong><br />{stage.rri}</div>
-                      <div style={{ padding: "10px 12px", background: "#fffaf2", borderLeft: "3px solid #d79738" }}><strong>AI</strong><br />{stage.ai}</div>
-                    </div>
-                    <div><strong>階段輸出：</strong>{stage.output}</div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
-
-          <section className="fg">
-              <div className="fg-head">
-                <h3>解方</h3>
-                <span className="meta mono">how we respond</span>
-              </div>
-              <div style={{ padding: "16px 18px", fontSize: 14, lineHeight: 1.8, color: "#2a313b" }}>
-                <ul style={{ margin: 0, paddingLeft: 18 }}>
-                  {solutionPoints.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
+                  {block.points.map((point) => <li key={point}>{point}</li>)}
                 </ul>
               </div>
             </section>
-          </div>
-
-          <section className="fg">
-            <div className="fg-head">
-              <h3>專案定位</h3>
-              <span className="meta mono">project position</span>
-            </div>
-            <div style={{ padding: "16px 18px", fontSize: 14, lineHeight: 1.8, color: "#2a313b" }}>
-              <ul style={{ margin: 0, paddingLeft: 18 }}>
-                {positioningPoints.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          </section>
+          ))}
         </div>
       </div>
     </>

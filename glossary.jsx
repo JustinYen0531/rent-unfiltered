@@ -4,6 +4,7 @@ function GlossaryPage({ setRoute, tab = "rhir" }) {
   const tabs = [
     { key: "rhir", label: "RHIR 規格" },
     { key: "rri", label: "RRI 指標" },
+    { key: "ai", label: "AI Insight" },
   ];
 
   const disclosureStatuses = [
@@ -24,6 +25,33 @@ function GlossaryPage({ setRoute, tab = "rhir" }) {
     ["userReport", "使用者回報"],
     ["user_input", "使用者輸入"],
     ["unknown", "來源不明"],
+  ];
+
+  const stages = [
+    {
+      number: "01",
+      title: "找房與刊登資訊初篩",
+      flow: "591 刊登頁 → 欄位擷取 → 缺漏、矛盾與初步風險",
+      body: "RHIR 固定欄位與來源；RRI 做初步風險篩檢；AI Insight 整理刊登文字、白話摘要與第一批追問。",
+    },
+    {
+      number: "02A",
+      title: "條款與費用談判",
+      flow: "房東／仲介回覆 → 條件補充 → 談判版本比較",
+      body: "RHIR 保存談判子版本；RRI 聚焦押金、電費、修繕、提前解約與權益欄位；AI Insight 產生詢問話術、證據清單與 Action Plan。",
+    },
+    {
+      number: "02B",
+      title: "契約審閱與簽約前確認",
+      flow: "刊登內容 + 對話 + 契約草稿 → 三方欄位比對",
+      body: "RHIR 保存 X（刊登）、N（談判）、C（契約）版本；RRI 標記 missing、partial、conflict；AI Insight 整理修改建議，不取代法律判斷。",
+    },
+    {
+      number: "03",
+      title: "入住、租期與退租追蹤",
+      flow: "簽約交屋 → 租期事件 → 退租點交與押金結算",
+      body: "RHIR 保存照片、報修、費用與點交證據；RRI 追蹤實際風險脈絡；AI Insight 整理事件時間線與下一步提醒。",
+    },
   ];
 
   const topLevelBlocks = [
@@ -77,7 +105,7 @@ function GlossaryPage({ setRoute, tab = "rhir" }) {
             </div>
             <h1 className="page-title">名詞解釋</h1>
             <p className="page-sub">
-              這裡集中解釋專案裡最重要的兩個概念：RHIR 是資料格式，RRI 是風險判讀指標。
+              這裡集中解釋 RHIR、RRI 與 AI Insight，並整理三階段租屋流程中三者各自扮演的角色。
             </p>
           </div>
           <div style={{ display: "flex", gap: 8 }}>
@@ -87,6 +115,25 @@ function GlossaryPage({ setRoute, tab = "rhir" }) {
             </button>
           </div>
         </div>
+
+        <section className="fg" style={{ marginBottom: 18 }}>
+          <div className="fg-head">
+            <h3>三階段租屋流程</h3>
+            <span className="meta mono">PRODUCT STAGES · 01 / 02A / 02B / 03</span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 12, padding: 16 }}>
+            {stages.map((stage) => (
+              <article key={stage.number} style={{ border: "1px solid #e2e5e9", borderRadius: 6, padding: "13px 14px", background: "#fbfcfd" }}>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 9 }}>
+                  <span className="mono" style={{ color: "var(--accent)", fontSize: 12 }}>{stage.number}</span>
+                  <strong style={{ color: "#1f2933" }}>{stage.title}</strong>
+                </div>
+                <div className="mono" style={{ fontSize: 11, color: "#5a6573", margin: "8px 0", lineHeight: 1.6 }}>{stage.flow}</div>
+                <div style={{ fontSize: 13, lineHeight: 1.7, color: "#2a313b" }}>{stage.body}</div>
+              </article>
+            ))}
+          </div>
+        </section>
 
         <div className="segmented" style={{ marginBottom: 18 }}>
           {tabs.map((item) => (
@@ -213,7 +260,7 @@ function GlossaryPage({ setRoute, tab = "rhir" }) {
               </div>
             </section>
           </div>
-        ) : (
+        ) : tab === "rri" ? (
           <div style={{ display: "grid", gap: 18 }}>
             <div className="stat-row">
               <div className="stat">
@@ -287,6 +334,61 @@ function GlossaryPage({ setRoute, tab = "rhir" }) {
                 <strong>RRI 應該被理解成輔助閱讀層</strong>
                 它的價值在於幫使用者更快看見重點、缺漏與風險訊號，而不是替使用者做最後決定。
               </div>
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: "grid", gap: 18 }}>
+            <div className="stat-row">
+              <div className="stat"><div className="stat-label">AI Insight 是什麼</div><div className="stat-value" style={{ fontSize: 18 }}>解釋與行動層</div></div>
+              <div className="stat"><div className="stat-label">輸入基礎</div><div className="stat-value" style={{ fontSize: 18 }}>RHIR + RRI</div></div>
+              <div className="stat"><div className="stat-label">主要輸出</div><div className="stat-value" style={{ fontSize: 18 }}>白話報告</div></div>
+              <div className="stat"><div className="stat-label">不是什麼</div><div className="stat-value" style={{ fontSize: 18 }}>法律結論</div></div>
+            </div>
+
+            <section className="fg">
+              <div className="fg-head">
+                <h3>AI Insight 的角色</h3>
+                <span className="meta mono">EVIDENCE-AWARE EXPLANATION</span>
+              </div>
+              <div style={{ padding: "16px 18px", fontSize: 14, lineHeight: 1.8, color: "#2a313b" }}>
+                <p style={{ marginTop: 0 }}>AI Insight 是 Rent Unfiltered 的白話解釋與行動建議層。它讀取 RHIR 的結構化欄位、RRI 的風險結果與已確認的案例證據，把技術結果轉成租客能理解、能執行的下一步。</p>
+                <ul style={{ margin: 0, paddingLeft: 18 }}>
+                  <li>整理目前物件最需要注意的風險脈絡。</li>
+                  <li>產生待追問問題、談判話術與簽約前檢查方向。</li>
+                  <li>建議使用者保存對話、照片、費用說明與契約條款等證據。</li>
+                  <li>在條款或來源衝突時，指出衝突位置，不自行替使用者判定誰一定正確。</li>
+                </ul>
+              </div>
+            </section>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+              <section className="fg">
+                <div className="fg-head"><h3>AI Insight 可以做什麼</h3><span className="meta mono">SUPPORTED TASKS</span></div>
+                <div style={{ padding: "16px 18px", fontSize: 14, lineHeight: 1.8, color: "#2a313b" }}>
+                  <ul style={{ margin: 0, paddingLeft: 18 }}>
+                    <li>把 RRI 結果改寫成新手看得懂的說明。</li>
+                    <li>摘要相關案例的共同模式與可能後果。</li>
+                    <li>產生 Action Plan、證據保存清單與可複製訊息。</li>
+                    <li>回應使用者對目前物件的追問，但必須回到已有資料。</li>
+                  </ul>
+                </div>
+              </section>
+              <section className="fg">
+                <div className="fg-head"><h3>AI Insight 不可以做什麼</h3><span className="meta mono">GUARDRAILS</span></div>
+                <div style={{ padding: "16px 18px", fontSize: 14, lineHeight: 1.8, color: "#2a313b" }}>
+                  <ul style={{ margin: 0, paddingLeft: 18 }}>
+                    <li>不可自行生成不存在的案例或法規依據。</li>
+                    <li>不可把資料缺漏直接說成違法。</li>
+                    <li>不可取代 RRI 規則、契約確認或專業法律意見。</li>
+                    <li>不可替使用者決定要不要租或保證交易結果。</li>
+                  </ul>
+                </div>
+              </section>
+            </div>
+
+            <div className="callout">
+              <span className="ic"><Icon name="info" size={14} /></span>
+              <div><strong>AI Insight 應該被理解成決策輔助層。</strong>它把 RHIR、RRI 與證據變成可理解的語言與行動，但最終判斷仍由使用者、現場查核與必要的專業協助共同完成。</div>
             </div>
           </div>
         )}
