@@ -325,6 +325,36 @@ const CAPTURE_IMPORTS_KEY = "ru_capture_imports";
 const IMPORTED_RECORD_BUNDLES = [];
 const CAPTURE_IMPORTS = {};
 
+function ensureLifecycleBundle(bundle) {
+  if (!bundle) return bundle;
+  if (!Array.isArray(bundle.events) || bundle.events.length === 0) {
+    bundle.events = window.RU_LIFECYCLE?.legacyVersionsToEvents(bundle.versions || [], bundle.rhir) || [];
+  }
+  const latestEvent = bundle.events[bundle.events.length - 1] || null;
+  bundle.versions = (bundle.versions || []).map((version) => {
+    const matchingEvent = bundle.events.find(event =>
+      event.legacyLabel === version.label || event.id === version.id
+    );
+    return {
+      stage: "X",
+      substage: "X",
+      eventType: "legacy_import",
+      displayCode: matchingEvent?.displayCode || version.label,
+      eventId: matchingEvent?.id || version.id,
+      snapshotHash: matchingEvent?.snapshotHash || null,
+      rhirSnapshot: matchingEvent?.cumulativeRhirSnapshot || null,
+      ...version,
+    };
+  });
+  bundle.record = {
+    ...bundle.record,
+    currentStage: latestEvent?.substage || bundle.record?.currentStage || "X",
+    latestEventId: latestEvent?.id || bundle.record?.latestEventId || null,
+    latestSnapshotHash: latestEvent?.snapshotHash || bundle.record?.latestSnapshotHash || null,
+  };
+  return bundle;
+}
+
 function loadImportedRecordBundles() {
   try {
     const raw = window.localStorage.getItem(IMPORTED_RECORDS_KEY);
@@ -391,6 +421,7 @@ function upsertVisibleRecord(record) {
 
 function addImportedRecord(bundle) {
   if (!bundle?.record?.id) return null;
+  ensureLifecycleBundle(bundle);
   const existingIndex = IMPORTED_RECORD_BUNDLES.findIndex((item) => item.record?.id === bundle.record.id);
   if (existingIndex >= 0) {
     IMPORTED_RECORD_BUNDLES[existingIndex] = bundle;
@@ -466,17 +497,157 @@ function addSubVersion(parentRecordId, newRhir, versionMeta) {
   return parentRecordId;
 }
 
+function applyDeltaToFieldGroups(fieldGroups, delta) {
+  const nextGroups = JSON.parse(JSON.stringify(fieldGroups || []));
+  const specs = Object.values(window.RU_LIFECYCLE?.FIELD_SPECS || {}).flat();
+  const specByKey = new Map(specs.map(spec => [spec.key, spec]));
+  const groupByPrefix = {
+    property: "property",
+    cost: "cost",
+    leaseTerms: "lease",
+    safety: "safety",
+    rights: "rights",
+    progress: "progress",
+    contract: "contract",
+    payment: "payment",
+    occupancy: "occupancy",
+    performance: "performance",
+  };
+
+  function visit(node, path = []) {
+    for (const [key, value] of Object.entries(node || {})) {
+      const nextPath = [...path, key];
+      if (value && typeof value === "object" && Object.prototype.hasOwnProperty.call(value, "value")) {
+        const fieldKey = nextPath.join(".");
+        const spec = specByKey.get(fieldKey) || { key: fieldKey, label: fieldKey };
+        const groupId = groupByPrefix[nextPath[0]] || nextPath[0];
+        let group = nextGroups.find(item => item.id === groupId);
+        if (!group) {
+          group = {
+            id: groupId,
+            title: {
+              progress: "進度與對話",
+              contract: "契約文件",
+              payment: "付款紀錄",
+              occupancy: "點交與入住",
+              performance: "入住後履約",
+            }[groupId] || groupId,
+            fields: [],
+          };
+          nextGroups.push(group);
+        }
+        const field = {
+          key: fieldKey,
+          label: spec.label,
+          value: value.value,
+          status: value.disclosureStatus,
+          src: value.sourceType,
+        };
+        const fieldIndex = group.fields.findIndex(item => item.key === fieldKey);
+        if (fieldIndex >= 0) group.fields[fieldIndex] = field;
+        else group.fields.push(field);
+      } else if (value && typeof value === "object" && !Array.isArray(value)) {
+        visit(value, nextPath);
+      }
+    }
+  }
+  visit(delta);
+  return nextGroups;
+}
+
+function eventToVersion(event, completion = 0) {
+  const rriSummary = event.cumulativeRriSnapshot;
+  return {
+    id: event.id,
+    eventId: event.id,
+    label: event.displayCode,
+    displayCode: event.displayCode,
+    stage: event.stage,
+    substage: event.substage,
+    eventType: event.eventType,
+    title: event.title,
+    createdAt: String(event.occurredAt || event.createdAt || "").replace("T", " ").slice(0, 16),
+    author: "你",
+    diff: {
+      added: Object.values(event.inputPayload || {}).filter(value => value != null && value !== "").length,
+      changed: 0,
+      removed: 0,
+    },
+    completion,
+    rri: rriSummary?.score ?? null,
+    riskLevel: rriSummary?.level || "尚未分析",
+    hasReport: false,
+    note: `${window.RU_LIFECYCLE?.STAGES?.[event.substage]?.label || event.substage}進度`,
+    snapshotHash: event.snapshotHash,
+    rhirSnapshot: event.cumulativeRhirSnapshot,
+    sourceType: event.sourceType,
+  };
+}
+
+function addLifecycleEvent(parentRecordId, eventInput) {
+  if (!parentRecordId || !window.RU_LIFECYCLE) return null;
+  let existingIndex = IMPORTED_RECORD_BUNDLES.findIndex(item => item.record?.id === parentRecordId);
+  let bundle;
+  if (existingIndex >= 0) {
+    bundle = ensureLifecycleBundle(IMPORTED_RECORD_BUNDLES[existingIndex]);
+  } else {
+    const sampleBundle = getRecordBundle(parentRecordId);
+    if (!sampleBundle) return null;
+    bundle = ensureLifecycleBundle({
+      record: { ...sampleBundle.record },
+      versions: JSON.parse(JSON.stringify(sampleBundle.versions || [])),
+      events: JSON.parse(JSON.stringify(sampleBundle.events || [])),
+      fieldGroups: JSON.parse(JSON.stringify(sampleBundle.fieldGroups || [])),
+      rhir: JSON.parse(JSON.stringify(sampleBundle.rhir || {})),
+      report: sampleBundle.report,
+    });
+  }
+
+  const event = window.RU_LIFECYCLE.createEvent({
+    ...eventInput,
+    currentSnapshot: bundle.rhir,
+    existingEvents: bundle.events,
+  });
+  const rri = summarizeRri(event.cumulativeRhirSnapshot);
+  event.cumulativeRriSnapshot = rri;
+
+  const completion = bundle.record?.completion ?? 0;
+  const version = eventToVersion(event, completion);
+  bundle.events = [...(bundle.events || []), event];
+  bundle.versions = [version, ...(bundle.versions || [])];
+  bundle.rhir = event.cumulativeRhirSnapshot;
+  bundle.fieldGroups = applyDeltaToFieldGroups(bundle.fieldGroups, event.rhirDelta);
+  bundle.report = null;
+  bundle.record = {
+    ...bundle.record,
+    updatedAt: version.createdAt,
+    versions: bundle.versions.map(item => item.label),
+    currentStage: event.substage,
+    latestEventId: event.id,
+    latestSnapshotHash: event.snapshotHash,
+    rri: rri?.score ?? null,
+    riskLevel: rri?.level || "尚未分析",
+    hasReport: false,
+  };
+
+  if (existingIndex >= 0) IMPORTED_RECORD_BUNDLES[existingIndex] = bundle;
+  else IMPORTED_RECORD_BUNDLES.unshift(bundle);
+  upsertVisibleRecord(bundle.record);
+  saveImportedRecordBundles();
+  return event;
+}
+
 function getRecordBundle(recordId) {
   const imported = IMPORTED_RECORD_BUNDLES.find((item) => item.record?.id === recordId);
-  if (imported) return imported;
+  if (imported) return ensureLifecycleBundle(imported);
   if (recordId === "RHIR-2026-0142") {
-    return {
+    return ensureLifecycleBundle({
       record: SAMPLE_RECORDS.find((item) => item.id === recordId),
       versions: VERSIONS_0142,
       fieldGroups: FIELD_GROUPS,
       rhir: buildRecord0142(),
       report: REPORT_X2,
-    };
+    });
   }
   return null;
 }
@@ -513,6 +684,7 @@ function getCaptureImport(id) {
 }
 
 loadImportedRecordBundles().forEach((bundle) => {
+  ensureLifecycleBundle(bundle);
   IMPORTED_RECORD_BUNDLES.push(bundle);
   if (bundle?.record) upsertVisibleRecord(bundle.record);
 });
@@ -527,6 +699,7 @@ window.RU_DATA = {
   REPORT_X2,
   RECORD_0142_RHIR: buildRecord0142(),
   addImportedRecord,
+  addLifecycleEvent,
   addSubVersion,
   getRecordBundle,
   saveCaptureImport,

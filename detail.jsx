@@ -5,6 +5,7 @@ const { useState: useStateD, useMemo: useMemoD } = React;
 function DetailPage({ setRoute, recordId }) {
   const { SAMPLE_RECORDS, VERSIONS_0142, FIELD_GROUPS, REPORT_X2, RECORD_0142_RHIR } = window.RU_DATA;
   const { Icon, Badge, RiskPill, Crumbs, downloadJSON } = window.RU;
+  const [, setRefreshToken] = useStateD(0);
   const bundle = window.RU_DATA.getRecordBundle(recordId);
   const record = bundle?.record || SAMPLE_RECORDS.find(r => r.id === recordId) || SAMPLE_RECORDS[0];
   const versions = bundle?.versions || VERSIONS_0142;
@@ -15,7 +16,17 @@ function DetailPage({ setRoute, recordId }) {
   const [activeVer, setActiveVer] = useStateD(versions[0].id);
   const [tab, setTab] = useStateD("fields");
   const [showAddModal, setShowAddModal] = useStateD(false);
+  const [collapsedGroups, setCollapsedGroups] = useStateD(() => {
+    const currentGroup = String(record.currentStage || "X").slice(0, 1);
+    return { X: currentGroup !== "X", Y: currentGroup !== "Y", Z: currentGroup !== "Z" };
+  });
   const activeVersion = versions.find(v => v.id === activeVer) || versions[0];
+  const activeRhir = activeVersion?.rhirSnapshot || rhir;
+  const lifecycleGroups = ["X", "Y", "Z"].map(group => ({
+    group,
+    label: { X: "刊登判讀", Y: "看房與簽約前", Z: "入住與履約中" }[group],
+    versions: versions.filter(version => (version.stage || "X") === group),
+  }));
 
   return (
     <>
@@ -46,7 +57,7 @@ function DetailPage({ setRoute, recordId }) {
             </button>
             <button className="btn"><Icon name="copy" size={14}/> 複製紀錄</button>
             <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
-              <Icon name="git" size={14}/> 新增子版本
+              <Icon name="git" size={14}/> 新增進度
             </button>
           </div>
         </div>
@@ -55,38 +66,57 @@ function DetailPage({ setRoute, recordId }) {
           {/* Version list */}
           <aside className="aside">
             <div className="aside-head">
-              <div className="aside-title">版本（{versions.length}）</div>
-              <button className="aside-add" onClick={() => setShowAddModal(true)} title="新增子版本">+</button>
+              <div className="aside-title">生命週期（{versions.length}）</div>
+              <button className="aside-add" onClick={() => setShowAddModal(true)} title="新增進度">+</button>
             </div>
-            <ul className="vlist">
-              {versions.map(v => (
-                <li
-                  key={v.id}
-                  className={`vitem ${activeVer === v.id ? "active" : ""}`}
-                  onClick={() => setActiveVer(v.id)}
+            {lifecycleGroups.map(group => (
+              <div className="lifecycle-group" key={group.group}>
+                <button
+                  className="lifecycle-group-head"
+                  onClick={() => setCollapsedGroups(current => ({ ...current, [group.group]: !current[group.group] }))}
                 >
-                  <div className="mono vlabel">{v.label}</div>
-                  <div>
-                    <div style={{fontSize:12, color:"#2a313b"}}>{v.title}</div>
-                    <div className="vmeta mono">{v.createdAt.slice(0,10)}</div>
-                  </div>
-                  <div style={{display:"flex", flexDirection:"column", alignItems:"flex-end", gap:3}}>
-                    {v.hasReport
-                      ? <span className="mono" style={{fontSize:10, color:"#1652f0"}}>RRI {v.rri}</span>
-                      : <span className="mono" style={{fontSize:10, color:"#8a93a0"}}>未分析</span>}
-                    <span className="vstatus mono">{Math.round(v.completion*100)}%</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
+                  <strong><span className="mono">{group.group}</span> · {group.label}</strong>
+                  <span>{group.versions.length} 筆 {collapsedGroups[group.group] ? "＋" : "－"}</span>
+                </button>
+                {!collapsedGroups[group.group] && (
+                  <ul className="vlist">
+                    {group.versions.map(v => (
+                      <li
+                        key={v.id}
+                        className={`vitem ${activeVer === v.id ? "active" : ""}`}
+                        onClick={() => setActiveVer(v.id)}
+                      >
+                        <div className="mono vlabel">{v.displayCode || v.label}</div>
+                        <div>
+                          <div style={{fontSize:12, color:"#2a313b"}}>{v.title}</div>
+                          <div className="vmeta mono">{String(v.createdAt || "").slice(0,10)}</div>
+                        </div>
+                        <div style={{display:"flex", flexDirection:"column", alignItems:"flex-end", gap:3}}>
+                          {v.rri != null
+                            ? <span className="mono" style={{fontSize:10, color:"#1652f0"}}>RRI {v.rri}</span>
+                            : <span className="mono" style={{fontSize:10, color:"#8a93a0"}}>待分析</span>}
+                          {v.snapshotHash && <span className="vstatus mono">{v.snapshotHash.slice(-4)}</span>}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
             <div className="aside-foot">
-              <div style={{marginBottom:6}}>子版本是延伸，不是覆蓋。每個版本都會保留為獨立節點，可比較不同填寫狀態與分析結果。</div>
+              <div style={{marginBottom:6}}>每次進度都是不可變事件；新資料形成累積快照，不會抹掉先前說法。</div>
             </div>
           </aside>
 
           {/* Content */}
           <main>
-            <VersionHeader version={activeVersion} recordId={record.id} setRoute={setRoute} nextLabel={`X-${versions.length}`}/>
+            <VersionHeader version={activeVersion} recordId={record.id} setRoute={setRoute}/>
+            {activeVersion?.snapshotHash && (
+              <div className="snapshot-note mono">
+                <Icon name="database" size={12}/>
+                SNAPSHOT {activeVersion.snapshotHash} · {activeVersion.substage || "X"} · 此事件的累積資料
+              </div>
+            )}
 
             <div className="tabs">
               <button className={`tab ${tab === "fields" ? "active" : ""}`} onClick={() => setTab("fields")}>
@@ -109,14 +139,14 @@ function DetailPage({ setRoute, recordId }) {
               </button>
             </div>
 
-            {tab === "fields" && <FieldCompletionView groups={fieldGroups} rhir={rhir} recordId={record.id} setRoute={setRoute}/>}
-            {tab === "rhir" && <RHIRView data={rhir} recordId={record.id}/>}
-            {tab === "report" && <ReportView report={report} version={activeVersion} rhir={rhir} recordId={record.id}/>}
+            {tab === "fields" && <FieldCompletionView groups={fieldGroups} rhir={activeRhir} recordId={record.id} setRoute={setRoute}/>}
+            {tab === "rhir" && <RHIRView data={activeRhir} recordId={record.id}/>}
+            {tab === "report" && <ReportView report={report} version={activeVersion} rhir={activeRhir} recordId={record.id}/>}
             {tab === "strategy" && (
               <StrategyView
                 key={`${record.id}-${activeVersion.id}`}
                 version={activeVersion}
-                rhir={rhir}
+                rhir={activeRhir}
                 recordId={record.id}
               />
             )}
@@ -125,22 +155,29 @@ function DetailPage({ setRoute, recordId }) {
       </div>
 
       {showAddModal && (
-        <AddVersionModal
+        <window.ProgressWizard
           onClose={() => setShowAddModal(false)}
-          nextLabel={`X-${versions.length}`}
           recordId={record.id}
-          setRoute={setRoute}
+          currentSnapshot={rhir}
+          existingEvents={bundle?.events || []}
+          initialStage={record.currentStage === "X" ? "Y1" : record.currentStage || "Y1"}
+          onSaved={(event) => {
+            setActiveVer(event.id);
+            setCollapsedGroups(current => ({ ...current, [event.stage]: false }));
+            setShowAddModal(false);
+            setRefreshToken(value => value + 1);
+          }}
         />
       )}
     </>
   );
 }
 
-function VersionHeader({ version, recordId, setRoute, nextLabel }) {
+function VersionHeader({ version, recordId, setRoute }) {
   const { Icon } = window.RU;
   const openForm = (section = "") => {
     if (!recordId || !setRoute) return;
-    setRoute({ name: "form", mode: "new", editRecordId: recordId, section, versionLabel: nextLabel || "X-1" });
+    setRoute({ name: "form", mode: "new", editRecordId: recordId, section, versionLabel: version?.label || "X" });
   };
   return (
     <div className="detail-head" style={{padding:"14px 18px", marginBottom:18}}>
@@ -163,8 +200,8 @@ function VersionHeader({ version, recordId, setRoute, nextLabel }) {
           </div>
         </div>
         <div style={{height:32, width:1, background:"#e4e7ec"}}/>
-        <button className="btn btn-sm"><Icon name="eye" size={12}/> 對照 X</button>
-        <button className="btn btn-sm" onClick={() => openForm()}><Icon name="edit" size={12}/> 編輯表單</button>
+        <button className="btn btn-sm"><Icon name="eye" size={12}/> 對照前一事件</button>
+        <button className="btn btn-sm" onClick={() => openForm()}><Icon name="edit" size={12}/> 補刊登表單</button>
       </div>
     </div>
   );
