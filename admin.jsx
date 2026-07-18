@@ -166,6 +166,8 @@ function EvidenceWorkBoard({ cases, loading, error }) {
 function EvidenceReviewList({ cases, onReviewed }) {
   const [query, setQuery] = useStateAD("");
   const [riskFilter, setRiskFilter] = useStateAD("all");
+  const [rhirFilter, setRhirFilter] = useStateAD("all");
+  const [mappingStatusFilter, setMappingStatusFilter] = useStateAD("all");
   const [viewingCase, setViewingCase] = useStateAD(null);
   const [viewingJsonCase, setViewingJsonCase] = useStateAD(null);
   const [jsonCopyMessage, setJsonCopyMessage] = useStateAD("");
@@ -176,13 +178,36 @@ function EvidenceReviewList({ cases, onReviewed }) {
   const [sourceReferenceUrl, setSourceReferenceUrl] = useStateAD("");
   const [savingReview, setSavingReview] = useStateAD(false);
   const [reviewMessage, setReviewMessage] = useStateAD(null);
-  const risks = [...new Set(cases.flatMap(item => item.risk_types || []))].sort();
+  const allMappings = cases.flatMap(item => item.evidence_mappings || []);
+  const risks = [...new Set(allMappings.map(mapping => mapping.risk_type))].sort();
+  const rhirFields = [...new Set(allMappings.map(mapping => mapping.rhir_field))].sort();
+  const mappingStatuses = [...new Set(allMappings.map(mapping => mapping.disclosure_status))].sort();
   const normalizedQuery = query.trim().toLowerCase();
   const filtered = cases.filter(item => {
-    const haystack = [item.id, item.title, item.summary, ...(item.keywords || [])].join(" ").toLowerCase();
+    const mappings = item.evidence_mappings || [];
+    const mappingSearchTerms = mappings.flatMap(mapping => [
+      mapping.rhir_field,
+      mapping.disclosure_status,
+      mapping.risk_type,
+      mapping.mapping_note
+    ]);
+    const haystack = [
+      item.id,
+      item.title,
+      item.summary,
+      ...(item.keywords || []),
+      ...(item.rhir_fields || []),
+      ...(item.risk_types || []),
+      ...mappingSearchTerms
+    ].filter(Boolean).join(" ").toLowerCase();
     const matchesQuery = !normalizedQuery || haystack.includes(normalizedQuery);
-    const matchesRisk = riskFilter === "all" || (item.risk_types || []).includes(riskFilter);
-    return matchesQuery && matchesRisk;
+    const mappingFiltersActive = riskFilter !== "all" || rhirFilter !== "all" || mappingStatusFilter !== "all";
+    const matchesMapping = !mappingFiltersActive || mappings.some(mapping =>
+      (riskFilter === "all" || mapping.risk_type === riskFilter) &&
+      (rhirFilter === "all" || mapping.rhir_field === rhirFilter) &&
+      (mappingStatusFilter === "all" || mapping.disclosure_status === mappingStatusFilter)
+    );
+    return matchesQuery && matchesMapping;
   });
 
   function openCase(item) {
@@ -293,17 +318,32 @@ function EvidenceReviewList({ cases, onReviewed }) {
         <span className="mono" style={{ fontSize: 12, color: "var(--ink-3)" }}>{filtered.length} / {cases.length} 筆</span>
       </div>
 
-      <div className="toolbar">
+      <div className="toolbar evidence-filter-toolbar">
         <input
           className="search"
-          style={{ width: 280 }}
           value={query}
           onChange={event => setQuery(event.target.value)}
-          placeholder="搜尋案例、縣市或關鍵詞"
+          placeholder="搜尋案例、RHIR、Risk Type 或 Mapping"
+          aria-label="搜尋案例與 Mapping"
         />
-        <select className="chip" value={riskFilter} onChange={event => setRiskFilter(event.target.value)}>
+        <select className="chip" value={riskFilter} onChange={event => setRiskFilter(event.target.value)} aria-label="依 Risk Type 篩選">
           <option value="all">全部風險類型</option>
           {risks.map(risk => <option key={risk} value={risk}>{risk}</option>)}
+        </select>
+        <select className="chip" value={rhirFilter} onChange={event => setRhirFilter(event.target.value)} aria-label="依 RHIR 欄位篩選">
+          <option value="all">全部 RHIR 欄位</option>
+          {rhirFields.map(field => <option key={field} value={field}>{field}</option>)}
+        </select>
+        <select className="chip" value={mappingStatusFilter} onChange={event => setMappingStatusFilter(event.target.value)} aria-label="依 Mapping 狀態篩選">
+          <option value="all">全部 Mapping 狀態</option>
+          {mappingStatuses.map(status => (
+            <option key={status} value={status}>
+              {status === "missing" ? "未揭露（missing）" :
+                status === "disclosed" ? "已揭露（disclosed）" :
+                  status === "conflict" ? "資料衝突（conflict）" :
+                    status === "unknown" ? "不明（unknown）" : status}
+            </option>
+          ))}
         </select>
       </div>
 
