@@ -6,7 +6,9 @@
     "dev": "serve . --listen tcp://127.0.0.1:5500",
     "start": "serve . --listen tcp://127.0.0.1:5500",
     "evidence:sync:moi": "node scripts/sync-moi-rental-cases.mjs",
-    "evidence:dictionary:validate": "node scripts/validate-rhir-risk-dictionary.mjs"
+    "evidence:dictionary:validate": "node scripts/validate-rhir-risk-dictionary.mjs",
+    "evidence:mappings:generate": "node scripts/generate-evidence-mappings.mjs --write",
+    "evidence:mappings:validate": "node scripts/generate-evidence-mappings.mjs"
   },
   "devDependencies": {
     "serve": "^14.2.4"

@@ -10,6 +10,20 @@
 
 這份字典不是案例 migration，也不是重新分類工具。它不修改 Supabase `evidence_cases` 的 `rhir_fields` 或 `risk_types`。
 
+## 三鍵 Mapping 詞典位置
+
+每一筆 verified 案例實際可被哪些三鍵組合取回，記錄在：
+
+`data/evidence/evidence-mappings.v1.json`
+
+目前版本包含 91 筆 verified 案例、260 筆 mapping，每案 1–4 筆。相同內容的
+Supabase upsert SQL 位於：
+
+`docs/RRI/evidence_mappings.seed.sql`
+
+mapping 詞典是案例層索引；`rhir-risk-dictionary.v1.json` 則是欄位與風險的語意字典。
+兩者用途不同，不應合併成同一份資料。
+
 ## 資料基準
 
 字典以 2026-07-18 的 Supabase 唯讀盤點為基準：
