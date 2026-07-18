@@ -28,6 +28,7 @@ const SUPABASE_ANON_KEY = "sb_publishable_G8A-JLI_5r1kXrIf-UmKlg_3Ge-BwzK";
 const INSIGHT_OWNER_STORAGE_KEY = "ru_ai_insight_owner_token";
 const AI_INSIGHT_PROMPT_VERSION = "action-provenance-v2";
 const STRATEGY_PROMPT_VERSION = "personal-strategy-v1";
+const SOURCE_DOCUMENT_BUCKET = "rental-source-documents";
 
 const _isConfigured = () =>
   !SUPABASE_URL.includes("YOUR_PROJECT") && !SUPABASE_ANON_KEY.includes("YOUR_ANON");
@@ -413,6 +414,140 @@ async function buildEvidenceRetrievalContextFromRhir(rhir, options = {}) {
 
 window.RU_SUPABASE = {
   isConfigured: _isConfigured,
+  getOwnerToken: _getInsightOwnerToken,
+
+  async uploadSourceDocument({ recordId, eventId = null, file, checksum }) {
+    const client = _client();
+    if (!client) throw new Error("請先完成 Supabase 設定，才能保存契約原檔。");
+    if (!recordId || !file || !checksum) throw new Error("保存契約缺少案件、檔案或 checksum。");
+
+    const documentId = _createUuid();
+    const safeFilename = String(file.name || "document")
+      .normalize("NFKC")
+      .replace(/[^\p{L}\p{N}._-]+/gu, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 120) || "document";
+    const storagePath = `${_getInsightOwnerToken()}/${recordId}/${documentId}/${safeFilename}`;
+    const { error: uploadError } = await client.storage
+      .from(SOURCE_DOCUMENT_BUCKET)
+      .upload(storagePath, file, {
+        contentType: file.type,
+        upsert: false,
+      });
+    if (uploadError) throw uploadError;
+
+    const { data, error } = await client
+      .from("source_documents")
+      .insert({
+        id: documentId,
+        owner_token: _getInsightOwnerToken(),
+        record_id: String(recordId),
+        event_id: eventId ? String(eventId) : null,
+        storage_path: storagePath,
+        original_filename: file.name,
+        mime_type: file.type,
+        size_bytes: file.size,
+        checksum,
+        version: 1,
+        processing_status: "uploaded",
+        review_status: "pending",
+      })
+      .select("id, record_id, event_id, storage_path, original_filename, mime_type, size_bytes, checksum, version, processing_status, review_status, created_at")
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async createSourceDocumentSignedUrl(storagePath, expiresIn = 300) {
+    const client = _client();
+    if (!client) throw new Error("請先完成 Supabase 設定，才能讀取契約原檔。");
+    const ttl = Math.min(600, Math.max(60, Number(expiresIn) || 300));
+    const { data, error } = await client.storage
+      .from(SOURCE_DOCUMENT_BUCKET)
+      .createSignedUrl(storagePath, ttl);
+    if (error) throw error;
+    return data?.signedUrl || null;
+  },
+
+  async updateSourceDocument(documentId, changes) {
+    const client = _client();
+    if (!client) throw new Error("請先完成 Supabase 設定，才能更新契約狀態。");
+    const allowed = {};
+    if (changes?.eventId !== undefined) allowed.event_id = changes.eventId || null;
+    if (changes?.processingStatus) allowed.processing_status = changes.processingStatus;
+    if (changes?.reviewStatus) allowed.review_status = changes.reviewStatus;
+    allowed.updated_at = new Date().toISOString();
+    const { data, error } = await client
+      .from("source_documents")
+      .update(allowed)
+      .eq("id", documentId)
+      .select("id, event_id, processing_status, review_status, updated_at")
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async saveDocumentExtraction({
+    documentId,
+    engine,
+    parserHash = null,
+    extractedText = null,
+    candidates = [],
+    fileAnnotations = [],
+    status = "parsed",
+    paidOcr = false,
+    failureReason = null,
+  }) {
+    const client = _client();
+    if (!client) throw new Error("請先完成 Supabase 設定，才能保存契約解析。");
+    const { data, error } = await client
+      .from("document_extractions")
+      .insert({
+        owner_token: _getInsightOwnerToken(),
+        document_id: documentId,
+        engine,
+        parser_hash: parserHash,
+        extracted_text: extractedText,
+        candidates,
+        file_annotations: fileAnnotations,
+        status,
+        paid_ocr: Boolean(paidOcr),
+        failure_reason: failureReason,
+      })
+      .select("id, document_id, engine, parser_hash, extracted_text, candidates, status, paid_ocr, failure_reason, created_at, updated_at")
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async updateDocumentExtraction(extractionId, candidates, status = "reviewed") {
+    const client = _client();
+    if (!client) throw new Error("請先完成 Supabase 設定，才能保存人工校對。");
+    const { data, error } = await client
+      .from("document_extractions")
+      .update({
+        candidates: Array.isArray(candidates) ? candidates : [],
+        status,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", extractionId)
+      .select("id, document_id, candidates, status, updated_at")
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async getSourceDocuments(recordId) {
+    const client = _client();
+    if (!client) throw new Error("請先完成 Supabase 設定，才能讀取契約文件。");
+    const { data, error } = await client
+      .from("source_documents")
+      .select("id, record_id, event_id, storage_path, original_filename, mime_type, size_bytes, checksum, version, processing_status, review_status, created_at, updated_at")
+      .eq("record_id", String(recordId))
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return data || [];
+  },
 
   async uploadRhir(rhirBundle) {
     const client = _client();
@@ -508,6 +643,8 @@ window.RU_SUPABASE = {
   async saveAiInsight({
     recordId,
     versionId,
+    basisEventId = null,
+    snapshotHash = null,
     rriSnapshot,
     evidenceContext,
     insightResult
@@ -524,13 +661,15 @@ window.RU_SUPABASE = {
         owner_token: _getInsightOwnerToken(),
         record_id: String(recordId),
         version_id: String(versionId),
+        basis_event_id: basisEventId ? String(basisEventId) : null,
+        snapshot_hash: snapshotHash || null,
         prompt_version: AI_INSIGHT_PROMPT_VERSION,
         rri_snapshot: rriSnapshot,
         evidence_context: evidenceContext,
         insight_result: insightResult,
         model: insightResult.model || null
       })
-      .select("id, record_id, version_id, model, created_at")
+      .select("id, record_id, version_id, basis_event_id, snapshot_hash, model, created_at")
       .single();
 
     if (error) throw error;
@@ -544,7 +683,7 @@ window.RU_SUPABASE = {
 
     const { data, error } = await client
       .from("ai_insights")
-      .select("id, record_id, version_id, prompt_version, rri_snapshot, evidence_context, insight_result, model, created_at")
+      .select("id, record_id, version_id, basis_event_id, snapshot_hash, prompt_version, rri_snapshot, evidence_context, insight_result, model, created_at")
       .eq("record_id", String(recordId))
       .eq("version_id", String(versionId))
       .order("created_at", { ascending: false })
@@ -558,6 +697,8 @@ window.RU_SUPABASE = {
   async saveStrategySession({
     recordId,
     versionId,
+    basisEventId = null,
+    snapshotHash = null,
     aiInsightId,
     strategyProfile,
     rriSnapshot,
@@ -592,6 +733,8 @@ window.RU_SUPABASE = {
         owner_token: _getInsightOwnerToken(),
         record_id: String(recordId),
         version_id: String(versionId),
+        basis_event_id: basisEventId ? String(basisEventId) : null,
+        snapshot_hash: snapshotHash || null,
         ai_insight_id: aiInsightId || null,
         prompt_version: strategyResult.promptVersion || STRATEGY_PROMPT_VERSION,
         strategy_profile: strategyProfile,
@@ -604,7 +747,7 @@ window.RU_SUPABASE = {
         status: "completed",
         model: strategyResult.model || null
       })
-      .select("id, record_id, version_id, ai_insight_id, prompt_version, strategy_profile, strategy_result, strategy_trace, consultation_messages, status, model, created_at, updated_at")
+      .select("id, record_id, version_id, basis_event_id, snapshot_hash, ai_insight_id, prompt_version, strategy_profile, strategy_result, strategy_trace, consultation_messages, status, model, created_at, updated_at")
       .single();
 
     if (error) throw error;
@@ -618,7 +761,7 @@ window.RU_SUPABASE = {
 
     const { data, error } = await client
       .from("strategy_sessions")
-      .select("id, record_id, version_id, ai_insight_id, prompt_version, strategy_profile, rri_snapshot, evidence_context, insight_snapshot, strategy_result, strategy_trace, consultation_messages, status, model, created_at, updated_at")
+      .select("id, record_id, version_id, basis_event_id, snapshot_hash, ai_insight_id, prompt_version, strategy_profile, rri_snapshot, evidence_context, insight_snapshot, strategy_result, strategy_trace, consultation_messages, status, model, created_at, updated_at")
       .eq("owner_token", _getInsightOwnerToken())
       .eq("record_id", String(recordId))
       .eq("version_id", String(versionId))

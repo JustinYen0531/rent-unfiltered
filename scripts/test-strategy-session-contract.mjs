@@ -112,6 +112,8 @@ const strategyResult = {
 const saved = await context.window.RU_SUPABASE.saveStrategySession({
   recordId: "record-1",
   versionId: "v1",
+  basisEventId: "event-y3-01",
+  snapshotHash: "ru1-12345678",
   aiInsightId: null,
   strategyProfile: { rentalGoal: "長期居住" },
   rriSnapshot: { totalScore: 55 },
@@ -126,6 +128,8 @@ const insertCall = calls.find(call => call.table === "strategy_sessions" && call
 assert.ok(insertCall);
 assert.equal(insertCall.payload.owner_token, ownerToken);
 assert.equal(insertCall.payload.record_id, "record-1");
+assert.equal(insertCall.payload.basis_event_id, "event-y3-01");
+assert.equal(insertCall.payload.snapshot_hash, "ru1-12345678");
 assert.equal(insertCall.payload.strategy_trace[0].actionTitle, "先確認");
 assert.equal(insertCall.payload.status, "completed");
 

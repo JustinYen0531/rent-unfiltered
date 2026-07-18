@@ -46,6 +46,27 @@ assert.equal(event.cumulativeRhirSnapshot.cost.monthlyRent.disclosureStatus, "co
 assert.equal(event.cumulativeRhirSnapshot.cost.monthlyRent.conflicts[0].value, 13500);
 assert.equal(event.cumulativeRhirSnapshot.progress.landlordResponse.value, "房東表示租金為 14,000 元");
 assert.match(event.snapshotHash, /^ru1-[0-9a-f]{8}$/);
+assert.throws(
+  () => lifecycle.writePath({}, "__proto__.polluted", { value: true }),
+  /不安全或無效/
+);
+
+const contractEvent = lifecycle.createEvent({
+  stage: "Y4",
+  values: { eventType: "contract_extraction_review" },
+  rhirDelta: {
+    leaseTerms: {
+      duration: {
+        value: "一年",
+        disclosureStatus: "disclosed",
+        sourceType: "contract_extraction",
+      },
+    },
+  },
+  currentSnapshot: event.cumulativeRhirSnapshot,
+  existingEvents: [event],
+});
+assert.equal(contractEvent.cumulativeRhirSnapshot.leaseTerms.duration.value, "一年");
 
 const missing = lifecycle.getMissingPrerequisites("Y4", event.cumulativeRhirSnapshot);
 assert.equal(missing.length, 0, "Y4 prerequisite should be satisfied by landlord response");

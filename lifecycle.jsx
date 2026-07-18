@@ -103,6 +103,10 @@
 
   function writePath(root, path, value) {
     const keys = String(path || "").split(".");
+    const forbidden = new Set(["__proto__", "prototype", "constructor"]);
+    if (keys.length < 2 || keys.some(key => !key || forbidden.has(key))) {
+      throw new Error(`不安全或無效的 RHIR 欄位路徑：${path}`);
+    }
     const leaf = keys.pop();
     const parent = keys.reduce((current, key) => {
       if (!current[key] || typeof current[key] !== "object" || Array.isArray(current[key])) current[key] = {};
@@ -209,13 +213,15 @@
     return `${stage}-${String(count).padStart(2, "0")}`;
   }
 
-  function createEvent({ stage, values, sourceType, currentSnapshot, existingEvents, occurredAt, title, sourceReferences, legacyLabel }) {
+  function createEvent({ stage, values, sourceType, currentSnapshot, existingEvents, occurredAt, title, sourceReferences, legacyLabel, rhirDelta: providedDelta }) {
     if (!STAGES[stage]) throw new Error(`未知的 XYZ 階段：${stage}`);
     const timestamp = occurredAt || new Date().toISOString();
     const eventId = global.crypto?.randomUUID
       ? global.crypto.randomUUID()
       : `evt-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-    const rhirDelta = createRhirDelta(stage, values || {}, sourceType, timestamp, eventId);
+    const rhirDelta = providedDelta
+      ? clone(providedDelta)
+      : createRhirDelta(stage, values || {}, sourceType, timestamp, eventId);
     const cumulativeRhirSnapshot = mergeSnapshot(currentSnapshot || {}, rhirDelta);
     const displayCode = nextDisplayCode(stage, existingEvents);
     return {
@@ -276,6 +282,7 @@
     mergeSnapshot,
     nextDisplayCode,
     readPath,
+    writePath,
     snapshotHash,
     stableStringify,
   };

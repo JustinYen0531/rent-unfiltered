@@ -375,9 +375,9 @@ function saveImportedRecordBundles() {
   }
 }
 
-function summarizeRri(rhir) {
+function summarizeRri(rhir, stage = "X") {
   if (!window.RU_RRI?.calculate || !rhir) return null;
-  const result = window.RU_RRI.calculate(rhir);
+  const result = window.RU_RRI.calculate(rhir, { stage });
   if (!result) return null;
   const score = Math.round(result.midScore);
   const level = result.isCertain || result.levelMin === result.levelMax
@@ -608,7 +608,7 @@ function addLifecycleEvent(parentRecordId, eventInput) {
     currentSnapshot: bundle.rhir,
     existingEvents: bundle.events,
   });
-  const rri = summarizeRri(event.cumulativeRhirSnapshot);
+  const rri = summarizeRri(event.cumulativeRhirSnapshot, event.substage);
   event.cumulativeRriSnapshot = rri;
 
   const completion = bundle.record?.completion ?? 0;

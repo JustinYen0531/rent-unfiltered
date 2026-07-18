@@ -309,9 +309,63 @@
     return { min: Math.round(min * 4) / 4, max: Math.round(max * 4) / 4 };
   }
 
+  const STAGE_RULES = {
+    Y1: [
+      ["progress.contactRole", "counterparty_identity_unknown", "對方身分尚未確認"],
+      ["progress.addressConfirmed", "property_identity_uncertain", "看房地址尚未完整確認"],
+    ],
+    Y2: [
+      ["safety.onSiteCondition", "on_site_condition_missing", "尚未保存現場屋況"],
+      ["progress.listingDifferences", "listing_reality_gap_unknown", "尚未確認現場與刊登差異"],
+    ],
+    Y3: [
+      ["progress.unresolvedIssues", "negotiation_unresolved", "仍有尚未談妥事項"],
+      ["progress.paymentPressure", "payment_pressure", "存在付款催促或期限壓力"],
+    ],
+    Y4: [
+      ["contract.lessorAuthority", "lessor_authority_unknown", "出租權限尚未確認"],
+      ["leaseTerms.specialClauses", "special_clause_review", "特殊條款需要人工審閱"],
+      ["payment.preContractStatus", "precontract_payment_unknown", "簽約前付款與收據狀態不清楚"],
+    ],
+    Z1: [
+      ["occupancy.inventory", "handover_inventory_missing", "點交設備清冊尚未保存"],
+      ["occupancy.existingDamage", "existing_damage_unknown", "入住前既有損傷尚未確認"],
+      ["payment.initialPayment", "initial_receipt_missing", "首期付款或收據尚未確認"],
+    ],
+    Z2: [
+      ["performance.repairIssue", "repair_performance_issue", "存在入住後修繕事件"],
+      ["performance.privacyIssue", "occupancy_privacy_issue", "存在隱私或使用干擾"],
+      ["performance.utilityDispute", "utility_performance_dispute", "存在水電或費用履約爭議"],
+    ],
+  };
+
+  function buildStageAssessment(rhir, stage) {
+    const rules = STAGE_RULES[stage] || [];
+    const findings = rules.flatMap(([path, riskType, message]) => {
+      const fieldValue = get(rhir, path);
+      const status = st(fieldValue);
+      const value = val(fieldValue);
+      const isIncidentField = stage === "Z2" || path === "progress.paymentPressure" || path === "progress.unresolvedIssues";
+      const active = isIncidentField ? Boolean(value) : status === "missing" || value == null || value === "";
+      if (!active) return [];
+      return [{
+        rhirField: path,
+        disclosureStatus: isIncidentField ? (status === "conflict" ? "conflict" : "disclosed") : "missing",
+        riskType,
+        severity: status === "conflict" || isIncidentField ? "attention" : "information-gap",
+        message,
+      }];
+    });
+    return {
+      stage: stage || "X",
+      ruleVersion: "xyz-stage-v1",
+      findings,
+    };
+  }
+
   // ── public API ───────────────────────────────────────────────
 
-  function calculate(rhirBundle) {
+  function calculate(rhirBundle, options = {}) {
     if (!rhirBundle) return null;
 
     const dims = {
@@ -390,6 +444,7 @@
       levelMax: levelLabel(maxScore),
       isCertain: minScore === maxScore,
       dimensions: dims,
+      stageAssessment: buildStageAssessment(rhirBundle, options.stage || "X"),
     };
   }
 
@@ -401,6 +456,6 @@
     return "極高風險";
   }
 
-  window.RU_RRI = { calculate, levelLabel };
+  window.RU_RRI = { calculate, levelLabel, buildStageAssessment, STAGE_RULES };
 
 })();

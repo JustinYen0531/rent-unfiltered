@@ -127,6 +127,10 @@ function DetailPage({ setRoute, recordId }) {
                 <Icon name="code" size={14}/> 查看 RHIR
                 <span className="tabcount mono">JSON</span>
               </button>
+              <button className={`tab ${tab === "documents" ? "active" : ""}`} onClick={() => setTab("documents")}>
+                <Icon name="file" size={14}/> 契約文件
+                <span className="tabcount mono">Y4</span>
+              </button>
               <button className={`tab ${tab === "report" ? "active" : ""}`} onClick={() => setTab("report")}>
                 <Icon name="chart" size={14}/> 分析報告
                 {activeVersion.hasReport
@@ -141,13 +145,25 @@ function DetailPage({ setRoute, recordId }) {
 
             {tab === "fields" && <FieldCompletionView groups={fieldGroups} rhir={activeRhir} recordId={record.id} setRoute={setRoute}/>}
             {tab === "rhir" && <RHIRView data={activeRhir} recordId={record.id}/>}
-            {tab === "report" && <ReportView report={report} version={activeVersion} rhir={activeRhir} recordId={record.id}/>}
+            {tab === "documents" && (
+              <window.ContractDocumentsView
+                recordId={record.id}
+                activeVersion={activeVersion}
+                onLifecycleSaved={(event) => {
+                  setActiveVer(event.id);
+                  setCollapsedGroups(current => ({ ...current, Y: false }));
+                  setRefreshToken(value => value + 1);
+                }}
+              />
+            )}
+            {tab === "report" && <ReportView report={report} version={activeVersion} rhir={activeRhir} recordId={record.id} latestSnapshotHash={record.latestSnapshotHash}/>}
             {tab === "strategy" && (
               <StrategyView
                 key={`${record.id}-${activeVersion.id}`}
                 version={activeVersion}
                 rhir={activeRhir}
                 recordId={record.id}
+                latestSnapshotHash={record.latestSnapshotHash}
               />
             )}
           </main>
@@ -766,7 +782,7 @@ function InsightActionCard({ item, index }) {
   );
 }
 
-function ReportView({ report, version, rhir, recordId }) {
+function ReportView({ report, version, rhir, recordId, latestSnapshotHash }) {
   const { Icon } = window.RU;
   const [insightState, setInsightState] = useStateD("idle"); // "idle" | "loading" | "done" | "stub" | "error"
   const [insightResult, setInsightResult] = useStateD(null);
@@ -800,7 +816,11 @@ function ReportView({ report, version, rhir, recordId }) {
         setInsightResult(saved.insight_result);
         setInsightState("done");
         setInsightSaveState("saved");
-        setInsightSaveMessage(`已載入 ${new Date(saved.created_at).toLocaleString("zh-TW")} 儲存的 Insight`);
+        const stale = Boolean(saved.snapshot_hash && latestSnapshotHash && saved.snapshot_hash !== latestSnapshotHash);
+        setInsightSaveMessage(stale
+          ? `此 Insight 依據 ${saved.snapshot_hash}；目前資料已更新，請手動生成新版`
+          : `已載入 ${new Date(saved.created_at).toLocaleString("zh-TW")} 儲存的 Insight`
+        );
       })
       .catch(loadError => {
         if (cancelled) return;
@@ -809,10 +829,12 @@ function ReportView({ report, version, rhir, recordId }) {
       });
 
     return () => { cancelled = true; };
-  }, [recordId, version?.id]);
+  }, [recordId, version?.id, latestSnapshotHash]);
 
   // Compute live range from RHIR bundle (no AI involved)
-  const rri = (window.RU_RRI && rhir) ? window.RU_RRI.calculate(rhir) : null;
+  const rri = (window.RU_RRI && rhir)
+    ? window.RU_RRI.calculate(rhir, { stage: version?.substage || "X" })
+    : null;
   if (!rri) {
     return (
       <div className="callout" style={{padding:"32px", justifyContent:"center", alignItems:"center", flexDirection:"column", textAlign:"center"}}>
@@ -824,7 +846,10 @@ function ReportView({ report, version, rhir, recordId }) {
   }
 
   // Layer 2: template conclusion (deterministic, no AI)
-  const conclusion = window.RU_CONCLUSION?.conclusionFromRri(rri);
+  const baseConclusion = window.RU_CONCLUSION?.conclusionFromRri(rri);
+  const conclusion = baseConclusion
+    ? { ...baseConclusion, stageAssessment: rri.stageAssessment }
+    : null;
 
   const minScore  = rri.minScore;
   const maxScore  = rri.maxScore;
@@ -879,6 +904,8 @@ function ReportView({ report, version, rhir, recordId }) {
       const saved = await window.RU_SUPABASE.saveAiInsight({
         recordId,
         versionId: version.id,
+        basisEventId: version.eventId || version.id,
+        snapshotHash: version.snapshotHash || window.RU_LIFECYCLE?.snapshotHash(rhir, version.id),
         rriSnapshot: conclusion,
         evidenceContext: evidenceRetrieval.context || {
           retrievalMode: "deterministic-exact-v1",
@@ -1005,6 +1032,28 @@ function ReportView({ report, version, rhir, recordId }) {
             <span className="mono" style={{fontSize:10, color:"#8a93a0", letterSpacing:"0.06em"}}>RULE-BASED · 固定格式</span>
           </div>
           <p style={{whiteSpace:"pre-line", margin:0}}>{conclusion.finalText}</p>
+        </div>
+      )}
+
+      {rri.stageAssessment?.findings?.length > 0 && (
+        <div className="fg" style={{marginTop:16}}>
+          <div className="fg-head">
+            <h3>{rri.stageAssessment.stage} 階段提醒</h3>
+            <span className="meta mono">{rri.stageAssessment.ruleVersion}</span>
+          </div>
+          <ul className="risk-list" style={{padding:"8px 16px 12px"}}>
+            {rri.stageAssessment.findings.map((finding, index) => (
+              <li key={`${finding.rhirField}-${index}`}>
+                <span className="num">{String(index + 1).padStart(2, "0")}</span>
+                <div>
+                  <div>{finding.message}</div>
+                  <div className="mono" style={{fontSize:10,color:"#8a93a0",marginTop:2}}>
+                    {finding.rhirField} · {finding.riskType}
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 
@@ -1636,10 +1685,15 @@ function StrategyResultPanel({
   );
 }
 
-function StrategyView({ version, rhir, recordId }) {
+function StrategyView({ version, rhir, recordId, latestSnapshotHash }) {
   const { Icon } = window.RU;
-  const rri = (window.RU_RRI && rhir) ? window.RU_RRI.calculate(rhir) : null;
-  const conclusion = rri ? window.RU_CONCLUSION?.conclusionFromRri(rri) : null;
+  const rri = (window.RU_RRI && rhir)
+    ? window.RU_RRI.calculate(rhir, { stage: version?.substage || "X" })
+    : null;
+  const strategyBaseConclusion = rri ? window.RU_CONCLUSION?.conclusionFromRri(rri) : null;
+  const conclusion = strategyBaseConclusion
+    ? { ...strategyBaseConclusion, stageAssessment: rri.stageAssessment }
+    : null;
   const evidenceRetrieval = useEvidenceRetrievalContext(rhir);
   const [profile, setProfile] = useStateD(() => loadStrategyDraft(recordId, version.id));
   const [draftState, setDraftState] = useStateD("saved");
@@ -1772,10 +1826,16 @@ function StrategyView({ version, rhir, recordId }) {
 
   const profileCompletion = getStrategyProfileCompletion(profile);
   const profileReady = isStrategyProfileReady(profile);
-  const strategyNeedsRefresh = Boolean(
+  const strategyProfileNeedsRefresh = Boolean(
     strategyProfileSnapshot &&
     JSON.stringify(profile) !== JSON.stringify(strategyProfileSnapshot)
   );
+  const strategySnapshotStale = Boolean(
+    strategySession?.snapshot_hash &&
+    latestSnapshotHash &&
+    strategySession.snapshot_hash !== latestSnapshotHash
+  );
+  const strategyNeedsRefresh = strategyProfileNeedsRefresh || strategySnapshotStale;
   const generationDisabled =
     !profileReady ||
     strategyState === "generating" ||
@@ -1790,6 +1850,7 @@ function StrategyView({ version, rhir, recordId }) {
     !strategySession ||
     strategyState !== "ready" ||
     strategyNeedsRefresh ||
+    strategySnapshotStale ||
     chatLoading ||
     savedInsightState === "loading" ||
     evidenceRetrieval.state === "loading" ||
@@ -1852,6 +1913,8 @@ function StrategyView({ version, rhir, recordId }) {
       const saved = await window.RU_SUPABASE.saveStrategySession({
         recordId,
         versionId: version.id,
+        basisEventId: version.eventId || version.id,
+        snapshotHash: version.snapshotHash || window.RU_LIFECYCLE?.snapshotHash(rhir, version.id),
         aiInsightId: savedInsightRecord?.id || null,
         strategyProfile: profileSnapshot,
         rriSnapshot: conclusion,
@@ -2200,7 +2263,9 @@ function StrategyView({ version, rhir, recordId }) {
             <strong>先生成並保存個人策略，才會開放後續追問</strong>
             <div>
               {strategyNeedsRefresh
-                ? "你的情境已改變，請重新生成策略後再繼續詢問。"
+                ? strategySnapshotStale
+                  ? "案件已有新的 XYZ 進度；舊策略仍保留，但請依最新快照重新生成後再繼續詢問。"
+                  : "你的情境已改變，請重新生成策略後再繼續詢問。"
                 : "這樣 AI 顧問的回答會固定依據同一份策略，不會在對話中悄悄改變方向。"}
             </div>
           </div>

@@ -22,23 +22,23 @@
 
 ```text
 RentalRecord
-  id, userId, title, currentStage, latestEventId
+  id, ownerToken, title, currentStage, latestEventId
   latestRhirSnapshot, latestRriSnapshot, latestSnapshotHash
   createdAt, updatedAt
 
 RentalEvent
-  id, recordId, userId, stage, substage, eventType, displayCode
+  id, recordId, ownerToken, stage, substage, eventType, displayCode
   occurredAt, inputPayload, rhirDelta
   cumulativeRhirSnapshot, cumulativeRriSnapshot, snapshotHash
   sourceReferences, legacyLabel, createdAt
 
 SourceDocument
-  id, recordId, eventId, userId, storagePath
+  id, recordId, eventId, ownerToken, storagePath
   originalFilename, mimeType, sizeBytes, checksum, version
   processingStatus, reviewStatus, createdAt
 
 DocumentExtraction
-  id, documentId, userId, engine, parserHash
+  id, documentId, ownerToken, engine, parserHash
   extractedText, candidates, status, failureReason, createdAt
 
 FieldCandidate
@@ -60,7 +60,7 @@ FieldCandidate
 原始文件放在私人 bucket `rental-source-documents`：
 
 ```text
-{userId}/{recordId}/{documentId}/{filename}
+{ownerToken}/{recordId}/{documentId}/{filename}
 ```
 
 只接受 PDF、JPG、JPEG、PNG，單檔上限 20 MB。解析先使用免費 `cloudflare-ai`；內容不足時必須由使用者明確同意，才能改用付費 `mistral-ocr`。只有 `accepted` 或 `edited` 候選可以形成 RHIR event。
@@ -75,11 +75,11 @@ rhirField + disclosureStatus + riskType
 
 AI Insight 與個人策略都保存 `basisEventId` 與 `snapshotHash`。最新案件 hash 改變時只標示舊結果過期，不自動覆蓋或重新生成。
 
-## 帳號與遷移
+## 第一版所有權邊界
 
-訪客草稿留在 localStorage。Email 魔法連結登入後，使用者可確認一次性遷移：
+本次不實作登入與帳號遷移。案件草稿與 XYZ event 留在 localStorage；正式保存的原始文件、解析、AI Insight 與策略沿用目前瀏覽器 owner token：
 
-* 本機案件轉為帳號所有的 `rental_records` 與 `rental_events`。
-* 可由本機 owner token 證明的 AI Insight 與策略改綁 `auth.uid()`。
-* 公開舊 `rhir_uploads` 不認領，避免把無法證明歸屬的資料綁到錯誤帳號。
-* 遷移完成後保存 migration marker，重試採 idempotent upsert，不建立重複事件。
+* 私有 Storage 路徑第一層必須等於本機 owner token。
+* `source_documents`、`document_extractions`、AI Insight 與策略以相同 header token 隔離。
+* 不認領公開舊 `rhir_uploads`。
+* 清除瀏覽器資料可能失去原 token；跨裝置登入與復原保留為日後獨立工程。
