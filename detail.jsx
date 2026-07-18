@@ -107,7 +107,7 @@ function DetailPage({ setRoute, recordId }) {
 
             {tab === "fields" && <FieldCompletionView groups={fieldGroups} rhir={rhir} recordId={record.id} setRoute={setRoute}/>}
             {tab === "rhir" && <RHIRView data={rhir} recordId={record.id}/>}
-            {tab === "report" && <ReportView report={report} version={activeVersion} rhir={rhir}/>}
+            {tab === "report" && <ReportView report={report} version={activeVersion} rhir={rhir} recordId={record.id}/>}
           </main>
         </div>
       </div>
@@ -612,10 +612,13 @@ function RelatedCasesPanel({ retrieval }) {
   );
 }
 
-function ReportView({ report, version, rhir }) {
+function ReportView({ report, version, rhir, recordId }) {
   const { Icon } = window.RU;
   const [insightState, setInsightState] = useStateD("idle"); // "idle" | "loading" | "done" | "stub" | "error"
   const [insightResult, setInsightResult] = useStateD(null);
+  const [insightCollapsed, setInsightCollapsed] = useStateD(false);
+  const [insightSaveState, setInsightSaveState] = useStateD("loading");
+  const [insightSaveMessage, setInsightSaveMessage] = useStateD("");
   const evidenceRetrieval = useEvidenceRetrievalContext(rhir);
 
   // Chat consultant state
@@ -629,6 +632,42 @@ function ReportView({ report, version, rhir }) {
       chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
     }
   }, [chatMessages, chatLoading]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    setInsightResult(null);
+    setInsightState("idle");
+    setInsightSaveState("loading");
+    setInsightSaveMessage("正在讀取已儲存的 AI Insight…");
+
+    if (!recordId || !version?.id || !window.RU_SUPABASE?.isConfigured()) {
+      setInsightSaveState("idle");
+      setInsightSaveMessage("");
+      return () => { cancelled = true; };
+    }
+
+    window.RU_SUPABASE.getLatestAiInsight(recordId, version.id)
+      .then(saved => {
+        if (cancelled) return;
+        if (!saved?.insight_result) {
+          setInsightSaveState("idle");
+          setInsightSaveMessage("尚未儲存 AI Insight");
+          return;
+        }
+
+        setInsightResult(saved.insight_result);
+        setInsightState("done");
+        setInsightSaveState("saved");
+        setInsightSaveMessage(`已載入 ${new Date(saved.created_at).toLocaleString("zh-TW")} 儲存的 Insight`);
+      })
+      .catch(loadError => {
+        if (cancelled) return;
+        setInsightSaveState("error");
+        setInsightSaveMessage(`讀取已儲存 Insight 失敗：${loadError?.message || loadError}`);
+      });
+
+    return () => { cancelled = true; };
+  }, [recordId, version?.id]);
 
   // Compute live range from RHIR bundle (no AI involved)
   const rri = (window.RU_RRI && rhir) ? window.RU_RRI.calculate(rhir) : null;
@@ -703,7 +742,7 @@ function ReportView({ report, version, rhir }) {
   }
 
   async function handleGenerateInsight() {
-    if (evidenceRetrieval.state === "loading") return;
+    if (insightSaveState === "loading" || evidenceRetrieval.state === "loading") return;
     if (evidenceRetrieval.state === "error") {
       setInsightResult({
         status: "error",
@@ -723,10 +762,45 @@ function ReportView({ report, version, rhir }) {
       setInsightResult(result);
       if (result?.status === "not_implemented") setInsightState("stub");
       else if (result?.status === "error") setInsightState("error");
-      else setInsightState("done");
+      else {
+        setInsightState("done");
+        setInsightSaveState("unsaved");
+        setInsightSaveMessage("這份 Insight 尚未儲存");
+      }
     } catch (e) {
       setInsightResult({ status: "error", message: String(e?.message || e) });
       setInsightState("error");
+    }
+  }
+
+  async function handleSaveInsight() {
+    if (!insightResult || insightState !== "done" || insightSaveState === "saving") return;
+
+    setInsightSaveState("saving");
+    setInsightSaveMessage("正在儲存 AI Insight…");
+    try {
+      const saved = await window.RU_SUPABASE.saveAiInsight({
+        recordId,
+        versionId: version.id,
+        rriSnapshot: conclusion,
+        evidenceContext: evidenceRetrieval.context || {
+          retrievalMode: "deterministic-exact-v1",
+          fallbackUsed: false,
+          findings: [],
+          uniqueCases: [],
+          stats: {
+            findingCount: 0,
+            matchedFindingCount: 0,
+            uniqueCaseCount: 0
+          }
+        },
+        insightResult
+      });
+      setInsightSaveState("saved");
+      setInsightSaveMessage(`已儲存 ${new Date(saved.created_at).toLocaleString("zh-TW")}`);
+    } catch (saveError) {
+      setInsightSaveState("error");
+      setInsightSaveMessage(`儲存失敗：${saveError?.message || saveError}`);
     }
   }
 
@@ -843,9 +917,43 @@ function ReportView({ report, version, rhir }) {
       <div className="fg" style={{marginTop:18}}>
         <div className="fg-head">
           <h3><Icon name="sparkle" size={14}/> AI Insight · 風險脈絡解讀</h3>
-          <span className="meta mono">OPTIONAL</span>
+          <div style={{display:"flex", alignItems:"center", gap:8}}>
+            <span className="meta mono">
+              {insightSaveState === "saved" ? "SAVED" : insightSaveState === "unsaved" ? "UNSAVED" : "OPTIONAL"}
+            </span>
+            <button
+              className="btn btn-sm btn-ghost"
+              onClick={() => setInsightCollapsed(collapsed => !collapsed)}
+              aria-expanded={!insightCollapsed}
+            >
+              <span style={{
+                display:"inline-flex",
+                transform: insightCollapsed ? "none" : "rotate(180deg)",
+                transition:"transform 0.15s ease"
+              }}>
+                <Icon name="chevronDown" size={11}/>
+              </span>
+              {insightCollapsed ? "展開" : "收合"}
+            </button>
+          </div>
         </div>
-        {insightState === "idle" && (
+        {!insightCollapsed && (
+          <>
+          {insightSaveMessage && (
+            <div style={{
+              margin:"10px 16px 0",
+              fontSize:11,
+              color: insightSaveState === "error"
+                ? "#dc2626"
+                : insightSaveState === "saved"
+                  ? "var(--s-disclosed-ink)"
+                  : "#8a6500"
+            }}>
+              {insightSaveMessage}
+            </div>
+          )}
+
+          {insightState === "idle" && (
           <div style={{padding:"18px 16px"}}>
             <p style={{color:"#5a6573", margin:"0 0 12px", fontSize:13, lineHeight:1.6}}>
               RRI 分數與結論已由 rule engine 產生（上方），AI Insight 不重算分數，只解讀風險之間的關聯、
@@ -855,10 +963,18 @@ function ReportView({ report, version, rhir }) {
             <button
               className="btn btn-primary"
               onClick={handleGenerateInsight}
-              disabled={evidenceRetrieval.state === "loading" || evidenceRetrieval.state === "error"}
+              disabled={
+                insightSaveState === "loading"
+                || evidenceRetrieval.state === "loading"
+                || evidenceRetrieval.state === "error"
+              }
             >
               <Icon name="sparkle" size={14}/>
-              {evidenceRetrieval.state === "loading" ? "等待案例查詢" : "生成 AI Insight"}
+              {insightSaveState === "loading"
+                ? "讀取已儲存 Insight"
+                : evidenceRetrieval.state === "loading"
+                  ? "等待案例查詢"
+                  : "生成 AI Insight"}
             </button>
             {evidenceRetrieval.state === "error" && (
               <div className="t-meta" style={{marginTop:8}}>
@@ -973,16 +1089,34 @@ function ReportView({ report, version, rhir }) {
               </div>
             )}
 
-            <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", borderTop:"1px dashed var(--hairline)", marginTop:12, paddingTop:8, fontSize:10, color:"#8a93a0"}}>
-              <span className="mono">MODEL · {insightResult.model || "—"}</span>
-              {insightResult.usage && (
-                <span className="mono">
-                  TOKENS · {insightResult.usage.total_tokens || (insightResult.usage.prompt_tokens + insightResult.usage.completion_tokens) || "—"}
-                </span>
-              )}
-              <button className="btn btn-sm btn-ghost" onClick={handleGenerateInsight}><Icon name="sparkle" size={11}/> 重新生成</button>
+            <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", gap:10, flexWrap:"wrap", borderTop:"1px dashed var(--hairline)", marginTop:12, paddingTop:8, fontSize:10, color:"#8a93a0"}}>
+              <div style={{display:"flex", alignItems:"center", gap:12, flexWrap:"wrap"}}>
+                <span className="mono">MODEL · {insightResult.model || "—"}</span>
+                {insightResult.usage && (
+                  <span className="mono">
+                    TOKENS · {insightResult.usage.total_tokens || (insightResult.usage.prompt_tokens + insightResult.usage.completion_tokens) || "—"}
+                  </span>
+                )}
+              </div>
+              <div style={{display:"flex", alignItems:"center", gap:8}}>
+                <button
+                  className="btn btn-sm"
+                  onClick={handleSaveInsight}
+                  disabled={insightSaveState === "saving" || insightSaveState === "saved"}
+                >
+                  <Icon name="database" size={11}/>
+                  {insightSaveState === "saving"
+                    ? "儲存中…"
+                    : insightSaveState === "saved"
+                      ? "已儲存"
+                      : "儲存 Insight"}
+                </button>
+                <button className="btn btn-sm btn-ghost" onClick={handleGenerateInsight}><Icon name="sparkle" size={11}/> 重新生成</button>
+              </div>
             </div>
           </div>
+        )}
+          </>
         )}
       </div>
 
@@ -1136,7 +1270,7 @@ function ReportView({ report, version, rhir }) {
       <div className="callout" style={{marginTop:18}}>
         <span className="ic"><Icon name="alert" size={14}/></span>
         <div>
-          上方 RRI 與結論由 rule engine + template 產生，<strong>每次顯示都是即時重算</strong>，不消耗 AI 算力。AI Insight 是選擇性功能，需手動觸發。本分析作為租屋決策輔助，不代表法律判定。
+          上方 RRI 與結論由 rule engine + template 產生，<strong>每次顯示都是即時重算</strong>，不消耗 AI 算力。AI Insight 是選擇性功能，需手動生成；儲存後會在同一瀏覽器再次開啟此版本時自動載入。本分析作為租屋決策輔助，不代表法律判定。
         </div>
       </div>
     </>

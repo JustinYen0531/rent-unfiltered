@@ -25,14 +25,68 @@
 
 const SUPABASE_URL      = "https://ypjuewskrfmbhzgyjint.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_G8A-JLI_5r1kXrIf-UmKlg_3Ge-BwzK";
+const INSIGHT_OWNER_STORAGE_KEY = "ru_ai_insight_owner_token";
 
 const _isConfigured = () =>
   !SUPABASE_URL.includes("YOUR_PROJECT") && !SUPABASE_ANON_KEY.includes("YOUR_ANON");
 
 let _sb = null;
+let _insightOwnerToken = null;
+
+function _createUuid() {
+  const cryptoApi = globalThis.crypto;
+  if (typeof cryptoApi?.randomUUID === "function") {
+    return cryptoApi.randomUUID();
+  }
+  if (typeof cryptoApi?.getRandomValues !== "function") {
+    throw new Error("目前瀏覽器無法建立 AI Insight 的本機識別碼。");
+  }
+
+  const bytes = new Uint8Array(16);
+  cryptoApi.getRandomValues(bytes);
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = [...bytes].map(value => value.toString(16).padStart(2, "0"));
+  return [
+    hex.slice(0, 4).join(""),
+    hex.slice(4, 6).join(""),
+    hex.slice(6, 8).join(""),
+    hex.slice(8, 10).join(""),
+    hex.slice(10, 16).join("")
+  ].join("-");
+}
+
+function _getInsightOwnerToken() {
+  if (_insightOwnerToken) return _insightOwnerToken;
+
+  try {
+    const stored = window.localStorage.getItem(INSIGHT_OWNER_STORAGE_KEY);
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(stored || "")) {
+      _insightOwnerToken = stored;
+      return _insightOwnerToken;
+    }
+  } catch (error) {
+    // Keep an in-memory capability token when local storage is unavailable.
+  }
+
+  _insightOwnerToken = _createUuid();
+  try {
+    window.localStorage.setItem(INSIGHT_OWNER_STORAGE_KEY, _insightOwnerToken);
+  } catch (error) {
+    // The current page can still save and reload until it is closed.
+  }
+  return _insightOwnerToken;
+}
+
 function _client() {
   if (!_sb && _isConfigured() && typeof supabase !== "undefined") {
-    _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: {
+        headers: {
+          "x-ru-insight-token": _getInsightOwnerToken()
+        }
+      }
+    });
   }
   return _sb;
 }
@@ -448,6 +502,56 @@ window.RU_SUPABASE = {
   planEvidenceQueriesForRhir,
   buildEvidenceRetrievalContext,
   buildEvidenceRetrievalContextFromRhir,
+
+  async saveAiInsight({
+    recordId,
+    versionId,
+    rriSnapshot,
+    evidenceContext,
+    insightResult
+  }) {
+    const client = _client();
+    if (!client) throw new Error("請先在 supabase.jsx 填入你的 Project URL 和 Anon Key，然後重新整理頁面。");
+    if (!recordId || !versionId || !rriSnapshot || !evidenceContext || !insightResult) {
+      throw new Error("儲存 AI Insight 缺少紀錄、版本、RRI、案例 context 或 Insight 結果。");
+    }
+
+    const { data, error } = await client
+      .from("ai_insights")
+      .insert({
+        owner_token: _getInsightOwnerToken(),
+        record_id: String(recordId),
+        version_id: String(versionId),
+        prompt_version: "evidence-context-v1",
+        rri_snapshot: rriSnapshot,
+        evidence_context: evidenceContext,
+        insight_result: insightResult,
+        model: insightResult.model || null
+      })
+      .select("id, record_id, version_id, model, created_at")
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async getLatestAiInsight(recordId, versionId) {
+    const client = _client();
+    if (!client) throw new Error("請先在 supabase.jsx 填入你的 Project URL 和 Anon Key，然後重新整理頁面。");
+    if (!recordId || !versionId) return null;
+
+    const { data, error } = await client
+      .from("ai_insights")
+      .select("id, record_id, version_id, prompt_version, rri_snapshot, evidence_context, insight_result, model, created_at")
+      .eq("record_id", String(recordId))
+      .eq("version_id", String(versionId))
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data || null;
+  },
 
   async updateEvidenceReview(id, changes) {
     const client = _client();
