@@ -27,6 +27,7 @@ const SUPABASE_URL      = "https://ypjuewskrfmbhzgyjint.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_G8A-JLI_5r1kXrIf-UmKlg_3Ge-BwzK";
 const INSIGHT_OWNER_STORAGE_KEY = "ru_ai_insight_owner_token";
 const AI_INSIGHT_PROMPT_VERSION = "action-provenance-v2";
+const STRATEGY_PROMPT_VERSION = "personal-strategy-v1";
 
 const _isConfigured = () =>
   !SUPABASE_URL.includes("YOUR_PROJECT") && !SUPABASE_ANON_KEY.includes("YOUR_ANON");
@@ -552,6 +553,108 @@ window.RU_SUPABASE = {
 
     if (error) throw error;
     return data || null;
+  },
+
+  async saveStrategySession({
+    recordId,
+    versionId,
+    aiInsightId,
+    strategyProfile,
+    rriSnapshot,
+    evidenceContext,
+    insightSnapshot,
+    strategyResult,
+    consultationMessages = []
+  }) {
+    const client = _client();
+    if (!client) throw new Error("請先完成 Supabase 設定，才能保存個人策略。");
+    if (
+      !recordId ||
+      !versionId ||
+      !strategyProfile ||
+      !rriSnapshot ||
+      !evidenceContext ||
+      !strategyResult
+    ) {
+      throw new Error("保存個人策略缺少紀錄、版本、個人情境、RRI、案例 context 或策略結果。");
+    }
+
+    const strategyTrace = (strategyResult.priorityActions || []).map(action => ({
+      actionTitle: action.title,
+      sourceMode: action.sourceMode,
+      priorityLevel: action.priorityLevel,
+      caseReferences: action.caseReferences || [],
+      ...action.trace,
+    }));
+    const { data, error } = await client
+      .from("strategy_sessions")
+      .insert({
+        owner_token: _getInsightOwnerToken(),
+        record_id: String(recordId),
+        version_id: String(versionId),
+        ai_insight_id: aiInsightId || null,
+        prompt_version: strategyResult.promptVersion || STRATEGY_PROMPT_VERSION,
+        strategy_profile: strategyProfile,
+        rri_snapshot: rriSnapshot,
+        evidence_context: evidenceContext,
+        insight_snapshot: insightSnapshot || null,
+        strategy_result: strategyResult,
+        strategy_trace: strategyTrace,
+        consultation_messages: Array.isArray(consultationMessages) ? consultationMessages : [],
+        status: "completed",
+        model: strategyResult.model || null
+      })
+      .select("id, record_id, version_id, ai_insight_id, prompt_version, strategy_profile, strategy_result, strategy_trace, consultation_messages, status, model, created_at, updated_at")
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async getLatestStrategySession(recordId, versionId) {
+    const client = _client();
+    if (!client) throw new Error("請先完成 Supabase 設定，才能讀取個人策略。");
+    if (!recordId || !versionId) return null;
+
+    const { data, error } = await client
+      .from("strategy_sessions")
+      .select("id, record_id, version_id, ai_insight_id, prompt_version, strategy_profile, rri_snapshot, evidence_context, insight_snapshot, strategy_result, strategy_trace, consultation_messages, status, model, created_at, updated_at")
+      .eq("owner_token", _getInsightOwnerToken())
+      .eq("record_id", String(recordId))
+      .eq("version_id", String(versionId))
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data || null;
+  },
+
+  async updateStrategySessionMessages(sessionId, consultationMessages) {
+    const client = _client();
+    if (!client) throw new Error("請先完成 Supabase 設定，才能保存策略對話。");
+    if (!sessionId) throw new Error("缺少策略 session id。");
+
+    const messages = (Array.isArray(consultationMessages) ? consultationMessages : [])
+      .filter(message => message && ["user", "assistant"].includes(message.role))
+      .map(message => ({
+        role: message.role,
+        content: String(message.content || ""),
+        error: Boolean(message.error),
+      }));
+    const { data, error } = await client
+      .from("strategy_sessions")
+      .update({
+        consultation_messages: messages,
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", sessionId)
+      .eq("owner_token", _getInsightOwnerToken())
+      .select("id, consultation_messages, updated_at")
+      .single();
+
+    if (error) throw error;
+    return data;
   },
 
   async updateEvidenceReview(id, changes) {

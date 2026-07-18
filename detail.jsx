@@ -1308,6 +1308,297 @@ function StrategyStatusCard({ label, value, state = "ready" }) {
   );
 }
 
+const STRATEGY_SOURCE_META = {
+  mixed: { label: "AI × 案例一致", className: "is-mixed" },
+  evidence_backed: { label: "案例支持", className: "is-evidence" },
+  ai_assessment: { label: "AI 判讀", className: "is-ai" },
+};
+const STRATEGY_PRIORITY_LABELS = {
+  immediate: "立即處理",
+  before_signing: "簽約前確認",
+  negotiable: "可以談判",
+  monitor: "持續觀察",
+};
+
+function getStrategyProfileCompletion(profile) {
+  return [
+    profile.rentalGoal,
+    profile.moveUrgency,
+    profile.budgetFlexibility,
+    profile.mustHaveConditions,
+    profile.negotiableConditions,
+    profile.redLines,
+    profile.specialNeeds.length > 0 ? "yes" : "",
+    profile.personalNote,
+  ].filter(value => String(value || "").trim()).length;
+}
+
+function hasPersonalStrategyInputs(profile) {
+  return Boolean(
+    profile.rentalGoal ||
+    profile.mustHaveConditions ||
+    profile.negotiableConditions ||
+    profile.redLines ||
+    profile.specialNeeds.length ||
+    profile.personalNote
+  );
+}
+
+function isStrategyProfileReady(profile) {
+  const hasDecisionCondition = Boolean(
+    profile.mustHaveConditions ||
+    profile.negotiableConditions ||
+    profile.redLines ||
+    profile.specialNeeds.length ||
+    profile.personalNote
+  );
+  return Boolean(
+    profile.rentalGoal &&
+    hasDecisionCondition &&
+    getStrategyProfileCompletion(profile) >= 4
+  );
+}
+
+function StrategyTraceDetails({ action }) {
+  const trace = action.trace || {};
+  return (
+    <details className="strategy-trace">
+      <summary>為什麼這樣建議？</summary>
+      <div className="strategy-trace-grid">
+        {trace.personalInputs?.length > 0 && (
+          <div>
+            <strong>你的條件</strong>
+            {trace.personalInputs.map((input, index) => (
+              <p key={`${input.field}-${index}`}>
+                <span className="mono">{input.field}</span>：{input.value}
+                {input.relevance ? `｜${input.relevance}` : ""}
+              </p>
+            ))}
+          </div>
+        )}
+        {trace.rhirSignals?.length > 0 && (
+          <div>
+            <strong>物件訊號</strong>
+            {trace.rhirSignals.map((signal, index) => (
+              <p key={`${signal.field}-${index}`}>
+                <span className="mono">{signal.field}</span>
+                {signal.disclosureStatus ? ` · ${signal.disclosureStatus}` : ""}
+              </p>
+            ))}
+          </div>
+        )}
+        {trace.rriSignals?.length > 0 && (
+          <div>
+            <strong>RRI 判讀</strong>
+            {trace.rriSignals.map((signal, index) => <p key={index}>{signal}</p>)}
+          </div>
+        )}
+        {trace.aiInsightActions?.length > 0 && (
+          <div>
+            <strong>AI Insight</strong>
+            {trace.aiInsightActions.map((item, index) => (
+              <p key={`${item.title}-${index}`}>{item.title}</p>
+            ))}
+          </div>
+        )}
+        {action.caseReferences?.length > 0 && (
+          <div className="strategy-trace-wide">
+            <strong>案例依據</strong>
+            {action.caseReferences.map(reference => (
+              <p key={reference.caseId}>
+                {reference.sourceUrl
+                  ? <a href={reference.sourceUrl} target="_blank" rel="noreferrer">{reference.title}</a>
+                  : reference.title}
+                {reference.relevance ? `｜${reference.relevance}` : ""}
+              </p>
+            ))}
+          </div>
+        )}
+        <div className="strategy-trace-reason strategy-trace-wide">
+          <strong>策略理由</strong>
+          <p>{trace.reasonSummary}</p>
+        </div>
+      </div>
+    </details>
+  );
+}
+
+function StrategyResultPanel({
+  result,
+  state,
+  message,
+  canGenerate,
+  needsRefresh,
+  session,
+  onGenerate,
+  onRetrySave
+}) {
+  const { Icon } = window.RU;
+  const isBusy = state === "generating" || state === "saving";
+  const savedAt = session?.created_at
+    ? new Date(session.created_at).toLocaleString("zh-TW", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "";
+
+  return (
+    <section className="strategy-result-card">
+      <div className="strategy-card-head">
+        <div>
+          <div className="strategy-step mono">STEP 04</div>
+          <h3><Icon name="sparkle" size={15}/> 我的個人策略</h3>
+          <p>先產生並保存完整策略，之後才開放 AI 顧問針對這份策略繼續追問。</p>
+        </div>
+        {session && <span className="strategy-draft-state is-saved">已保存</span>}
+      </div>
+
+      {!result && (
+        <div className="strategy-generate-empty">
+          <span className="strategy-generate-icon"><Icon name="sparkle" size={20}/></span>
+          <strong>{isBusy ? "正在整理你的個人策略…" : "情境填得差不多後，就可以生成"}</strong>
+          <p>
+            系統會整理優先行動、必問事項、談判點、紅線、證據清單與備用方案，
+            並保留每項建議的來源依據。
+          </p>
+          <button
+            className="btn btn-primary strategy-generate-btn"
+            onClick={onGenerate}
+            disabled={!canGenerate || isBusy}
+          >
+            <Icon name="sparkle" size={14}/>
+            {state === "generating" ? "生成中…" : state === "saving" ? "保存中…" : "生成個人策略"}
+          </button>
+          {!canGenerate && !isBusy && (
+            <span className="strategy-generate-hint">
+              請至少選擇租屋目的，並填一項必要條件、紅線、特殊需求或補充說明。
+            </span>
+          )}
+          {message && <div className="strategy-result-error">{message}</div>}
+        </div>
+      )}
+
+      {result && (
+        <div className="strategy-result-body">
+          <div className="strategy-result-summary">
+            <div>
+              <span className="mono">DECISION DIRECTION</span>
+              <p>{result.decisionSummary}</p>
+            </div>
+            <button className="btn btn-sm" onClick={onGenerate} disabled={!canGenerate || isBusy}>
+              {isBusy ? "處理中…" : "重新生成"}
+            </button>
+          </div>
+
+          {needsRefresh && (
+            <div className="strategy-inline-note">
+              你已修改個人情境；目前顯示的是上一份已保存策略。重新生成後才會套用新條件。
+            </div>
+          )}
+          {message && (
+            <div className="strategy-result-error">
+              {message}
+              {state === "unsaved" && (
+                <button className="btn btn-sm" onClick={onRetrySave}>重試保存</button>
+              )}
+            </div>
+          )}
+
+          <div className="strategy-result-section">
+            <div className="strategy-result-section-head">
+              <h4>優先行動</h4>
+              <span className="mono">{result.priorityActions?.length || 0} ACTIONS</span>
+            </div>
+            <div className="strategy-action-list">
+              {(result.priorityActions || []).map((action, index) => {
+                const source = STRATEGY_SOURCE_META[action.sourceMode] || STRATEGY_SOURCE_META.ai_assessment;
+                return (
+                  <article className={`strategy-action-card ${source.className}`} key={`${action.title}-${index}`}>
+                    <div className="strategy-action-head">
+                      <span className="strategy-action-index mono">{String(index + 1).padStart(2, "0")}</span>
+                      <div>
+                        <div className="strategy-action-badges">
+                          <span className="strategy-priority-badge">
+                            {STRATEGY_PRIORITY_LABELS[action.priorityLevel] || action.priorityLevel}
+                          </span>
+                          <span className={`strategy-source-badge ${source.className}`}>{source.label}</span>
+                        </div>
+                        <h5>{action.title}</h5>
+                      </div>
+                    </div>
+                    <p className="strategy-action-rationale">{action.rationale}</p>
+                    <StrategyTraceDetails action={action}/>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="strategy-result-grid">
+            <section>
+              <h4>簽約／看房必問</h4>
+              <ol>{(result.questionsToAsk || []).map((item, index) => <li key={index}>{item}</li>)}</ol>
+            </section>
+            <section>
+              <h4>紅線提醒</h4>
+              <ul>
+                {(result.redLineWarnings || []).map((item, index) => (
+                  <li key={index}><strong>{item.condition}</strong><span>{item.response}</span></li>
+                ))}
+              </ul>
+            </section>
+            <section>
+              <h4>證據清單</h4>
+              <ul>{(result.evidenceChecklist || []).map((item, index) => <li key={index}>{item}</li>)}</ul>
+            </section>
+            <section>
+              <h4>備用方案</h4>
+              <ul>{(result.fallbackPlan || []).map((item, index) => <li key={index}>{item}</li>)}</ul>
+            </section>
+          </div>
+
+          {(result.negotiationPoints || []).length > 0 && (
+            <div className="strategy-result-section">
+              <div className="strategy-result-section-head"><h4>談判點</h4></div>
+              <div className="strategy-negotiation-list">
+                {result.negotiationPoints.map((item, index) => (
+                  <article key={`${item.topic}-${index}`}>
+                    <strong>{item.topic}</strong>
+                    <p><span>目標</span>{item.target}</p>
+                    <p><span>說法</span>{item.approach}</p>
+                    <p><span>退路</span>{item.fallback}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {(result.copyMessages || []).length > 0 && (
+            <details className="strategy-copy-messages">
+              <summary>可複製的溝通草稿</summary>
+              {result.copyMessages.map((item, index) => (
+                <div key={`${item.label}-${index}`}>
+                  <strong>{item.label}</strong>
+                  <p>{item.text}</p>
+                </div>
+              ))}
+              <small>請依實際物件與對話情況調整後再使用。</small>
+            </details>
+          )}
+
+          <div className="strategy-result-foot">
+            <span>{savedAt ? `保存於 ${savedAt}` : "尚未完成資料庫保存"}</span>
+            <span>{result.cautionNote}</span>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
 function StrategyView({ version, rhir, recordId }) {
   const { Icon } = window.RU;
   const rri = (window.RU_RRI && rhir) ? window.RU_RRI.calculate(rhir) : null;
@@ -1315,11 +1606,17 @@ function StrategyView({ version, rhir, recordId }) {
   const evidenceRetrieval = useEvidenceRetrievalContext(rhir);
   const [profile, setProfile] = useStateD(() => loadStrategyDraft(recordId, version.id));
   const [draftState, setDraftState] = useStateD("saved");
+  const [savedInsightRecord, setSavedInsightRecord] = useStateD(null);
   const [savedInsight, setSavedInsight] = useStateD(null);
   const [savedInsightState, setSavedInsightState] = useStateD("loading");
   const [chatMessages, setChatMessages] = useStateD(() => loadStrategyChatDraft(recordId, version.id));
   const [chatInput, setChatInput] = useStateD("");
   const [chatLoading, setChatLoading] = useStateD(false);
+  const [strategyResult, setStrategyResult] = useStateD(null);
+  const [strategySession, setStrategySession] = useStateD(null);
+  const [strategyProfileSnapshot, setStrategyProfileSnapshot] = useStateD(null);
+  const [strategyState, setStrategyState] = useStateD("loading");
+  const [strategyMessage, setStrategyMessage] = useStateD("");
   const chatScrollRef = React.useRef(null);
 
   React.useEffect(() => {
@@ -1362,12 +1659,54 @@ function StrategyView({ version, rhir, recordId }) {
           setSavedInsightState("missing");
           return;
         }
+        setSavedInsightRecord(saved);
         setSavedInsight(saved.insight_result);
         setSavedInsightState("ready");
       })
       .catch(() => {
         if (cancelled) return;
         setSavedInsightState("error");
+      });
+
+    return () => { cancelled = true; };
+  }, [recordId, version.id]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    setStrategyState("loading");
+    setStrategyMessage("");
+
+    if (!recordId || !version?.id || !window.RU_SUPABASE?.isConfigured()) {
+      setStrategyState("missing");
+      return () => { cancelled = true; };
+    }
+
+    window.RU_SUPABASE.getLatestStrategySession(recordId, version.id)
+      .then(saved => {
+        if (cancelled) return;
+        if (!saved?.strategy_result) {
+          setStrategyState("missing");
+          return;
+        }
+        setStrategySession(saved);
+        setStrategyResult(saved.strategy_result);
+        setStrategyProfileSnapshot(saved.strategy_profile);
+        setChatMessages(Array.isArray(saved.consultation_messages) ? saved.consultation_messages : []);
+        if (!hasPersonalStrategyInputs(profile) && saved.strategy_profile) {
+          setProfile({
+            ...createDefaultStrategyProfile(),
+            ...saved.strategy_profile,
+            specialNeeds: Array.isArray(saved.strategy_profile.specialNeeds)
+              ? saved.strategy_profile.specialNeeds
+              : [],
+          });
+        }
+        setStrategyState("ready");
+      })
+      .catch(error => {
+        if (cancelled) return;
+        setStrategyState("load-error");
+        setStrategyMessage(`讀取已保存策略失敗：${error.message}`);
       });
 
     return () => { cancelled = true; };
@@ -1394,19 +1733,26 @@ function StrategyView({ version, rhir, recordId }) {
     }));
   };
 
-  const profileCompletion = [
-    profile.rentalGoal,
-    profile.moveUrgency,
-    profile.budgetFlexibility,
-    profile.mustHaveConditions,
-    profile.negotiableConditions,
-    profile.redLines,
-    profile.specialNeeds.length > 0 ? "yes" : "",
-    profile.personalNote,
-  ].filter(value => String(value || "").trim()).length;
+  const profileCompletion = getStrategyProfileCompletion(profile);
+  const profileReady = isStrategyProfileReady(profile);
+  const strategyNeedsRefresh = Boolean(
+    strategyProfileSnapshot &&
+    JSON.stringify(profile) !== JSON.stringify(strategyProfileSnapshot)
+  );
+  const generationDisabled =
+    !profileReady ||
+    strategyState === "generating" ||
+    strategyState === "saving" ||
+    savedInsightState === "loading" ||
+    evidenceRetrieval.state === "loading" ||
+    evidenceRetrieval.state === "error";
 
   const chatDisabled =
     !rri ||
+    !strategyResult ||
+    !strategySession ||
+    strategyState !== "ready" ||
+    strategyNeedsRefresh ||
     chatLoading ||
     savedInsightState === "loading" ||
     evidenceRetrieval.state === "loading" ||
@@ -1429,12 +1775,22 @@ function StrategyView({ version, rhir, recordId }) {
         conclusion,
         history,
         text,
-        evidenceRetrieval.context,
-        profile,
-        savedInsight
+        strategySession?.evidence_context || evidenceRetrieval.context,
+        strategySession?.strategy_profile || profile,
+        strategySession?.insight_snapshot || savedInsight,
+        strategyResult
       );
       if (result.status === "ok") {
-        setChatMessages([...nextMessages, { role: "assistant", content: result.content }]);
+        const completedMessages = [...nextMessages, { role: "assistant", content: result.content }];
+        setChatMessages(completedMessages);
+        try {
+          await window.RU_SUPABASE.updateStrategySessionMessages(
+            strategySession.id,
+            completedMessages
+          );
+        } catch (error) {
+          setStrategyMessage(`對話已顯示，但同步保存失敗：${error.message}`);
+        }
       } else {
         setChatMessages([
           ...nextMessages,
@@ -1448,6 +1804,68 @@ function StrategyView({ version, rhir, recordId }) {
       ]);
     } finally {
       setChatLoading(false);
+    }
+  }
+
+  async function saveGeneratedStrategy(generated, profileSnapshot = strategyProfileSnapshot) {
+    setStrategyState("saving");
+    setStrategyMessage("");
+    setStrategyProfileSnapshot(profileSnapshot);
+    try {
+      const saved = await window.RU_SUPABASE.saveStrategySession({
+        recordId,
+        versionId: version.id,
+        aiInsightId: savedInsightRecord?.id || null,
+        strategyProfile: profileSnapshot,
+        rriSnapshot: conclusion,
+        evidenceContext: evidenceRetrieval.context,
+        insightSnapshot: savedInsight,
+        strategyResult: generated,
+        consultationMessages: [],
+      });
+      setStrategySession(saved);
+      setStrategyResult(saved.strategy_result);
+      setChatMessages([]);
+      setStrategyState("ready");
+    } catch (error) {
+      setStrategyResult(generated);
+      setStrategyState("unsaved");
+      setStrategyMessage(`策略已生成，但資料庫保存失敗：${error.message}`);
+    }
+  }
+
+  async function handleGenerateStrategy() {
+    if (generationDisabled) return;
+    setStrategyState("generating");
+    setStrategyMessage("");
+    const profileSnapshot = JSON.parse(JSON.stringify(profile));
+
+    try {
+      const generated = await window.RU_INSIGHT.generateStrategy(
+        conclusion,
+        profileSnapshot,
+        savedInsight,
+        evidenceRetrieval.context
+      );
+      if (generated.status !== "ok") {
+        setStrategyState(strategySession ? "ready" : "error");
+        setStrategyMessage(generated.message || "個人策略生成失敗。");
+        return;
+      }
+      await saveGeneratedStrategy(generated, profileSnapshot);
+    } catch (error) {
+      setStrategyState(strategySession ? "ready" : "error");
+      setStrategyMessage(`個人策略生成失敗：${error.message}`);
+    }
+  }
+
+  async function handleClearStrategyChat() {
+    setChatMessages([]);
+    if (!strategySession?.id) return;
+    try {
+      await window.RU_SUPABASE.updateStrategySessionMessages(strategySession.id, []);
+    } catch (error) {
+      setStrategyMessage(`本機對話已清除，但資料庫同步失敗：${error.message}`);
     }
   }
 
@@ -1503,8 +1921,22 @@ function StrategyView({ version, rhir, recordId }) {
         />
         <StrategyStatusCard
           label="STRATEGY"
-          value={`${profileCompletion}/8 情境項目`}
-          state={profileCompletion >= 4 ? "ready" : "optional"}
+          value={
+            strategyState === "loading"
+              ? "正在讀取"
+              : strategySession && strategyState === "ready"
+                ? "已生成並保存"
+                : `${profileCompletion}/8 情境項目`
+          }
+          state={
+            strategySession && strategyState === "ready"
+              ? "ready"
+              : strategyState === "loading"
+                ? "loading"
+                : profileReady
+                  ? "ready"
+                  : "optional"
+          }
         />
       </div>
 
@@ -1611,7 +2043,7 @@ function StrategyView({ version, rhir, recordId }) {
           </div>
 
           <div className="strategy-profile-foot">
-            <span>草稿保存在這個瀏覽器，不會回寫分析報告。</span>
+            <span>{profileCompletion}/8 項 · 草稿保存在這個瀏覽器，不回寫分析報告。</span>
             <button
               className="btn btn-sm btn-ghost"
               onClick={() => {
@@ -1624,12 +2056,25 @@ function StrategyView({ version, rhir, recordId }) {
           </div>
         </section>
 
-        <section className="strategy-chat-card">
+        <StrategyResultPanel
+          result={strategyResult}
+          state={strategyState}
+          message={strategyMessage}
+          canGenerate={!generationDisabled}
+          needsRefresh={strategyNeedsRefresh}
+          session={strategyState === "ready" ? strategySession : null}
+          onGenerate={handleGenerateStrategy}
+          onRetrySave={() => saveGeneratedStrategy(strategyResult)}
+        />
+      </div>
+
+      {strategyResult && strategySession && strategyState === "ready" && !strategyNeedsRefresh ? (
+        <section className="strategy-chat-card strategy-chat-followup">
           <div className="strategy-card-head">
             <div>
-              <div className="strategy-step mono">STEP 03</div>
+              <div className="strategy-step mono">FOLLOW-UP</div>
               <h3><Icon name="sparkle" size={15}/> AI 策略顧問</h3>
-              <p>顧問會同時閱讀 RRI、verified cases、保存的 Insight 與左側個人情境。</p>
+              <p>這裡只針對上方已生成並保存的個人策略繼續追問，對話會同步到同一個 session。</p>
             </div>
             <span className="strategy-context-chip mono">
               {evidenceRetrieval.state === "done"
@@ -1656,8 +2101,8 @@ function StrategyView({ version, rhir, recordId }) {
             {chatMessages.length === 0 && (
               <div className="strategy-chat-empty">
                 <Icon name="sparkle" size={18}/>
-                <strong>從你的條件開始談</strong>
-                <span>你可以請顧問比較風險、安排確認順序，或準備跟房東溝通的方式。</span>
+                <strong>策略已準備好，可以繼續追問</strong>
+                <span>你可以要求展開某個行動、修改溝通語氣，或討論房東拒絕時的下一步。</span>
               </div>
             )}
             {chatMessages.map((message, index) => (
@@ -1674,10 +2119,10 @@ function StrategyView({ version, rhir, recordId }) {
           {chatMessages.length === 0 && (
             <div className="strategy-quick-prompts">
               {[
-                "根據我的紅線，哪一項應該最先確認？",
-                "幫我安排跟房東談條件的順序。",
-                "如果對方不願書面確認，我有哪些備用方案？",
-                "我的預算和這個物件的風險要怎麼取捨？",
+                "把第一項優先行動拆成具體步驟。",
+                "幫我把談判說法改得更自然。",
+                "如果房東拒絕第一個要求，我下一步怎麼做？",
+                "哪一條紅線最可能影響我是否承租？",
               ].map(question => (
                 <button className="strategy-prompt" key={question} onClick={() => setChatInput(question)}>
                   {question}
@@ -1707,19 +2152,30 @@ function StrategyView({ version, rhir, recordId }) {
           <div className="strategy-chat-foot">
             <span>Enter 送出 · Shift+Enter 換行</span>
             {chatMessages.length > 0 && (
-              <button className="btn btn-sm btn-ghost" onClick={() => setChatMessages([])}>清空對話</button>
+              <button className="btn btn-sm btn-ghost" onClick={handleClearStrategyChat}>清空對話</button>
             )}
           </div>
         </section>
-      </div>
+      ) : (
+        <div className="callout strategy-chat-locked">
+          <span className="ic"><Icon name="info" size={14}/></span>
+          <div>
+            <strong>先生成並保存個人策略，才會開放後續追問</strong>
+            <div>
+              {strategyNeedsRefresh
+                ? "你的情境已改變，請重新生成策略後再繼續詢問。"
+                : "這樣 AI 顧問的回答會固定依據同一份策略，不會在對話中悄悄改變方向。"}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="callout strategy-next-stage">
         <span className="ic"><Icon name="info" size={14}/></span>
         <div>
-          <strong>目前完成策略分析 Step 1–3</strong>
+          <strong>目前完成策略分析 Step 1–5</strong>
           <div>
-            個人行動策略、Strategy Trace 與資料庫 session 仍保留在下一階段，
-            不會把尚未確認的顧問對話直接當成正式策略。
+            每次重新生成都會建立新的保存 session；歷史策略列表與版本比較保留在 Step 6。
           </div>
         </div>
       </div>

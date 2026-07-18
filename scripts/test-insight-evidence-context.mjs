@@ -236,7 +236,8 @@ const strategyContext = context.window.RU_INSIGHT.buildStrategyChatContext(
   rriResult,
   evidenceContext,
   strategyProfile,
-  savedInsight
+  savedInsight,
+  null
 );
 assert.equal(strategyContext.rri.totalScore, 55);
 assert.equal(strategyContext.strategyProfile.redLines, "拒絕書面確認電費");
@@ -257,11 +258,123 @@ assert.equal(
 assert.match(context.window.RU_INSIGHT.CHAT_SYSTEM_PROMPT, /strategyProfile/);
 assert.match(context.window.RU_INSIGHT.CHAT_SYSTEM_PROMPT, /不修改風險等級/);
 
+const validatedStrategy = context.window.RU_INSIGHT.validateStrategyResult({
+  decisionSummary: "先確認電費書面條件，再決定是否進入租金談判。",
+  priorityActions: [{
+    title: "持續觀察其他費用",
+    rationale: "目前沒有直接衝突，但仍需保留紀錄。",
+    sourceMode: "ai_assessment",
+    priority: 1,
+    priorityLevel: "monitor",
+    caseReferences: [],
+    trace: {
+      personalInputs: [{
+        field: "budgetFlexibility",
+        value: "只能小幅調整",
+        relevance: "額外費用可能影響預算"
+      }],
+      rhirSignals: [],
+      rriSignals: ["持續觀察費用變化"],
+      aiInsightActions: [],
+      reasonSummary: "預算彈性有限，因此將其他費用列為持續觀察。"
+    }
+  }, {
+    title: "取得電費計價書面確認",
+    rationale: "電費衝突同時碰到使用者的必要條件。",
+    sourceMode: "mixed",
+    priority: 1,
+    priorityLevel: "immediate",
+    caseReferences: [{
+      caseId: "gov_electricity_test_001",
+      title: "電費計價爭議案例",
+      relevance: "案例同樣涉及契約與實際計價不一致。"
+    }],
+    trace: {
+      personalInputs: [{
+        field: "mustHaveConditions",
+        value: "必須有獨立電表",
+        relevance: "直接影響是否承租"
+      }],
+      rhirSignals: [{
+        field: "cost.electricityRate",
+        disclosureStatus: "conflict"
+      }],
+      rriSignals: ["費用透明度是主要風險"],
+      aiInsightActions: [{
+        sourceMode: "mixed",
+        title: "要求書面確認電費"
+      }],
+      reasonSummary: "個人必要條件與物件衝突欄位重疊，應先處理。"
+    }
+  }],
+  questionsToAsk: ["請問每度電費與計算方式會寫入契約嗎？"],
+  negotiationPoints: [{
+    topic: "電費條款",
+    target: "寫入明確計價方式",
+    approach: "以避免雙方日後誤會為理由提出",
+    fallback: "無法書面確認時暫緩簽約"
+  }],
+  redLineWarnings: [{
+    condition: "拒絕提供書面計價方式",
+    response: "啟用備用方案並暫緩簽約"
+  }],
+  evidenceChecklist: ["契約電費條款", "電費帳單"],
+  fallbackPlan: ["比較其他物件"],
+  copyMessages: [{
+    label: "詢問電費",
+    text: "想先確認每度電費與計算方式是否能寫入契約。"
+  }],
+  cautionNote: "此策略僅供租屋決策輔助，不代表法律判定。"
+}, evidenceContext);
+assert.equal(validatedStrategy.priorityActions[0].priorityLevel, "immediate");
+assert.equal(validatedStrategy.priorityActions[1].priorityLevel, "monitor");
+assert.equal(validatedStrategy.priorityActions[0].caseReferences[0].sourceType, "gov");
+assert.equal(validatedStrategy.negotiationPoints[0].topic, "電費條款");
+
+const strategyWithResultContext = context.window.RU_INSIGHT.buildStrategyChatContext(
+  rriResult,
+  evidenceContext,
+  strategyProfile,
+  savedInsight,
+  validatedStrategy
+);
+assert.equal(
+  strategyWithResultContext.strategyResult.priorityActions[0].title,
+  "取得電費計價書面確認"
+);
+assert.match(context.window.RU_INSIGHT.STRATEGY_SYSTEM_PROMPT, /priorityActions/);
+assert.match(context.window.RU_INSIGHT.STRATEGY_SYSTEM_PROMPT, /personalInputs/);
+assert.match(context.window.RU_INSIGHT.CHAT_SYSTEM_PROMPT, /strategyResult/);
+
+assert.throws(() => {
+  context.window.RU_INSIGHT.validateStrategyResult({
+    decisionSummary: "不合法策略",
+    priorityActions: [{
+      title: "使用未定義欄位",
+      rationale: "此測試應被阻擋。",
+      sourceMode: "ai_assessment",
+      priority: 1,
+      priorityLevel: "immediate",
+      caseReferences: [],
+      trace: {
+        personalInputs: [{
+          field: "inventedProfileField",
+          value: "不存在",
+          relevance: "不應通過"
+        }],
+        reasonSummary: "測試"
+      }
+    }]
+  }, { retrievalMode: "deterministic-exact-v1", findings: [] });
+}, /未知個人欄位/);
+
 console.log("AI Insight evidence context 契約驗證通過");
 console.log("- verified case context：已包含");
 console.log("- 三來源 actionItems：分類與順序已驗證");
 console.log("- 案例展盒 metadata：已由 verified context 補齊");
 console.log("- 策略顧問 context：RRI、案例、保存 Insight、個人情境已分層");
+console.log("- 個人策略 schema：優先行動、談判點、Strategy Trace 已驗證");
+console.log("- 個人策略來源：verified case 與正式 profile 欄位已驗證");
 console.log("- UI 重複資料：未送入 prompt");
 console.log("- 空案例 context：合法");
 console.log("- 虛構案例引用：已阻擋");

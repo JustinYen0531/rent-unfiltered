@@ -11,7 +11,8 @@
     "evidence:mappings:validate": "node scripts/generate-evidence-mappings.mjs",
     "evidence:retrieval:test": "node scripts/test-evidence-retrieval.mjs",
     "evidence:insight-context:test": "node scripts/test-insight-evidence-context.mjs",
-    "strategy:ui:test": "node scripts/test-strategy-analysis-ui.mjs"
+    "strategy:ui:test": "node scripts/test-strategy-analysis-ui.mjs",
+    "strategy:session:test": "node scripts/test-strategy-session-contract.mjs"
   },
   "devDependencies": {
     "serve": "^14.2.4"

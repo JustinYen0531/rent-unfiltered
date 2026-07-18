@@ -101,6 +101,91 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
     cautionNote: "string — fixed disclaimer about decision aid, not legal judgment",
   };
 
+  const STRATEGY_PROMPT_VERSION = "personal-strategy-v1";
+  const STRATEGY_PROFILE_FIELDS = new Set([
+    "rentalGoal",
+    "moveUrgency",
+    "budgetFlexibility",
+    "mustHaveConditions",
+    "negotiableConditions",
+    "redLines",
+    "specialNeeds",
+    "personalNote",
+  ]);
+  const STRATEGY_PRIORITY_LEVELS = new Set([
+    "immediate",
+    "before_signing",
+    "negotiable",
+    "monitor",
+  ]);
+  const STRATEGY_PRIORITY_ORDER = {
+    immediate: 0,
+    before_signing: 1,
+    negotiable: 2,
+    monitor: 3,
+  };
+
+  const STRATEGY_SYSTEM_PROMPT = `你是 Rent Unfiltered「策略分析」的個人行動策略產生器。
+
+你的任務是把已完成的客觀物件分析與使用者自己的條件，整理成可執行、可保存的個人策略。
+
+輸入包含：
+- rri：rule engine 已完成的客觀風險，不得重算或修改。
+- evidenceContext：由 RHIR、disclosureStatus、riskType 精確 mapping 查得的 verified cases。
+- savedInsight：已保存的三來源 AI Insight；可能為 null。
+- strategyProfile：使用者的租屋目的、急迫度、預算、必要條件、可談判條件、紅線與特殊需求。
+
+產出原則：
+- 先說明這位使用者面對此物件時最重要的決策方向。
+- priorityActions 必須依個人情境排序，使用 immediate、before_signing、negotiable、monitor 四種 priorityLevel。
+- 每個 priorityAction 必須保留 sourceMode：mixed、evidence_backed 或 ai_assessment。
+- mixed 與 evidence_backed 必須引用 evidenceContext 中實際存在的 caseId 與 title；ai_assessment 不得附案例。
+- 有 verified cases 時，至少一項 priorityAction 應在關聯真實的前提下使用 mixed 或 evidence_backed；不得為了湊來源而捏造。
+- 每項 priorityAction 的 trace 必須分開列出 personalInputs、rhirSignals、rriSignals、aiInsightActions 與 reasonSummary。
+- personalInputs.field 只能使用 strategyProfile 的正式欄位名稱。
+- negotiationPoints 要說明目標、說法與退路，不把談判寫成保證。
+- redLineWarnings 要清楚說明觸發條件與建議反應。
+- copyMessages 是可複製草稿，必須提醒依實際情況調整。
+- savedInsight 為 null 時，不得假裝引用過 Insight。
+- 不做法律判定，不說房東違法、惡意、詐騙。
+- 不替使用者直接決定是否承租。
+- 僅輸出符合 schema 的 JSON，不輸出 markdown。`;
+
+  const STRATEGY_OUTPUT_SCHEMA = {
+    decisionSummary: "string — 2–4 sentences describing the personalized decision direction",
+    priorityActions: [{
+      title: "string",
+      rationale: "string",
+      sourceMode: "mixed | evidence_backed | ai_assessment",
+      priority: "integer 1–5",
+      priorityLevel: "immediate | before_signing | negotiable | monitor",
+      caseReferences: [{
+        caseId: "string — exact verified case id",
+        title: "string — exact verified case title",
+        relevance: "string",
+      }],
+      trace: {
+        personalInputs: [{ field: "strategyProfile field", value: "string", relevance: "string" }],
+        rhirSignals: [{ field: "RHIR field path", disclosureStatus: "string" }],
+        rriSignals: "string[]",
+        aiInsightActions: [{ sourceMode: "mixed | evidence_backed | ai_assessment", title: "string" }],
+        reasonSummary: "string",
+      },
+    }],
+    questionsToAsk: "string[]",
+    negotiationPoints: [{
+      topic: "string",
+      target: "string",
+      approach: "string",
+      fallback: "string",
+    }],
+    redLineWarnings: [{ condition: "string", response: "string" }],
+    evidenceChecklist: "string[]",
+    fallbackPlan: "string[]",
+    copyMessages: [{ label: "string", text: "string" }],
+    cautionNote: "string — decision aid, not legal judgment",
+  };
+
   // ── OpenRouter config ────────────────────────────────────────
   // Judges can use the Vercel proxy without setting a browser-local key.
   // A browser-local key still works as an override for local testing.
@@ -390,10 +475,11 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
   // No score recalculation, no legal judgment, no value overrides.
 
   const CHAT_SYSTEM_PROMPT = `你是 Rent Unfiltered「策略分析」區域的個人化租屋顧問。
-使用者已經完成 RHIR 與 RRI，可能也保存了 AI Insight，現在要把物件分析和自己的條件放在一起思考。
+使用者已經完成 RHIR、RRI 與一份已保存的個人策略，現在要針對該策略繼續追問。
 
 回答原則：
-- 只能根據對話開頭提供的 RRI、evidenceContext、savedInsight 與 strategyProfile 回答。
+- 只能根據對話開頭提供的 RRI、evidenceContext、savedInsight、strategyProfile 與 strategyResult 回答。
+- strategyResult 是本次追問的主體；可以解釋、拆解或提供溝通草稿，但不得在對話中暗中改寫整份策略。
 - 不重新計算 RRI 分數，不修改風險等級。
 - strategyProfile 只影響個人優先順序與溝通方式，不得把偏好包裝成客觀風險。
 - savedInsight 若為 null，明確把回答限制在 RRI、案例與使用者情境，不要假裝已讀過 Insight。
@@ -430,7 +516,34 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
     };
   }
 
-  function buildStrategyChatContext(rriResult, evidenceContext, strategyProfile, savedInsight) {
+  function compactStrategyResult(strategyResult) {
+    if (!strategyResult || strategyResult.status === "error") return null;
+    return {
+      decisionSummary: strategyResult.decisionSummary || null,
+      priorityActions: (strategyResult.priorityActions || []).map(action => ({
+        title: action.title,
+        rationale: action.rationale,
+        sourceMode: action.sourceMode,
+        priority: action.priority,
+        priorityLevel: action.priorityLevel,
+        caseReferences: action.caseReferences || [],
+      })),
+      questionsToAsk: strategyResult.questionsToAsk || [],
+      negotiationPoints: strategyResult.negotiationPoints || [],
+      redLineWarnings: strategyResult.redLineWarnings || [],
+      evidenceChecklist: strategyResult.evidenceChecklist || [],
+      fallbackPlan: strategyResult.fallbackPlan || [],
+      copyMessages: strategyResult.copyMessages || [],
+    };
+  }
+
+  function buildStrategyChatContext(
+    rriResult,
+    evidenceContext,
+    strategyProfile,
+    savedInsight,
+    strategyResult
+  ) {
     return {
       rri: {
         totalScore: rriResult?.totalScore,
@@ -445,7 +558,244 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
       evidenceContext: compactEvidenceContext(evidenceContext),
       savedInsight: compactSavedInsight(savedInsight),
       strategyProfile: strategyProfile || null,
+      strategyResult: compactStrategyResult(strategyResult),
     };
+  }
+
+  function validateStrategyResult(output, evidenceContext) {
+    const compactContext = compactEvidenceContext(evidenceContext);
+    const allowedCases = new Map();
+    for (const finding of compactContext.findings) {
+      for (const evidenceCase of finding.cases) {
+        allowedCases.set(evidenceCase.id, evidenceCase);
+      }
+    }
+
+    const decisionSummary = String(output?.decisionSummary || "").trim();
+    if (!decisionSummary) throw new Error("策略缺少 decisionSummary");
+    if (!Array.isArray(output?.priorityActions) || output.priorityActions.length === 0) {
+      throw new Error("策略缺少 priorityActions");
+    }
+
+    let evidenceSupportedCount = 0;
+    const priorityActions = output.priorityActions.map((action, index) => {
+      const title = String(action?.title || "").trim();
+      const rationale = String(action?.rationale || "").trim();
+      const sourceMode = String(action?.sourceMode || "").trim();
+      const priorityLevel = String(action?.priorityLevel || "").trim();
+      if (!title || !rationale) {
+        throw new Error(`priorityActions[${index}] 缺少 title 或 rationale`);
+      }
+      if (!Object.prototype.hasOwnProperty.call(ACTION_SOURCE_ORDER, sourceMode)) {
+        throw new Error(`priorityActions[${index}] 的 sourceMode 無效`);
+      }
+      if (!STRATEGY_PRIORITY_LEVELS.has(priorityLevel)) {
+        throw new Error(`priorityActions[${index}] 的 priorityLevel 無效`);
+      }
+
+      const seenCases = new Set();
+      const caseReferences = (Array.isArray(action?.caseReferences) ? action.caseReferences : [])
+        .map(reference => {
+          const caseId = String(reference?.caseId || "").trim();
+          const titleValue = String(reference?.title || "").trim();
+          const evidenceCase = allowedCases.get(caseId);
+          if (!caseId || !evidenceCase) {
+            throw new Error(`priorityActions[${index}] 引用了未驗證案例：${caseId || "缺少 caseId"}`);
+          }
+          if (titleValue !== evidenceCase.title) {
+            throw new Error(`priorityActions[${index}] 案例標題不一致：${caseId}`);
+          }
+          if (seenCases.has(caseId)) return null;
+          seenCases.add(caseId);
+          return {
+            caseId,
+            title: titleValue,
+            relevance: String(reference?.relevance || "").trim(),
+            sourceType: evidenceCase.sourceType || null,
+            sourceName: evidenceCase.sourceName || null,
+            sourceUrl: evidenceCase.sourceUrl || null,
+            year: evidenceCase.year || null,
+            confidence: evidenceCase.confidence || null,
+          };
+        })
+        .filter(Boolean);
+
+      if (sourceMode === "ai_assessment" && caseReferences.length > 0) {
+        throw new Error(`priorityActions[${index}] 是 ai_assessment，不可附案例`);
+      }
+      if (sourceMode !== "ai_assessment" && caseReferences.length === 0) {
+        throw new Error(`priorityActions[${index}] 是 ${sourceMode}，至少需要 1 筆案例`);
+      }
+      if (sourceMode !== "ai_assessment") evidenceSupportedCount += 1;
+
+      const trace = action?.trace || {};
+      const personalInputs = (Array.isArray(trace.personalInputs) ? trace.personalInputs : [])
+        .map(input => {
+          const field = String(input?.field || "").trim();
+          if (!STRATEGY_PROFILE_FIELDS.has(field)) {
+            throw new Error(`priorityActions[${index}] 使用未知個人欄位：${field || "缺少 field"}`);
+          }
+          return {
+            field,
+            value: String(input?.value || "").trim(),
+            relevance: String(input?.relevance || "").trim(),
+          };
+        });
+      const reasonSummary = String(trace.reasonSummary || "").trim();
+      if (!reasonSummary) {
+        throw new Error(`priorityActions[${index}] 缺少 trace.reasonSummary`);
+      }
+
+      return {
+        title,
+        rationale,
+        sourceMode,
+        priority: Math.min(5, Math.max(1, Number.parseInt(action?.priority, 10) || index + 1)),
+        priorityLevel,
+        caseReferences,
+        trace: {
+          personalInputs,
+          rhirSignals: (Array.isArray(trace.rhirSignals) ? trace.rhirSignals : []).map(signal => ({
+            field: String(signal?.field || "").trim(),
+            disclosureStatus: String(signal?.disclosureStatus || "").trim(),
+          })),
+          rriSignals: (Array.isArray(trace.rriSignals) ? trace.rriSignals : []).map(String),
+          aiInsightActions: (Array.isArray(trace.aiInsightActions) ? trace.aiInsightActions : []).map(item => ({
+            sourceMode: String(item?.sourceMode || "").trim(),
+            title: String(item?.title || "").trim(),
+          })),
+          reasonSummary,
+        },
+      };
+    }).sort((left, right) => {
+      const levelDifference =
+        STRATEGY_PRIORITY_ORDER[left.priorityLevel] -
+        STRATEGY_PRIORITY_ORDER[right.priorityLevel];
+      return levelDifference || left.priority - right.priority;
+    });
+
+    if (allowedCases.size > 0 && evidenceSupportedCount === 0) {
+      throw new Error("有 verified cases，但策略沒有 mixed 或 evidence_backed 優先行動");
+    }
+    if (allowedCases.size === 0 && evidenceSupportedCount > 0) {
+      throw new Error("沒有 verified cases 時，策略只能使用 ai_assessment");
+    }
+
+    const strings = value => (Array.isArray(value) ? value : [])
+      .map(item => String(item || "").trim())
+      .filter(Boolean);
+
+    return {
+      decisionSummary,
+      priorityActions,
+      questionsToAsk: strings(output.questionsToAsk),
+      negotiationPoints: (Array.isArray(output.negotiationPoints) ? output.negotiationPoints : []).map(item => ({
+        topic: String(item?.topic || "").trim(),
+        target: String(item?.target || "").trim(),
+        approach: String(item?.approach || "").trim(),
+        fallback: String(item?.fallback || "").trim(),
+      })).filter(item => item.topic && item.approach),
+      redLineWarnings: (Array.isArray(output.redLineWarnings) ? output.redLineWarnings : []).map(item => ({
+        condition: String(item?.condition || "").trim(),
+        response: String(item?.response || "").trim(),
+      })).filter(item => item.condition && item.response),
+      evidenceChecklist: strings(output.evidenceChecklist),
+      fallbackPlan: strings(output.fallbackPlan),
+      copyMessages: (Array.isArray(output.copyMessages) ? output.copyMessages : []).map(item => ({
+        label: String(item?.label || "").trim(),
+        text: String(item?.text || "").trim(),
+      })).filter(item => item.label && item.text),
+      cautionNote: String(output?.cautionNote || "此策略僅供租屋決策輔助，不代表法律判定。").trim(),
+    };
+  }
+
+  function buildStrategyPromptPayload(rriResult, strategyProfile, savedInsight, evidenceContext) {
+    return {
+      system: STRATEGY_SYSTEM_PROMPT,
+      user: JSON.stringify(
+        buildStrategyChatContext(
+          rriResult,
+          evidenceContext,
+          strategyProfile,
+          savedInsight,
+          null
+        ),
+        null,
+        2
+      ),
+      expectedOutputSchema: STRATEGY_OUTPUT_SCHEMA,
+    };
+  }
+
+  async function generateStrategy(rriResult, strategyProfile, savedInsight, evidenceContext) {
+    if (!rriResult) return { status: "error", message: "缺少 RRI 結果，無法產生個人策略。" };
+    if (!strategyProfile) return { status: "error", message: "請先填寫你的租屋情境。" };
+
+    const payload = buildStrategyPromptPayload(
+      rriResult,
+      strategyProfile,
+      savedInsight,
+      evidenceContext
+    );
+    const userPrompt =
+      `請依照以下 context 產生個人行動策略，只輸出 JSON。\n\n` +
+      `### Context\n${payload.user}\n\n` +
+      `### Output schema\n${JSON.stringify(payload.expectedOutputSchema, null, 2)}`;
+
+    let response;
+    try {
+      response = await callOpenRouter({
+        model: OPENROUTER_MODEL,
+        messages: [
+          { role: "system", content: payload.system },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: 0.35,
+        response_format: { type: "json_object" },
+      }, "Rent Unfiltered Personal Strategy");
+    } catch (error) {
+      return { status: "error", message: `網路錯誤：${error.message}` };
+    }
+
+    if (!response.ok) {
+      const text = await response.text().catch(() => "");
+      return {
+        status: "error",
+        message: `OpenRouter API ${response.status}：${text.slice(0, 400) || response.statusText}`,
+      };
+    }
+
+    let data;
+    try {
+      data = await response.json();
+    } catch (error) {
+      return { status: "error", message: `回應解析失敗：${error.message}` };
+    }
+
+    const content = data?.choices?.[0]?.message?.content;
+    if (!content) return { status: "error", message: "AI 沒有回傳策略內容。" };
+
+    let parsed;
+    try {
+      parsed = JSON.parse(stripCodeFence(content));
+    } catch (error) {
+      return {
+        status: "error",
+        message: `AI 回傳的策略不是合法 JSON：${content.slice(0, 500)}`,
+      };
+    }
+
+    try {
+      return {
+        status: "ok",
+        model: data.model || OPENROUTER_MODEL,
+        usage: data.usage || null,
+        promptVersion: STRATEGY_PROMPT_VERSION,
+        ...validateStrategyResult(parsed, evidenceContext),
+      };
+    } catch (error) {
+      return { status: "error", message: `AI 策略驗證失敗：${error.message}` };
+    }
   }
 
   async function chatWithRri(
@@ -454,15 +804,23 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
     newUserMessage,
     evidenceContext,
     strategyProfile,
-    savedInsight
+    savedInsight,
+    strategyResult
   ) {
     if (!rriResult) return { status: "error", message: "缺少 RRI 結果，無法開始對話。" };
+    if (!strategyResult) return { status: "error", message: "請先生成個人策略，再開始追問。" };
     if (!newUserMessage || !newUserMessage.trim()) return { status: "error", message: "請輸入問題。" };
 
     const contextBlock =
       `以下是策略分析可使用的結構化 context。只可使用這些資料，不要重算 RRI：\n` +
       `\`\`\`json\n${JSON.stringify(
-        buildStrategyChatContext(rriResult, evidenceContext, strategyProfile, savedInsight),
+        buildStrategyChatContext(
+          rriResult,
+          evidenceContext,
+          strategyProfile,
+          savedInsight,
+          strategyResult
+        ),
         null,
         2
       )}\n\`\`\``;
@@ -507,14 +865,20 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
 
   window.RU_INSIGHT = {
     generateInsight,
+    generateStrategy,
     chatWithRri,
     buildPromptPayload,
+    buildStrategyPromptPayload,
     buildStrategyChatContext,
+    validateStrategyResult,
     validateEvidenceReferences,
     SYSTEM_PROMPT,
+    STRATEGY_SYSTEM_PROMPT,
     CHAT_SYSTEM_PROMPT,
     INPUT_SCHEMA,
     OUTPUT_SCHEMA,
+    STRATEGY_OUTPUT_SCHEMA,
+    STRATEGY_PROMPT_VERSION,
   };
 
 })();
