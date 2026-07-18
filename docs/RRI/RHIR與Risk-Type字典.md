@@ -91,6 +91,20 @@ await window.RU_SUPABASE.buildEvidenceRetrievalContext([
 輸出的 `deterministic-exact-v1` context 是後續 Related Cases 與類 RAG 系統的
 證據層；本階段尚未送入 AI Insight，也尚未啟用 related-field fallback。
 
+分析報告頁的 `Related Cases` 會再使用：
+
+```js
+await window.RU_SUPABASE.buildEvidenceRetrievalContextFromRhir(rhir, {
+  maxFindings: 6,
+  limitPerFinding: 2
+});
+```
+
+query planner 先讀 RHIR leaf 的完整欄位路徑與真實 `disclosureStatus`，再從已審核的
+`evidence_mappings` 找出目前存在的 `riskType`，組成完整三鍵。畫面會列出每一組
+查詢與命中案例，供人工測試。planner 不修改 RRI 分數，也不由 AI 猜測 `riskType`；
+衝突、未揭露與無法判斷的組合會優先顯示。
+
 ## 不變性規則
 
 1. 不重新命名人工審核過的 `riskType`。

@@ -185,6 +185,176 @@ async function findEvidenceCases(query) {
   };
 }
 
+const EVIDENCE_STATUS_RANK = {
+  conflict: 0,
+  missing: 1,
+  unknown: 2,
+  partial: 3,
+  inferred: 4,
+  supplemented: 5,
+  disclosed: 6
+};
+
+function collectRhirEvidencePairs(value, path = [], pairs = []) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return pairs;
+
+  if (typeof value.disclosureStatus === "string" && path.length > 0) {
+    pairs.push({
+      rhirField: path.join("."),
+      disclosureStatus: value.disclosureStatus
+    });
+    return pairs;
+  }
+
+  for (const [key, child] of Object.entries(value)) {
+    collectRhirEvidencePairs(child, [...path, key], pairs);
+  }
+  return pairs;
+}
+
+function evidencePairKey(rhirField, disclosureStatus) {
+  return `${rhirField}\u0000${disclosureStatus}`;
+}
+
+function evidenceQueryKey(rhirField, disclosureStatus, riskType) {
+  return `${rhirField}\u0000${disclosureStatus}\u0000${riskType}`;
+}
+
+async function planEvidenceQueriesForRhir(rhir, options = {}) {
+  const client = _client();
+  if (!client) throw new Error("請先在 supabase.jsx 填入你的 Project URL 和 Anon Key，然後重新整理頁面。");
+
+  const pairs = collectRhirEvidencePairs(rhir);
+  const rhirFields = [...new Set(pairs.map(pair => pair.rhirField))];
+  const requestedMax = Number(options.maxFindings ?? 6);
+  const maxFindings = Number.isFinite(requestedMax)
+    ? Math.min(20, Math.max(1, Math.floor(requestedMax)))
+    : 6;
+
+  if (rhirFields.length === 0) {
+    return {
+      inputFieldCount: 0,
+      matchedPairCount: 0,
+      totalQueryCount: 0,
+      truncated: false,
+      queries: []
+    };
+  }
+
+  const { data: mappings, error } = await client
+    .from("evidence_mappings")
+    .select("case_id, rhir_field, disclosure_status, risk_type")
+    .in("rhir_field", rhirFields);
+
+  if (error) throw error;
+
+  const inputPairs = new Set(pairs.map(pair =>
+    evidencePairKey(pair.rhirField, pair.disclosureStatus)
+  ));
+  const matchedPairs = new Set();
+  const queryGroups = new Map();
+
+  for (const mapping of mappings || []) {
+    const pairKey = evidencePairKey(mapping.rhir_field, mapping.disclosure_status);
+    if (!inputPairs.has(pairKey)) continue;
+
+    matchedPairs.add(pairKey);
+    const queryKey = evidenceQueryKey(
+      mapping.rhir_field,
+      mapping.disclosure_status,
+      mapping.risk_type
+    );
+    const existing = queryGroups.get(queryKey) || {
+      rhirField: mapping.rhir_field,
+      disclosureStatus: mapping.disclosure_status,
+      riskType: mapping.risk_type,
+      mappedCaseIds: new Set()
+    };
+    existing.mappedCaseIds.add(mapping.case_id);
+    queryGroups.set(queryKey, existing);
+  }
+
+  const allQueries = [...queryGroups.values()]
+    .map(query => ({
+      rhirField: query.rhirField,
+      disclosureStatus: query.disclosureStatus,
+      riskType: query.riskType,
+      estimatedCaseCount: query.mappedCaseIds.size
+    }))
+    .sort((left, right) => {
+      const statusDifference =
+        (EVIDENCE_STATUS_RANK[left.disclosureStatus] ?? 99) -
+        (EVIDENCE_STATUS_RANK[right.disclosureStatus] ?? 99);
+      if (statusDifference !== 0) return statusDifference;
+
+      const caseDifference = right.estimatedCaseCount - left.estimatedCaseCount;
+      if (caseDifference !== 0) return caseDifference;
+      return evidenceQueryKey(left.rhirField, left.disclosureStatus, left.riskType)
+        .localeCompare(evidenceQueryKey(right.rhirField, right.disclosureStatus, right.riskType));
+    });
+
+  return {
+    inputFieldCount: pairs.length,
+    matchedPairCount: matchedPairs.size,
+    totalQueryCount: allQueries.length,
+    truncated: allQueries.length > maxFindings,
+    queries: allQueries.slice(0, maxFindings)
+  };
+}
+
+async function buildEvidenceRetrievalContext(findings, options = {}) {
+  if (!Array.isArray(findings)) {
+    throw new Error("findings 必須是三欄位查詢物件的陣列。");
+  }
+
+  const limitPerFinding = Number(options.limitPerFinding ?? 5);
+  const results = await Promise.all(findings.map(finding =>
+    findEvidenceCases({ ...finding, limit: limitPerFinding })
+  ));
+  const uniqueCases = new Map();
+
+  for (const result of results) {
+    for (const evidenceCase of result.cases) {
+      const existing = uniqueCases.get(evidenceCase.id);
+      if (!existing) {
+        const { matchedMapping, ...caseData } = evidenceCase;
+        uniqueCases.set(evidenceCase.id, {
+          ...caseData,
+          matchedMappings: [matchedMapping]
+        });
+        continue;
+      }
+
+      const mappingKey = JSON.stringify(evidenceCase.matchedMapping);
+      const existingKeys = new Set(existing.matchedMappings.map(mapping => JSON.stringify(mapping)));
+      if (!existingKeys.has(mappingKey)) {
+        existing.matchedMappings.push(evidenceCase.matchedMapping);
+      }
+    }
+  }
+
+  return {
+    retrievalMode: "deterministic-exact-v1",
+    fallbackUsed: false,
+    findings: results,
+    uniqueCases: [...uniqueCases.values()],
+    stats: {
+      findingCount: findings.length,
+      matchedFindingCount: results.filter(result => result.totalMatches > 0).length,
+      uniqueCaseCount: uniqueCases.size
+    }
+  };
+}
+
+async function buildEvidenceRetrievalContextFromRhir(rhir, options = {}) {
+  const plan = await planEvidenceQueriesForRhir(rhir, options);
+  const context = await buildEvidenceRetrievalContext(plan.queries, options);
+  return {
+    ...context,
+    planner: plan
+  };
+}
+
 window.RU_SUPABASE = {
   isConfigured: _isConfigured,
 
@@ -275,50 +445,9 @@ window.RU_SUPABASE = {
   },
 
   findEvidenceCases,
-
-  async buildEvidenceRetrievalContext(findings, options = {}) {
-    if (!Array.isArray(findings)) {
-      throw new Error("findings 必須是三欄位查詢物件的陣列。");
-    }
-
-    const limitPerFinding = Number(options.limitPerFinding ?? 5);
-    const results = await Promise.all(findings.map(finding =>
-      findEvidenceCases({ ...finding, limit: limitPerFinding })
-    ));
-    const uniqueCases = new Map();
-
-    for (const result of results) {
-      for (const evidenceCase of result.cases) {
-        const existing = uniqueCases.get(evidenceCase.id);
-        if (!existing) {
-          const { matchedMapping, ...caseData } = evidenceCase;
-          uniqueCases.set(evidenceCase.id, {
-            ...caseData,
-            matchedMappings: [matchedMapping]
-          });
-          continue;
-        }
-
-        const mappingKey = JSON.stringify(evidenceCase.matchedMapping);
-        const existingKeys = new Set(existing.matchedMappings.map(mapping => JSON.stringify(mapping)));
-        if (!existingKeys.has(mappingKey)) {
-          existing.matchedMappings.push(evidenceCase.matchedMapping);
-        }
-      }
-    }
-
-    return {
-      retrievalMode: "deterministic-exact-v1",
-      fallbackUsed: false,
-      findings: results,
-      uniqueCases: [...uniqueCases.values()],
-      stats: {
-        findingCount: findings.length,
-        matchedFindingCount: results.filter(result => result.totalMatches > 0).length,
-        uniqueCaseCount: uniqueCases.size
-      }
-    };
-  },
+  planEvidenceQueriesForRhir,
+  buildEvidenceRetrievalContext,
+  buildEvidenceRetrievalContextFromRhir,
 
   async updateEvidenceReview(id, changes) {
     const client = _client();

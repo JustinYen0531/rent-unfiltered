@@ -406,6 +406,202 @@ function RHIRNote({ title, body }) {
 
 /* ---------- Tab 3: Analysis report ---------- */
 
+const RELATED_CASE_STATUS_LABELS = {
+  conflict: "來源衝突",
+  missing: "未揭露",
+  unknown: "無法判斷",
+  partial: "部分揭露",
+  inferred: "系統推估",
+  supplemented: "外部補足",
+  disclosed: "已揭露"
+};
+
+const RELATED_CASE_SOURCE_LABELS = {
+  gov: "政府案例",
+  court: "法院裁判",
+  research: "研究資料",
+  interview: "訪談",
+  social: "社群案例"
+};
+
+function RelatedCasesPanel({ rhir }) {
+  const { Icon } = window.RU;
+  const [state, setState] = useStateD("loading");
+  const [context, setContext] = useStateD(null);
+  const [error, setError] = useStateD("");
+  const [reloadToken, setReloadToken] = useStateD(0);
+
+  React.useEffect(() => {
+    let cancelled = false;
+
+    if (!rhir) {
+      setState("empty");
+      setContext(null);
+      return () => { cancelled = true; };
+    }
+    if (!window.RU_SUPABASE?.isConfigured()) {
+      setState("error");
+      setError("Supabase 尚未設定，無法查詢 Related Cases。");
+      return () => { cancelled = true; };
+    }
+
+    setState("loading");
+    setError("");
+    window.RU_SUPABASE
+      .buildEvidenceRetrievalContextFromRhir(rhir, {
+        maxFindings: 6,
+        limitPerFinding: 2
+      })
+      .then(result => {
+        if (cancelled) return;
+        setContext(result);
+        setState(result?.findings?.length ? "done" : "empty");
+      })
+      .catch(retrievalError => {
+        if (cancelled) return;
+        setError(retrievalError?.message || String(retrievalError));
+        setState("error");
+      });
+
+    return () => { cancelled = true; };
+  }, [rhir, reloadToken]);
+
+  const findings = context?.findings || [];
+  const planner = context?.planner;
+  const uniqueCaseCount = context?.stats?.uniqueCaseCount || 0;
+
+  return (
+    <div className="fg related-cases-panel" style={{marginTop:18}}>
+      <div className="fg-head">
+        <h3><Icon name="book" size={14}/> Related Cases · 對應案例</h3>
+        <span className="meta mono">
+          {state === "done" ? `${uniqueCaseCount} verified cases` : "DETERMINISTIC RETRIEVAL"}
+        </span>
+      </div>
+
+      {state === "loading" && (
+        <div className="related-cases-state">
+          <Icon name="database" size={14}/>
+          正在依 RHIR、揭露狀態與 Risk Type 查詢已驗證案例…
+        </div>
+      )}
+
+      {state === "error" && (
+        <div className="callout related-cases-callout">
+          <span className="ic"><Icon name="alert" size={14}/></span>
+          <div>
+            <strong>案例查詢失敗</strong>
+            <div className="related-cases-error">{error}</div>
+            <button className="btn btn-sm" onClick={() => setReloadToken(value => value + 1)}>重新查詢</button>
+          </div>
+        </div>
+      )}
+
+      {state === "empty" && (
+        <div className="related-cases-empty">
+          <div>目前 RHIR 欄位與狀態沒有精確對應的 verified 案例。</div>
+          <div className="t-meta">
+            這不是「沒有風險」，而是目前 mapping 詞典尚無完全相符的三鍵組合；系統不會自動猜測近似案例。
+          </div>
+          <button className="btn btn-sm" onClick={() => setReloadToken(value => value + 1)}>重新查詢</button>
+        </div>
+      )}
+
+      {state === "done" && (
+        <>
+          <div className="related-cases-summary">
+            <div>
+              從 <span className="mono">{planner?.inputFieldCount || 0}</span> 個 RHIR 欄位規劃出
+              {" "}<span className="mono">{planner?.totalQueryCount || 0}</span> 組可追溯查詢，
+              目前顯示 <span className="mono">{findings.length}</span> 組。
+            </div>
+            <button className="btn btn-sm" onClick={() => setReloadToken(value => value + 1)}>重新查詢</button>
+          </div>
+
+          <div className="related-findings">
+            {findings.map((finding, findingIndex) => {
+              const query = finding.query;
+              return (
+                <section
+                  className="related-finding"
+                  key={`${query.rhirField}-${query.disclosureStatus}-${query.riskType}`}
+                >
+                  <div className="related-finding-head">
+                    <span className="related-finding-number mono">{String(findingIndex + 1).padStart(2, "0")}</span>
+                    <div className="related-query">
+                      <div className="related-query-field mono">{query.rhirField}</div>
+                      <div className="related-query-tags">
+                        <span className={`badge badge-${query.disclosureStatus}`}>
+                          {RELATED_CASE_STATUS_LABELS[query.disclosureStatus] || query.disclosureStatus}
+                        </span>
+                        <span className="badge badge-outline mono">{query.riskType}</span>
+                      </div>
+                    </div>
+                    <span className="related-match-count mono">{finding.totalMatches} matches</span>
+                  </div>
+
+                  <div className="related-case-list">
+                    {finding.cases.map(evidenceCase => (
+                      <article className="related-case-card" key={evidenceCase.id}>
+                        <div className="related-case-head">
+                          <div>
+                            <div className="related-case-title">{evidenceCase.title}</div>
+                            <div className="t-meta mono">
+                              {RELATED_CASE_SOURCE_LABELS[evidenceCase.sourceType] || evidenceCase.sourceType}
+                              {evidenceCase.year ? ` · ${evidenceCase.year}` : ""}
+                              {evidenceCase.confidence ? ` · ${evidenceCase.confidence}` : ""}
+                            </div>
+                          </div>
+                          <a href={evidenceCase.sourceUrl} target="_blank" rel="noreferrer" className="evidence-source-link">
+                            查看來源 ↗
+                          </a>
+                        </div>
+                        <p className="related-case-summary">{evidenceCase.summary}</p>
+                        {evidenceCase.matchedMapping?.mappingNote && (
+                          <div className="related-mapping-note">
+                            <span className="mono">MAPPING</span>
+                            {evidenceCase.matchedMapping.mappingNote}
+                          </div>
+                        )}
+                        {evidenceCase.commonOutcome && (
+                          <div className="related-case-outcome">
+                            <strong>常見後果：</strong>{evidenceCase.commonOutcome}
+                          </div>
+                        )}
+                        <div className="related-case-guidance">
+                          {evidenceCase.actionHints?.length > 0 && (
+                            <div>
+                              <div className="related-case-label">可以怎麼做</div>
+                              <ul>{evidenceCase.actionHints.slice(0, 2).map((item, index) => <li key={`${index}-${item}`}>{item}</li>)}</ul>
+                            </div>
+                          )}
+                          {evidenceCase.evidenceToKeep?.length > 0 && (
+                            <div>
+                              <div className="related-case-label">建議保存</div>
+                              <ul>{evidenceCase.evidenceToKeep.slice(0, 2).map((item, index) => <li key={`${index}-${item}`}>{item}</li>)}</ul>
+                            </div>
+                          )}
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
+          </div>
+
+          <div className="callout related-cases-callout">
+            <span className="ic"><Icon name="info" size={14}/></span>
+            <div>
+              案例用來說明資訊不清或條件衝突時可能出現的爭議脈絡，不代表目前房東違法，也不代表個案結果必然適用。
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function ReportView({ report, version, rhir }) {
   const { Icon } = window.RU;
   const [insightState, setInsightState] = useStateD("idle"); // "idle" | "loading" | "done" | "stub" | "error"
@@ -602,6 +798,8 @@ function ReportView({ report, version, rhir }) {
           <p style={{whiteSpace:"pre-line", margin:0}}>{conclusion.finalText}</p>
         </div>
       )}
+
+      <RelatedCasesPanel rhir={rhir}/>
 
       {/* Layer 3 — AI Insight (gated; pure風險脈絡解讀，不重算分數) */}
       <div className="fg" style={{marginTop:18}}>
