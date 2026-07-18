@@ -461,6 +461,7 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
 .tabs {
   display: flex;
   gap: 0;
+  overflow-x: auto;
   border-bottom: 1px solid var(--hairline);
   margin-bottom: 20px;
 }
@@ -471,6 +472,7 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
   display: inline-flex; align-items: center; gap: 8px;
+  flex: 0 0 auto;
 }
 .tab:hover { color: var(--ink); }
 .tab.active {
@@ -856,6 +858,365 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
   font-size: 11px;
   line-height: 1.5;
 }
+
+/* ---------- Personalized strategy analysis ---------- */
+
+.strategy-page { display: grid; gap: 16px; }
+.strategy-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  padding: 22px 24px;
+  border: 1px solid #bfd0ff;
+  border-radius: var(--r-md);
+  background:
+    radial-gradient(circle at 88% 12%, rgba(124, 58, 237, 0.12), transparent 34%),
+    linear-gradient(135deg, #f6f8ff 0%, #eef4ff 55%, #f8f5ff 100%);
+}
+.strategy-eyebrow {
+  color: #5b3cc4;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+}
+.strategy-hero h2 {
+  margin: 4px 0 6px;
+  color: var(--ink);
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+.strategy-hero p {
+  max-width: 680px;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.strategy-privacy-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  max-width: 270px;
+  padding: 9px 11px;
+  border: 1px solid rgba(91, 60, 196, 0.18);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #51457c;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.strategy-privacy-note svg { flex: 0 0 auto; margin-top: 1px; }
+
+.strategy-status-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.strategy-status-card {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: 7px;
+  background: var(--bg);
+}
+.strategy-status-card.is-ready { border-color: #b7e4d2; background: #f4fbf8; }
+.strategy-status-card.is-loading { border-color: #d8e1f3; background: #f8fafc; }
+.strategy-status-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 25px;
+  height: 25px;
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--ink-3);
+}
+.strategy-status-card.is-ready .strategy-status-icon {
+  background: var(--s-disclosed-bg);
+  color: var(--s-disclosed-ink);
+}
+.strategy-status-label {
+  color: var(--ink-4);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+}
+.strategy-status-value {
+  overflow: hidden;
+  color: var(--ink-2);
+  font-size: 11px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.strategy-workspace {
+  display: grid;
+  grid-template-columns: minmax(330px, 0.9fr) minmax(420px, 1.1fr);
+  gap: 14px;
+  align-items: start;
+}
+.strategy-profile-card,
+.strategy-chat-card {
+  min-width: 0;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  overflow: hidden;
+}
+.strategy-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--hairline);
+  background: var(--panel);
+}
+.strategy-card-head h3 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 3px;
+  color: var(--ink);
+  font-size: 14px;
+}
+.strategy-card-head p {
+  max-width: 510px;
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.strategy-step {
+  color: #5b3cc4;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+.strategy-draft-state,
+.strategy-context-chip {
+  flex: 0 0 auto;
+  padding: 3px 7px;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--ink-3);
+  font-size: 9px;
+}
+.strategy-draft-state.is-saved {
+  border-color: #b7e4d2;
+  background: var(--s-disclosed-bg);
+  color: var(--s-disclosed-ink);
+}
+.strategy-draft-state.is-memory-only {
+  border-color: var(--s-partial-border);
+  background: var(--s-partial-bg);
+  color: var(--s-partial-ink);
+}
+
+.strategy-profile-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 15px 16px;
+}
+.strategy-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.strategy-field-full { grid-column: 1 / -1; }
+.strategy-field > span,
+.strategy-field legend {
+  color: var(--ink-2);
+  font-size: 11px;
+  font-weight: 600;
+}
+.strategy-field select,
+.strategy-field textarea {
+  width: 100%;
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.5;
+  outline: 0;
+}
+.strategy-field select { min-height: 36px; padding: 7px 9px; }
+.strategy-field textarea { min-height: 62px; padding: 8px 9px; resize: vertical; }
+.strategy-field select:focus,
+.strategy-field textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.strategy-need-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.strategy-need-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 31px;
+  padding: 5px 9px;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--ink-3);
+  font-size: 11px;
+  cursor: pointer;
+}
+.strategy-need-chip:hover { border-color: #9ab2ef; color: var(--ink-2); }
+.strategy-need-chip.is-active {
+  border-color: #8ca8ef;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+.strategy-need-chip input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.strategy-profile-foot,
+.strategy-chat-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  border-top: 1px solid var(--hairline);
+  color: var(--ink-4);
+  font-size: 10px;
+}
+
+.strategy-inline-note,
+.strategy-inline-error {
+  margin: 10px 14px 0;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.strategy-inline-note {
+  border: 1px solid var(--s-partial-border);
+  background: var(--s-partial-bg);
+  color: var(--s-partial-ink);
+}
+.strategy-inline-error {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+.strategy-chat-body {
+  display: flex;
+  min-height: 260px;
+  max-height: 440px;
+  overflow-y: auto;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+}
+.strategy-chat-empty {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  flex: 1;
+  min-height: 210px;
+  padding: 20px;
+  color: var(--ink-3);
+  text-align: center;
+}
+.strategy-chat-empty svg { margin-bottom: 8px; color: #6d4bd1; }
+.strategy-chat-empty strong { color: var(--ink-2); font-size: 13px; }
+.strategy-chat-empty span { max-width: 390px; margin-top: 4px; font-size: 11px; line-height: 1.5; }
+.strategy-message {
+  max-width: 86%;
+  padding: 9px 11px;
+  border-radius: 9px;
+  font-size: 12px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+.strategy-message.is-user {
+  align-self: flex-end;
+  background: var(--accent);
+  color: #fff;
+}
+.strategy-message.is-assistant {
+  align-self: flex-start;
+  border: 1px solid var(--hairline);
+  background: #f8fafc;
+  color: var(--ink-2);
+}
+.strategy-message.is-error {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+.strategy-message.is-loading { color: var(--ink-3); font-style: italic; }
+.strategy-quick-prompts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 14px 10px;
+}
+.strategy-prompt {
+  padding: 6px 9px;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--ink-3);
+  font: inherit;
+  font-size: 10px;
+  cursor: pointer;
+}
+.strategy-prompt:hover { border-color: #9ab2ef; background: var(--accent-soft); color: var(--accent-ink); }
+.strategy-chat-compose {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: end;
+  padding: 10px 14px;
+  border-top: 1px solid var(--hairline);
+  background: var(--panel);
+}
+.strategy-chat-compose textarea {
+  width: 100%;
+  min-height: 68px;
+  padding: 8px 10px;
+  resize: vertical;
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.5;
+  outline: 0;
+}
+.strategy-chat-compose textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.strategy-chat-compose .btn { min-height: 36px; }
+.strategy-next-stage { margin: 0; }
+.strategy-next-stage strong { display: block; margin-bottom: 2px; }
+.strategy-blocked { padding: 24px; }
 
 .segmented {
   display: inline-flex;
@@ -1401,6 +1762,13 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
   .evidence-work-grid {
     grid-template-columns: 1fr;
   }
+  .strategy-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .strategy-privacy-note { max-width: none; }
+  .strategy-status-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .strategy-workspace { grid-template-columns: 1fr; }
   .related-case-list {
     grid-template-columns: 1fr;
     margin-left: 0;
@@ -1413,6 +1781,31 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
   }
   .insight-action-legend { justify-content: flex-start; }
   .insight-evidence-case-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 600px) {
+  .strategy-hero { padding: 18px; }
+  .strategy-status-grid,
+  .strategy-profile-form {
+    grid-template-columns: 1fr;
+  }
+  .strategy-field-full { grid-column: auto; }
+  .strategy-card-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .strategy-status-value {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+  .strategy-chat-compose { grid-template-columns: 1fr; }
+  .strategy-chat-compose .btn { width: 100%; }
+  .strategy-profile-foot,
+  .strategy-chat-foot {
     align-items: flex-start;
     flex-direction: column;
   }

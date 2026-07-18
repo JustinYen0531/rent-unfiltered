@@ -107,8 +107,10 @@ query planner 先讀 RHIR leaf 的完整欄位路徑與真實 `disclosureStatus`
 
 ## AI Insight 證據 Context
 
-分析報告頁只建立一次 evidence retrieval context，並同時提供給 `Related Cases`、
-`AI Insight` 與 AI 顧問追問，避免畫面與模型使用不同案例。
+分析報告頁只建立一次 evidence retrieval context，並同時提供給 `Related Cases` 與
+`AI Insight`。獨立的策略分析頁則以相同的 deterministic query contract 重新建立
+context，再連同保存的 AI Insight 與個人情境提供給 AI 策略顧問，避免模型使用未經
+mapping 查詢的案例。
 
 送入 AI 的 context 只保留：
 

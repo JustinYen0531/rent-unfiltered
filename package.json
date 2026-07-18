@@ -10,7 +10,8 @@
     "evidence:mappings:generate": "node scripts/generate-evidence-mappings.mjs --write",
     "evidence:mappings:validate": "node scripts/generate-evidence-mappings.mjs",
     "evidence:retrieval:test": "node scripts/test-evidence-retrieval.mjs",
-    "evidence:insight-context:test": "node scripts/test-insight-evidence-context.mjs"
+    "evidence:insight-context:test": "node scripts/test-insight-evidence-context.mjs",
+    "strategy:ui:test": "node scripts/test-strategy-analysis-ui.mjs"
   },
   "devDependencies": {
     "serve": "^14.2.4"

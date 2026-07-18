@@ -1,4 +1,4 @@
-// Detail page — left version list + right content with 3 tabs
+// Detail page — left version list + right content with 4 tabs
 
 const { useState: useStateD, useMemo: useMemoD } = React;
 
@@ -103,11 +103,23 @@ function DetailPage({ setRoute, recordId }) {
                   ? <span className="tabcount mono">RRI {activeVersion.rri}</span>
                   : <span className="tabcount mono">未生成</span>}
               </button>
+              <button className={`tab ${tab === "strategy" ? "active" : ""}`} onClick={() => setTab("strategy")}>
+                <Icon name="sparkle" size={14}/> 策略分析
+                <span className="tabcount mono">PERSONAL</span>
+              </button>
             </div>
 
             {tab === "fields" && <FieldCompletionView groups={fieldGroups} rhir={rhir} recordId={record.id} setRoute={setRoute}/>}
             {tab === "rhir" && <RHIRView data={rhir} recordId={record.id}/>}
             {tab === "report" && <ReportView report={report} version={activeVersion} rhir={rhir} recordId={record.id}/>}
+            {tab === "strategy" && (
+              <StrategyView
+                key={`${record.id}-${activeVersion.id}`}
+                version={activeVersion}
+                rhir={rhir}
+                recordId={record.id}
+              />
+            )}
           </main>
         </div>
       </div>
@@ -726,18 +738,6 @@ function ReportView({ report, version, rhir, recordId }) {
   const [insightSaveMessage, setInsightSaveMessage] = useStateD("");
   const evidenceRetrieval = useEvidenceRetrievalContext(rhir);
 
-  // Chat consultant state
-  const [chatMessages, setChatMessages] = useStateD([]); // [{role:"user"|"assistant", content, error?}]
-  const [chatInput, setChatInput] = useStateD("");
-  const [chatLoading, setChatLoading] = useStateD(false);
-  const chatScrollRef = React.useRef(null);
-
-  React.useEffect(() => {
-    if (chatScrollRef.current) {
-      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
-    }
-  }, [chatMessages, chatLoading]);
-
   React.useEffect(() => {
     let cancelled = false;
     setInsightResult(null);
@@ -800,52 +800,6 @@ function ReportView({ report, version, rhir, recordId }) {
 
   const dimEntries = Object.entries(rri.dimensions).map(([id, d]) => ({ id, name: d.label, min: d.min, max: d.max }));
   const insightActions = sortInsightActionItems(insightResult?.actionItems);
-
-  async function handleSendChat() {
-    const text = chatInput.trim();
-    if (
-      !text ||
-      chatLoading ||
-      evidenceRetrieval.state === "loading" ||
-      evidenceRetrieval.state === "error"
-    ) return;
-    const nextMessages = [...chatMessages, { role: "user", content: text }];
-    setChatMessages(nextMessages);
-    setChatInput("");
-    setChatLoading(true);
-
-    try {
-      // Send only role/content pairs (strip any error flags) as conversation history
-      const history = chatMessages
-        .filter(m => !m.error)
-        .map(m => ({ role: m.role, content: m.content }));
-      if (evidenceRetrieval.state === "error") {
-        throw new Error(`案例 context 尚未就緒：${evidenceRetrieval.error}`);
-      }
-      const result = await window.RU_INSIGHT.chatWithRri(
-        conclusion,
-        history,
-        text,
-        evidenceRetrieval.context
-      );
-      if (result.status === "ok") {
-        setChatMessages([...nextMessages, { role: "assistant", content: result.content }]);
-      } else {
-        setChatMessages([...nextMessages, { role: "assistant", content: result.message || "AI 回應失敗", error: true }]);
-      }
-    } catch (e) {
-      setChatMessages([...nextMessages, { role: "assistant", content: `呼叫失敗：${e.message}`, error: true }]);
-    } finally {
-      setChatLoading(false);
-    }
-  }
-
-  function handleChatKeyDown(e) {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSendChat();
-    }
-  }
 
   async function handleGenerateInsight() {
     if (insightSaveState === "loading" || evidenceRetrieval.state === "loading") return;
@@ -1253,131 +1207,6 @@ function ReportView({ report, version, rhir, recordId }) {
         )}
       </div>
 
-      {/* AI Consultant Chat — multi-turn Q&A grounded in the RRI result */}
-      <div className="fg" style={{marginTop:18}}>
-        <div className="fg-head">
-          <h3><Icon name="sparkle" size={14}/> 詢問 AI 顧問</h3>
-          <span className="meta mono">CONTEXT: RRI {minScore}–{maxScore}</span>
-        </div>
-
-        <div style={{padding:"6px 16px 12px"}}>
-          <p style={{color:"#5a6573", margin:"6px 0 10px", fontSize:12, lineHeight:1.6}}>
-            針對這個物件進一步追問。AI 會用上方 RRI 結構化資料當作回答依據，不會自行推測沒寫的資訊。
-          </p>
-
-          {/* Message list */}
-          <div
-            ref={chatScrollRef}
-            style={{
-              minHeight: chatMessages.length ? 120 : 0,
-              maxHeight: 420,
-              overflowY: "auto",
-              padding: chatMessages.length ? "8px 0" : 0,
-              display: "flex",
-              flexDirection: "column",
-              gap: 8,
-            }}
-          >
-            {chatMessages.map((m, i) => (
-              <div
-                key={i}
-                style={{
-                  alignSelf: m.role === "user" ? "flex-end" : "flex-start",
-                  maxWidth: "85%",
-                  padding: "8px 12px",
-                  borderRadius: 10,
-                  fontSize: 13,
-                  lineHeight: 1.6,
-                  whiteSpace: "pre-wrap",
-                  background: m.role === "user"
-                    ? "var(--accent)"
-                    : m.error ? "#fef2f2" : "#f1f5f9",
-                  color: m.role === "user" ? "#fff" : m.error ? "#dc2626" : "#1f2937",
-                  border: m.error ? "1px solid #fecaca" : "none",
-                }}
-              >
-                {m.content}
-              </div>
-            ))}
-            {chatLoading && (
-              <div style={{alignSelf:"flex-start", padding:"8px 12px", color:"#5a6573", fontSize:12, fontStyle:"italic"}}>
-                AI 顧問思考中…
-              </div>
-            )}
-          </div>
-
-          {/* Quick prompts (only when chat is empty) */}
-          {chatMessages.length === 0 && (
-            <div style={{display:"flex", flexWrap:"wrap", gap:6, marginBottom:10}}>
-              {[
-                "這個物件對學生租屋族來說，最該擔心什麼？",
-                "如果我要跟房東議價，可以從哪幾項切入？",
-                "把這個物件的風險翻成兩三句白話讓我能跟家人解釋。",
-                "禁止報稅這條會影響我什麼權益？",
-              ].map((q, i) => (
-                <button
-                  key={i}
-                  className="btn btn-sm btn-ghost"
-                  style={{fontSize:11, color:"#5a6573"}}
-                  onClick={() => setChatInput(q)}
-                >
-                  {q}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Input row */}
-          <div style={{display:"flex", gap:8, alignItems:"flex-end", marginTop:10}}>
-            <textarea
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              onKeyDown={handleChatKeyDown}
-              placeholder="例如：禁止報稅對我會有什麼具體影響？／要不要簽約？"
-              disabled={
-                chatLoading ||
-                evidenceRetrieval.state === "loading" ||
-                evidenceRetrieval.state === "error"
-              }
-              rows={2}
-              style={{
-                flex: 1,
-                resize: "vertical",
-                padding: "8px 10px",
-                fontSize: 13,
-                fontFamily: "inherit",
-                border: "1px solid var(--hairline)",
-                borderRadius: 6,
-                outline: "none",
-                lineHeight: 1.5,
-              }}
-            />
-            <button
-              className="btn btn-primary"
-              onClick={handleSendChat}
-              disabled={
-                chatLoading ||
-                !chatInput.trim() ||
-                evidenceRetrieval.state === "loading" ||
-                evidenceRetrieval.state === "error"
-              }
-              style={{whiteSpace:"nowrap"}}
-            >
-              <Icon name="sparkle" size={13}/> 送出
-            </button>
-          </div>
-
-          {chatMessages.length > 0 && (
-            <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:8, fontSize:11, color:"#8a93a0"}}>
-              <span>{chatMessages.filter(m => !m.error).length} 則訊息 · Enter 送出，Shift+Enter 換行</span>
-              <button className="btn btn-sm btn-ghost" onClick={() => setChatMessages([])}>
-                清空對話
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
       {/* 建議簽前確認 — driven by conclusion.suggestedQuestions */}
       {conclusion?.suggestedQuestions?.length > 0 && (
         <div className="fg" style={{marginTop:18}}>
@@ -1407,6 +1236,494 @@ function ReportView({ report, version, rhir, recordId }) {
         </div>
       </div>
     </>
+  );
+}
+
+/* ---------- Strategy analysis — personalized context + AI consultant ---------- */
+
+const STRATEGY_DRAFT_STORAGE_PREFIX = "ru_strategy_draft_v1";
+const STRATEGY_SPECIAL_NEEDS = [
+  "需要租屋補助",
+  "需要設籍／報稅",
+  "攜帶寵物",
+  "希望短租",
+  "通勤時間重要",
+  "無障礙需求",
+];
+
+function createDefaultStrategyProfile() {
+  return {
+    rentalGoal: "",
+    moveUrgency: "一個月內",
+    budgetFlexibility: "只能小幅調整",
+    mustHaveConditions: "",
+    negotiableConditions: "",
+    redLines: "",
+    specialNeeds: [],
+    personalNote: "",
+  };
+}
+
+function strategyStorageKey(recordId, versionId, suffix) {
+  return `${STRATEGY_DRAFT_STORAGE_PREFIX}:${recordId}:${versionId}:${suffix}`;
+}
+
+function loadStrategyDraft(recordId, versionId) {
+  try {
+    const raw = window.localStorage.getItem(strategyStorageKey(recordId, versionId, "profile"));
+    if (!raw) return createDefaultStrategyProfile();
+    const parsed = JSON.parse(raw);
+    return {
+      ...createDefaultStrategyProfile(),
+      ...parsed,
+      specialNeeds: Array.isArray(parsed?.specialNeeds) ? parsed.specialNeeds : [],
+    };
+  } catch (error) {
+    return createDefaultStrategyProfile();
+  }
+}
+
+function loadStrategyChatDraft(recordId, versionId) {
+  try {
+    const raw = window.localStorage.getItem(strategyStorageKey(recordId, versionId, "chat"));
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function StrategyStatusCard({ label, value, state = "ready" }) {
+  const { Icon } = window.RU;
+  return (
+    <div className={`strategy-status-card is-${state}`}>
+      <span className="strategy-status-icon">
+        <Icon name={state === "ready" ? "check" : state === "loading" ? "database" : "info"} size={13}/>
+      </span>
+      <div>
+        <div className="strategy-status-label mono">{label}</div>
+        <div className="strategy-status-value">{value}</div>
+      </div>
+    </div>
+  );
+}
+
+function StrategyView({ version, rhir, recordId }) {
+  const { Icon } = window.RU;
+  const rri = (window.RU_RRI && rhir) ? window.RU_RRI.calculate(rhir) : null;
+  const conclusion = rri ? window.RU_CONCLUSION?.conclusionFromRri(rri) : null;
+  const evidenceRetrieval = useEvidenceRetrievalContext(rhir);
+  const [profile, setProfile] = useStateD(() => loadStrategyDraft(recordId, version.id));
+  const [draftState, setDraftState] = useStateD("saved");
+  const [savedInsight, setSavedInsight] = useStateD(null);
+  const [savedInsightState, setSavedInsightState] = useStateD("loading");
+  const [chatMessages, setChatMessages] = useStateD(() => loadStrategyChatDraft(recordId, version.id));
+  const [chatInput, setChatInput] = useStateD("");
+  const [chatLoading, setChatLoading] = useStateD(false);
+  const chatScrollRef = React.useRef(null);
+
+  React.useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        strategyStorageKey(recordId, version.id, "profile"),
+        JSON.stringify(profile)
+      );
+      setDraftState("saved");
+    } catch (error) {
+      setDraftState("memory-only");
+    }
+  }, [profile, recordId, version.id]);
+
+  React.useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        strategyStorageKey(recordId, version.id, "chat"),
+        JSON.stringify(chatMessages)
+      );
+    } catch (error) {
+      // Keep the current conversation in memory when local storage is unavailable.
+    }
+  }, [chatMessages, recordId, version.id]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    setSavedInsight(null);
+    setSavedInsightState("loading");
+
+    if (!recordId || !version?.id || !window.RU_SUPABASE?.isConfigured()) {
+      setSavedInsightState("missing");
+      return () => { cancelled = true; };
+    }
+
+    window.RU_SUPABASE.getLatestAiInsight(recordId, version.id)
+      .then(saved => {
+        if (cancelled) return;
+        if (!saved?.insight_result) {
+          setSavedInsightState("missing");
+          return;
+        }
+        setSavedInsight(saved.insight_result);
+        setSavedInsightState("ready");
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setSavedInsightState("error");
+      });
+
+    return () => { cancelled = true; };
+  }, [recordId, version.id]);
+
+  React.useEffect(() => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    }
+  }, [chatMessages, chatLoading]);
+
+  const updateProfile = (field, value) => {
+    setDraftState("saving");
+    setProfile(current => ({ ...current, [field]: value }));
+  };
+
+  const toggleSpecialNeed = (need) => {
+    setDraftState("saving");
+    setProfile(current => ({
+      ...current,
+      specialNeeds: current.specialNeeds.includes(need)
+        ? current.specialNeeds.filter(item => item !== need)
+        : [...current.specialNeeds, need],
+    }));
+  };
+
+  const profileCompletion = [
+    profile.rentalGoal,
+    profile.moveUrgency,
+    profile.budgetFlexibility,
+    profile.mustHaveConditions,
+    profile.negotiableConditions,
+    profile.redLines,
+    profile.specialNeeds.length > 0 ? "yes" : "",
+    profile.personalNote,
+  ].filter(value => String(value || "").trim()).length;
+
+  const chatDisabled =
+    !rri ||
+    chatLoading ||
+    savedInsightState === "loading" ||
+    evidenceRetrieval.state === "loading" ||
+    evidenceRetrieval.state === "error";
+
+  async function handleSendStrategyChat() {
+    const text = chatInput.trim();
+    if (!text || chatDisabled) return;
+
+    const nextMessages = [...chatMessages, { role: "user", content: text }];
+    setChatMessages(nextMessages);
+    setChatInput("");
+    setChatLoading(true);
+
+    try {
+      const history = chatMessages
+        .filter(message => !message.error)
+        .map(message => ({ role: message.role, content: message.content }));
+      const result = await window.RU_INSIGHT.chatWithRri(
+        conclusion,
+        history,
+        text,
+        evidenceRetrieval.context,
+        profile,
+        savedInsight
+      );
+      if (result.status === "ok") {
+        setChatMessages([...nextMessages, { role: "assistant", content: result.content }]);
+      } else {
+        setChatMessages([
+          ...nextMessages,
+          { role: "assistant", content: result.message || "AI 顧問回應失敗", error: true }
+        ]);
+      }
+    } catch (error) {
+      setChatMessages([
+        ...nextMessages,
+        { role: "assistant", content: `呼叫失敗：${error.message}`, error: true }
+      ]);
+    } finally {
+      setChatLoading(false);
+    }
+  }
+
+  function handleStrategyChatKeyDown(event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      handleSendStrategyChat();
+    }
+  }
+
+  if (!rri) {
+    return (
+      <div className="callout strategy-blocked">
+        <span className="ic"><Icon name="alert" size={16}/></span>
+        <div>
+          <strong>策略分析需要先完成 RRI</strong>
+          <div>目前版本缺少可計算的 RHIR 資料，請先回到欄位填寫情形補齊資料。</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="strategy-page">
+      <section className="strategy-hero">
+        <div>
+          <div className="strategy-eyebrow mono">PHASE 4 · PERSONAL STRATEGY</div>
+          <h2>策略分析</h2>
+          <p>
+            前面的報告說明物件本身；這裡加入你的需求、限制與紅線，
+            讓 AI 顧問協助整理適合你的確認與談判方向。
+          </p>
+        </div>
+        <div className="strategy-privacy-note">
+          <Icon name="info" size={14}/>
+          個人情境只影響策略，不修改 RHIR、RRI 或案例來源。
+        </div>
+      </section>
+
+      <div className="strategy-status-grid">
+        <StrategyStatusCard label="RHIR" value="物件資料已提供"/>
+        <StrategyStatusCard label="RRI" value={`${rri.minScore}–${rri.maxScore} · 已計算`}/>
+        <StrategyStatusCard
+          label="AI INSIGHT"
+          value={
+            savedInsightState === "loading"
+              ? "正在讀取"
+              : savedInsightState === "ready"
+                ? "已載入保存版本"
+                : "尚未保存，顧問仍可使用 RRI"
+          }
+          state={savedInsightState === "ready" ? "ready" : savedInsightState === "loading" ? "loading" : "optional"}
+        />
+        <StrategyStatusCard
+          label="STRATEGY"
+          value={`${profileCompletion}/8 情境項目`}
+          state={profileCompletion >= 4 ? "ready" : "optional"}
+        />
+      </div>
+
+      <div className="strategy-workspace">
+        <section className="strategy-profile-card">
+          <div className="strategy-card-head">
+            <div>
+              <div className="strategy-step mono">STEP 02</div>
+              <h3>我的情況</h3>
+              <p>先填會真正影響決策的條件，不必把自己塞進固定 persona。</p>
+            </div>
+            <span className={`strategy-draft-state is-${draftState}`}>
+              {draftState === "saving" ? "儲存中" : draftState === "memory-only" ? "僅本次保留" : "本機已暫存"}
+            </span>
+          </div>
+
+          <div className="strategy-profile-form">
+            <label className="strategy-field">
+              <span>租屋目的</span>
+              <select value={profile.rentalGoal} onChange={event => updateProfile("rentalGoal", event.target.value)}>
+                <option value="">請選擇</option>
+                <option value="長期居住">長期居住</option>
+                <option value="工作或通勤">工作或通勤</option>
+                <option value="就學">就學</option>
+                <option value="短期過渡">短期過渡</option>
+                <option value="家庭居住">家庭居住</option>
+              </select>
+            </label>
+
+            <label className="strategy-field">
+              <span>搬家急迫度</span>
+              <select value={profile.moveUrgency} onChange={event => updateProfile("moveUrgency", event.target.value)}>
+                <option value="不急，可以繼續比較">不急，可以繼續比較</option>
+                <option value="一個月內">一個月內</option>
+                <option value="兩週內">兩週內</option>
+                <option value="非常急迫">非常急迫</option>
+              </select>
+            </label>
+
+            <label className="strategy-field">
+              <span>預算彈性</span>
+              <select value={profile.budgetFlexibility} onChange={event => updateProfile("budgetFlexibility", event.target.value)}>
+                <option value="幾乎不能超出">幾乎不能超出</option>
+                <option value="只能小幅調整">只能小幅調整</option>
+                <option value="可為必要條件增加">可為必要條件增加</option>
+              </select>
+            </label>
+
+            <fieldset className="strategy-field strategy-field-full">
+              <legend>特殊需求</legend>
+              <div className="strategy-need-options">
+                {STRATEGY_SPECIAL_NEEDS.map(need => (
+                  <label className={`strategy-need-chip ${profile.specialNeeds.includes(need) ? "is-active" : ""}`} key={need}>
+                    <input
+                      type="checkbox"
+                      checked={profile.specialNeeds.includes(need)}
+                      onChange={() => toggleSpecialNeed(need)}
+                    />
+                    {need}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <label className="strategy-field strategy-field-full">
+              <span>必要條件</span>
+              <textarea
+                rows={2}
+                value={profile.mustHaveConditions}
+                onChange={event => updateProfile("mustHaveConditions", event.target.value)}
+                placeholder="例如：一定要能申請租補、必須有獨立電表"
+              />
+            </label>
+
+            <label className="strategy-field strategy-field-full">
+              <span>可以談判或妥協</span>
+              <textarea
+                rows={2}
+                value={profile.negotiableConditions}
+                onChange={event => updateProfile("negotiableConditions", event.target.value)}
+                placeholder="例如：租金可小幅調整，但希望換取修繕或設備"
+              />
+            </label>
+
+            <label className="strategy-field strategy-field-full">
+              <span>不能接受的紅線</span>
+              <textarea
+                rows={2}
+                value={profile.redLines}
+                onChange={event => updateProfile("redLines", event.target.value)}
+                placeholder="例如：拒絕書面確認費用、限制租補或押金條件不清"
+              />
+            </label>
+
+            <label className="strategy-field strategy-field-full">
+              <span>補充說明</span>
+              <textarea
+                rows={2}
+                value={profile.personalNote}
+                onChange={event => updateProfile("personalNote", event.target.value)}
+                placeholder="還有哪些只有你自己知道、但會影響決定的事情？"
+              />
+            </label>
+          </div>
+
+          <div className="strategy-profile-foot">
+            <span>草稿保存在這個瀏覽器，不會回寫分析報告。</span>
+            <button
+              className="btn btn-sm btn-ghost"
+              onClick={() => {
+                setDraftState("saving");
+                setProfile(createDefaultStrategyProfile());
+              }}
+            >
+              清除情境
+            </button>
+          </div>
+        </section>
+
+        <section className="strategy-chat-card">
+          <div className="strategy-card-head">
+            <div>
+              <div className="strategy-step mono">STEP 03</div>
+              <h3><Icon name="sparkle" size={15}/> AI 策略顧問</h3>
+              <p>顧問會同時閱讀 RRI、verified cases、保存的 Insight 與左側個人情境。</p>
+            </div>
+            <span className="strategy-context-chip mono">
+              {evidenceRetrieval.state === "done"
+                ? `${evidenceRetrieval.context?.stats?.uniqueCaseCount || 0} CASES`
+                : evidenceRetrieval.state.toUpperCase()}
+            </span>
+          </div>
+
+          {savedInsightState !== "ready" && savedInsightState !== "loading" && (
+            <div className="strategy-inline-note">
+              尚未載入已保存的 AI Insight；顧問仍會使用 RRI 與 verified cases。
+              若要包含三來源 Insight，請先回分析報告儲存。
+            </div>
+          )}
+
+          {evidenceRetrieval.state === "error" && (
+            <div className="strategy-inline-error">
+              案例查詢失敗：{evidenceRetrieval.error}
+              <button className="btn btn-sm" onClick={evidenceRetrieval.reload}>重新查詢</button>
+            </div>
+          )}
+
+          <div className="strategy-chat-body" ref={chatScrollRef}>
+            {chatMessages.length === 0 && (
+              <div className="strategy-chat-empty">
+                <Icon name="sparkle" size={18}/>
+                <strong>從你的條件開始談</strong>
+                <span>你可以請顧問比較風險、安排確認順序，或準備跟房東溝通的方式。</span>
+              </div>
+            )}
+            {chatMessages.map((message, index) => (
+              <div
+                className={`strategy-message is-${message.role} ${message.error ? "is-error" : ""}`}
+                key={`${message.role}-${index}`}
+              >
+                {message.content}
+              </div>
+            ))}
+            {chatLoading && <div className="strategy-message is-assistant is-loading">AI 顧問正在整理你的情境…</div>}
+          </div>
+
+          {chatMessages.length === 0 && (
+            <div className="strategy-quick-prompts">
+              {[
+                "根據我的紅線，哪一項應該最先確認？",
+                "幫我安排跟房東談條件的順序。",
+                "如果對方不願書面確認，我有哪些備用方案？",
+                "我的預算和這個物件的風險要怎麼取捨？",
+              ].map(question => (
+                <button className="strategy-prompt" key={question} onClick={() => setChatInput(question)}>
+                  {question}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div className="strategy-chat-compose">
+            <textarea
+              value={chatInput}
+              onChange={event => setChatInput(event.target.value)}
+              onKeyDown={handleStrategyChatKeyDown}
+              placeholder="例如：租補是我的紅線，我應該先要求房東提供什麼書面確認？"
+              disabled={chatDisabled}
+              rows={3}
+            />
+            <button
+              className="btn btn-primary"
+              onClick={handleSendStrategyChat}
+              disabled={chatDisabled || !chatInput.trim()}
+            >
+              <Icon name="sparkle" size={13}/> 送出
+            </button>
+          </div>
+
+          <div className="strategy-chat-foot">
+            <span>Enter 送出 · Shift+Enter 換行</span>
+            {chatMessages.length > 0 && (
+              <button className="btn btn-sm btn-ghost" onClick={() => setChatMessages([])}>清空對話</button>
+            )}
+          </div>
+        </section>
+      </div>
+
+      <div className="callout strategy-next-stage">
+        <span className="ic"><Icon name="info" size={14}/></span>
+        <div>
+          <strong>目前完成策略分析 Step 1–3</strong>
+          <div>
+            個人行動策略、Strategy Trace 與資料庫 session 仍保留在下一階段，
+            不會把尚未確認的顧問對話直接當成正式策略。
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

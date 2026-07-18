@@ -389,12 +389,14 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
   // Multi-turn Q&A grounded in the same structured RRI result.
   // No score recalculation, no legal judgment, no value overrides.
 
-  const CHAT_SYSTEM_PROMPT = `你是 Rent Unfiltered 的租屋風險顧問。
-使用者已經看過 RRI 分數與 AI Insight，現在想針對這個物件問你更多問題。
+  const CHAT_SYSTEM_PROMPT = `你是 Rent Unfiltered「策略分析」區域的個人化租屋顧問。
+使用者已經完成 RHIR 與 RRI，可能也保存了 AI Insight，現在要把物件分析和自己的條件放在一起思考。
 
 回答原則：
-- 只能根據對話開頭提供的結構化 RRI 資料回答。
+- 只能根據對話開頭提供的 RRI、evidenceContext、savedInsight 與 strategyProfile 回答。
 - 不重新計算 RRI 分數，不修改風險等級。
+- strategyProfile 只影響個人優先順序與溝通方式，不得把偏好包裝成客觀風險。
+- savedInsight 若為 null，明確把回答限制在 RRI、案例與使用者情境，不要假裝已讀過 Insight。
 - 不做法律判定，不說房東違法、惡意、詐騙。
 - missing 不代表一定有問題，只能說「資訊不確定」「需要確認」。
 - 若使用者問的內容 RRI 沒涵蓋，請說「目前 RRI 資料中沒有這項資訊，建議簽約前現場確認」，不要自行推測。
@@ -404,23 +406,66 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
 - 回答以繁體中文為主，保持簡短（1–3 段話），除非使用者要求展開。
 - 若使用者問如何議價、如何溝通房東、如何寫信，可給範例句，但要提醒「依實際情況調整」。`;
 
-  async function chatWithRri(rriResult, conversation, newUserMessage, evidenceContext) {
+  function compactSavedInsight(savedInsight) {
+    if (!savedInsight || savedInsight.status === "error") return null;
+    return {
+      insightSummary: savedInsight.insightSummary || null,
+      riskPattern: Array.isArray(savedInsight.riskPattern) ? savedInsight.riskPattern : [],
+      priorityQuestions: Array.isArray(savedInsight.priorityQuestions) ? savedInsight.priorityQuestions : [],
+      actionItems: Array.isArray(savedInsight.actionItems)
+        ? savedInsight.actionItems.map(action => ({
+            title: action.title,
+            rationale: action.rationale,
+            sourceMode: action.sourceMode,
+            priority: action.priority,
+            caseReferences: (action.caseReferences || []).map(reference => ({
+              caseId: reference.caseId,
+              title: reference.title,
+              relevance: reference.relevance,
+            })),
+          }))
+        : [],
+      recommendedSteps: Array.isArray(savedInsight.recommendedSteps) ? savedInsight.recommendedSteps : [],
+      evidenceToKeep: Array.isArray(savedInsight.evidenceToKeep) ? savedInsight.evidenceToKeep : [],
+    };
+  }
+
+  function buildStrategyChatContext(rriResult, evidenceContext, strategyProfile, savedInsight) {
+    return {
+      rri: {
+        totalScore: rriResult?.totalScore,
+        scoreRange: rriResult?.scoreRange,
+        riskLevel: rriResult?.riskLevel,
+        topRiskDimensions: rriResult?.topRiskDimensions,
+        topIssues: rriResult?.topIssues,
+        conflictFields: rriResult?.conflictFields,
+        uncertainFields: rriResult?.uncertainFields,
+        suggestedQuestions: rriResult?.suggestedQuestions,
+      },
+      evidenceContext: compactEvidenceContext(evidenceContext),
+      savedInsight: compactSavedInsight(savedInsight),
+      strategyProfile: strategyProfile || null,
+    };
+  }
+
+  async function chatWithRri(
+    rriResult,
+    conversation,
+    newUserMessage,
+    evidenceContext,
+    strategyProfile,
+    savedInsight
+  ) {
     if (!rriResult) return { status: "error", message: "缺少 RRI 結果，無法開始對話。" };
     if (!newUserMessage || !newUserMessage.trim()) return { status: "error", message: "請輸入問題。" };
 
     const contextBlock =
-      `以下是 rule engine 產出的結構化 RRI 資料（僅供你參考；不要重算）：\n` +
-      `\`\`\`json\n${JSON.stringify({
-        totalScore:        rriResult.totalScore,
-        scoreRange:        rriResult.scoreRange,
-        riskLevel:         rriResult.riskLevel,
-        topRiskDimensions: rriResult.topRiskDimensions,
-        topIssues:         rriResult.topIssues,
-        conflictFields:    rriResult.conflictFields,
-        uncertainFields:   rriResult.uncertainFields,
-        suggestedQuestions: rriResult.suggestedQuestions,
-        evidenceContext:   compactEvidenceContext(evidenceContext),
-      }, null, 2)}\n\`\`\``;
+      `以下是策略分析可使用的結構化 context。只可使用這些資料，不要重算 RRI：\n` +
+      `\`\`\`json\n${JSON.stringify(
+        buildStrategyChatContext(rriResult, evidenceContext, strategyProfile, savedInsight),
+        null,
+        2
+      )}\n\`\`\``;
 
     const messages = [
       { role: "system", content: CHAT_SYSTEM_PROMPT },
@@ -464,6 +509,7 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
     generateInsight,
     chatWithRri,
     buildPromptPayload,
+    buildStrategyChatContext,
     validateEvidenceReferences,
     SYSTEM_PROMPT,
     CHAT_SYSTEM_PROMPT,

@@ -207,10 +207,61 @@ const emptyContextOutput = context.window.RU_INSIGHT.validateEvidenceReferences(
 assert.equal(emptyContextOutput.actionItems[0].sourceMode, "ai_assessment");
 assert.equal(emptyContextOutput.actionItems[0].caseReferences.length, 0);
 
+const strategyProfile = {
+  rentalGoal: "長期居住",
+  moveUrgency: "兩週內",
+  budgetFlexibility: "只能小幅調整",
+  mustHaveConditions: "必須有獨立電表",
+  negotiableConditions: "租金可小幅調整",
+  redLines: "拒絕書面確認電費",
+  specialNeeds: ["需要租屋補助"],
+  personalNote: "通勤時間很重要"
+};
+const savedInsight = {
+  status: "ok",
+  insightSummary: "電費揭露衝突應優先確認。",
+  actionItems: [{
+    title: "要求書面確認電費",
+    rationale: "案例與本物件訊號方向一致。",
+    sourceMode: "mixed",
+    priority: 1,
+    caseReferences: [{
+      caseId: "gov_electricity_test_001",
+      title: "電費計價爭議案例",
+      relevance: "同樣涉及契約與實際計價不一致。"
+    }]
+  }]
+};
+const strategyContext = context.window.RU_INSIGHT.buildStrategyChatContext(
+  rriResult,
+  evidenceContext,
+  strategyProfile,
+  savedInsight
+);
+assert.equal(strategyContext.rri.totalScore, 55);
+assert.equal(strategyContext.strategyProfile.redLines, "拒絕書面確認電費");
+assert.equal(strategyContext.savedInsight.actionItems[0].sourceMode, "mixed");
+assert.equal(
+  strategyContext.evidenceContext.findings[0].cases[0].id,
+  "gov_electricity_test_001"
+);
+assert.equal(
+  context.window.RU_INSIGHT.buildStrategyChatContext(
+    rriResult,
+    evidenceContext,
+    strategyProfile,
+    null
+  ).savedInsight,
+  null
+);
+assert.match(context.window.RU_INSIGHT.CHAT_SYSTEM_PROMPT, /strategyProfile/);
+assert.match(context.window.RU_INSIGHT.CHAT_SYSTEM_PROMPT, /不修改風險等級/);
+
 console.log("AI Insight evidence context 契約驗證通過");
 console.log("- verified case context：已包含");
 console.log("- 三來源 actionItems：分類與順序已驗證");
 console.log("- 案例展盒 metadata：已由 verified context 補齊");
+console.log("- 策略顧問 context：RRI、案例、保存 Insight、個人情境已分層");
 console.log("- UI 重複資料：未送入 prompt");
 console.log("- 空案例 context：合法");
 console.log("- 虛構案例引用：已阻擋");
