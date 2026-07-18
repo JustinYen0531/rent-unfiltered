@@ -105,6 +105,33 @@ query planner 先讀 RHIR leaf 的完整欄位路徑與真實 `disclosureStatus`
 查詢與命中案例，供人工測試。planner 不修改 RRI 分數，也不由 AI 猜測 `riskType`；
 衝突、未揭露與無法判斷的組合會優先顯示。
 
+## AI Insight 證據 Context
+
+分析報告頁只建立一次 evidence retrieval context，並同時提供給 `Related Cases`、
+`AI Insight` 與 AI 顧問追問，避免畫面與模型使用不同案例。
+
+送入 AI 的 context 只保留：
+
+- 完整三鍵 query
+- 精確命中總數
+- 畫面實際顯示的 verified 案例
+- 案例 ID、標題、來源、摘要、常見後果、行動、應保存證據與命中 mapping
+
+UI 用的 `planner`、`uniqueCases` 等重複資料不送入模型。AI 輸出新增：
+
+```text
+recommendedSteps
+evidenceToKeep
+evidenceReferences[{ caseId, title, relevance }]
+```
+
+`evidenceReferences` 的 ID 與標題必須和 context 完全一致。Related Cases 查詢失敗時，
+AI Insight 與 AI 顧問會停用，不會在沒有證據 context 的情況下默默產生結果。沒有
+精確案例但查詢本身成功時，允許模型依 RRI 回答，但必須回傳空的案例引用並明確說明
+目前沒有精確命中的 verified 案例。AI Insight 回傳後還會由程式逐筆驗證
+`caseId + title`；若模型引用不存在的案例或改寫標題，整次結果會標記失敗，不顯示
+該引用。
+
 ## 不變性規則
 
 1. 不重新命名人工審核過的 `riskType`。

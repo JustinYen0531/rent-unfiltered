@@ -18,13 +18,16 @@
 你的任務不是重新計算 RRI，也不是替使用者做決定。
 RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入 JSON 為唯一依據。
 
-請只根據輸入的結構化 JSON，產生一段「AI Insight」，完成以下 5 件事：
+請只根據輸入的結構化 JSON，產生一段「AI Insight」，完成以下 8 件事：
 
 1. 用白話解釋此物件最主要的風險組合。
 2. 找出欄位之間的關聯（例如費用不透明是否同時伴隨租客權益限制）。
 3. 選出簽約前最優先確認的 3–5 個問題。
-4. 若有使用者背景（userProfile），請說明哪些風險對此使用者特別重要。
-5. 用中性、謹慎語氣提醒：此分析是決策輔助，不是法律判定。
+4. 根據 verified Related Cases 提出 2–5 個依序可執行的步驟。
+5. 整理使用者應保存的證據；只能使用 RRI 或案例中出現的項目。
+6. 若使用案例，列出實際使用的 caseId、title 與本案關聯，不得引用輸入以外的案例。
+7. 若有使用者背景（userProfile），請說明哪些風險對此使用者特別重要。
+8. 用中性、謹慎語氣提醒：此分析是決策輔助，不是法律判定。
 
 硬性限制：
 - 不得更改 RRI 分數。
@@ -32,6 +35,10 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
 - 不得自行推測輸入 JSON 沒有的資訊。
 - 不得說房東惡意、違法或詐騙，除非輸入 evidence 明確寫出。
 - missing 不代表一定有問題，只能說「資訊不確定」「需要確認」。
+- evidenceContext 只包含 verified 案例；案例只能用來說明可能的爭議脈絡，不得把個案結果寫成普遍法律結論。
+- evidenceReferences 只能使用 evidenceContext 中實際存在的 caseId 與 title。
+- evidenceContext 有案例時，evidenceReferences 至少引用 1 筆實際使用的案例。
+- 如果 evidenceContext 沒有案例，evidenceReferences 必須是空陣列，並明確說目前沒有精確命中的 verified 案例。
 - 輸出要具體、可行動，不要使用恐嚇語氣，不要使用空泛形容詞。
 - 嚴格依照輸出 JSON 結構。`;
 
@@ -46,6 +53,15 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
     conflictFields: "string[], fields whose info contradicts itself",
     uncertainFields: "string[], fields with missing info (NOT mixed with conflicts)",
     suggestedQuestions: "{field, q, dimension}[], priority-ordered questions from rule engine",
+    evidenceContext: {
+      retrievalMode: "deterministic-exact-v1",
+      fallbackUsed: "boolean, currently false",
+      findings: [{
+        query: "{rhirField, disclosureStatus, riskType}",
+        totalMatches: "number",
+        cases: "verified case records with source, summary, outcome, actionHints and evidenceToKeep",
+      }],
+    },
     userProfile: {
       isStudent: "boolean?",
       needsRentalSubsidy: "boolean?",
@@ -63,6 +79,15 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
       { title: "string — short pattern name", explanation: "string — why these signals combine into a pattern" },
     ],
     priorityQuestions: "string[] — 3–5 most important questions, more specific than the rule engine's generic ones",
+    recommendedSteps: "string[] — 2–5 ordered actions grounded in RRI and verified cases",
+    evidenceToKeep: "string[] — concrete records, messages, photos, bills or contract clauses to preserve",
+    evidenceReferences: [
+      {
+        caseId: "string — must exactly match an evidenceContext case id",
+        title: "string — must exactly match that case title",
+        relevance: "string — cautious explanation of why this case is relevant",
+      },
+    ],
     beginnerExplanation: "string — same as insightSummary but for first-time renters, plain language",
     personalNote: "string? — only if userProfile provided; otherwise omit",
     cautionNote: "string — fixed disclaimer about decision aid, not legal judgment",
@@ -108,12 +133,12 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
 
   // ── Real generator: calls OpenRouter and parses JSON output ───
 
-  async function generateInsight(rriResult, userProfile) {
+  async function generateInsight(rriResult, userProfile, evidenceContext) {
     if (!rriResult) {
       return { status: "error", message: "缺少 RRI 結果，無法產生 Insight。" };
     }
 
-    const payload = buildPromptPayload(rriResult, userProfile);
+    const payload = buildPromptPayload(rriResult, userProfile, evidenceContext);
     const userPrompt =
       `以下是 rule engine 產出的結構化 RRI 結果。請依照系統指示產生 AI Insight，僅輸出 JSON（不要 markdown code fence、不要前後文）。\n\n` +
       `### 結構化資料\n${payload.user}\n\n` +
@@ -161,17 +186,98 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
       };
     }
 
+    let validatedOutput;
+    try {
+      validatedOutput = validateEvidenceReferences(parsed, evidenceContext);
+    } catch (e) {
+      return {
+        status: "error",
+        message: `AI 案例引用驗證失敗：${e.message}`,
+      };
+    }
+
     return {
       status: "ok",
       model: data.model || OPENROUTER_MODEL,
       usage: data.usage || null,
-      ...parsed,
+      ...validatedOutput,
     };
   }
 
   // Build the prompt payload that would be sent to the API once connected.
   // Useful for inspection / debugging.
-  function buildPromptPayload(rriResult, userProfile) {
+  function compactEvidenceContext(evidenceContext) {
+    return {
+      retrievalMode: evidenceContext?.retrievalMode || "deterministic-exact-v1",
+      fallbackUsed: Boolean(evidenceContext?.fallbackUsed),
+      findings: (evidenceContext?.findings || []).map(finding => ({
+        query: {
+          rhirField: finding?.query?.rhirField,
+          disclosureStatus: finding?.query?.disclosureStatus,
+          riskType: finding?.query?.riskType,
+        },
+        totalMatches: Number(finding?.totalMatches || 0),
+        cases: (finding?.cases || []).map(evidenceCase => ({
+          id: evidenceCase.id,
+          title: evidenceCase.title,
+          year: evidenceCase.year,
+          sourceType: evidenceCase.sourceType,
+          sourceName: evidenceCase.sourceName,
+          sourceUrl: evidenceCase.sourceUrl,
+          summary: evidenceCase.summary,
+          commonOutcome: evidenceCase.commonOutcome,
+          actionHints: evidenceCase.actionHints || [],
+          evidenceToKeep: evidenceCase.evidenceToKeep || [],
+          confidence: evidenceCase.confidence,
+          matchedMapping: evidenceCase.matchedMapping,
+        })),
+      })),
+    };
+  }
+
+  function validateEvidenceReferences(output, evidenceContext) {
+    const compactContext = compactEvidenceContext(evidenceContext);
+    const allowedCases = new Map();
+    for (const finding of compactContext.findings) {
+      for (const evidenceCase of finding.cases) {
+        allowedCases.set(evidenceCase.id, evidenceCase.title);
+      }
+    }
+
+    const references = Array.isArray(output?.evidenceReferences)
+      ? output.evidenceReferences
+      : [];
+    if (allowedCases.size > 0 && references.length === 0) {
+      throw new Error("evidence context 有 verified 案例，但 AI 沒有提供案例引用");
+    }
+    const seen = new Set();
+    const validated = [];
+
+    for (const reference of references) {
+      const caseId = String(reference?.caseId || "").trim();
+      const title = String(reference?.title || "").trim();
+      if (!caseId || !allowedCases.has(caseId)) {
+        throw new Error(`AI 引用了 evidence context 以外的案例：${caseId || "缺少 caseId"}`);
+      }
+      if (title !== allowedCases.get(caseId)) {
+        throw new Error(`AI 案例標題與 verified context 不一致：${caseId}`);
+      }
+      if (seen.has(caseId)) continue;
+      seen.add(caseId);
+      validated.push({
+        caseId,
+        title,
+        relevance: String(reference?.relevance || "").trim()
+      });
+    }
+
+    return {
+      ...output,
+      evidenceReferences: validated
+    };
+  }
+
+  function buildPromptPayload(rriResult, userProfile, evidenceContext) {
     return {
       system: SYSTEM_PROMPT,
       user: JSON.stringify({
@@ -183,6 +289,7 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
         conflictFields:    rriResult?.conflictFields,
         uncertainFields:   rriResult?.uncertainFields,
         suggestedQuestions: rriResult?.suggestedQuestions,
+        evidenceContext:   compactEvidenceContext(evidenceContext),
         userProfile:       userProfile || null,
       }, null, 2),
       expectedOutputSchema: OUTPUT_SCHEMA,
@@ -202,11 +309,13 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
 - 不做法律判定，不說房東違法、惡意、詐騙。
 - missing 不代表一定有問題，只能說「資訊不確定」「需要確認」。
 - 若使用者問的內容 RRI 沒涵蓋，請說「目前 RRI 資料中沒有這項資訊，建議簽約前現場確認」，不要自行推測。
+- Related Cases 只用來說明可能的爭議脈絡，不得把個案結果寫成普遍法律結論。
+- 提及案例時，只能使用 evidenceContext 中實際存在的 caseId 與 title；沒有精確案例就明確說沒有。
 - 中性、具體、可行動。避免空泛形容詞與恐嚇語氣。
 - 回答以繁體中文為主，保持簡短（1–3 段話），除非使用者要求展開。
 - 若使用者問如何議價、如何溝通房東、如何寫信，可給範例句，但要提醒「依實際情況調整」。`;
 
-  async function chatWithRri(rriResult, conversation, newUserMessage) {
+  async function chatWithRri(rriResult, conversation, newUserMessage, evidenceContext) {
     if (!rriResult) return { status: "error", message: "缺少 RRI 結果，無法開始對話。" };
     if (!newUserMessage || !newUserMessage.trim()) return { status: "error", message: "請輸入問題。" };
 
@@ -221,6 +330,7 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
         conflictFields:    rriResult.conflictFields,
         uncertainFields:   rriResult.uncertainFields,
         suggestedQuestions: rriResult.suggestedQuestions,
+        evidenceContext:   compactEvidenceContext(evidenceContext),
       }, null, 2)}\n\`\`\``;
 
     const messages = [
@@ -265,6 +375,7 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
     generateInsight,
     chatWithRri,
     buildPromptPayload,
+    validateEvidenceReferences,
     SYSTEM_PROMPT,
     CHAT_SYSTEM_PROMPT,
     INPUT_SCHEMA,

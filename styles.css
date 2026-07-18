@@ -644,6 +644,41 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
   color: var(--ink-3);
   font-size: 12px;
 }
+.insight-evidence-references {
+  margin: 14px 0;
+  padding: 10px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  background: #f8fafc;
+}
+.insight-section-label {
+  margin-bottom: 7px;
+  color: var(--ink-3);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+.insight-evidence-reference {
+  padding: 8px 0;
+  border-top: 1px dashed var(--hairline);
+}
+.insight-evidence-reference:first-of-type { border-top: 0; }
+.insight-evidence-reference > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: baseline;
+  font-size: 12px;
+}
+.insight-evidence-reference .mono {
+  color: var(--accent-ink);
+  font-size: 10px;
+}
+.insight-evidence-reference p {
+  margin: 3px 0 0;
+  color: var(--ink-3);
+  font-size: 11px;
+  line-height: 1.5;
+}
 
 .segmented {
   display: inline-flex;

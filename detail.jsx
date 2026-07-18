@@ -424,8 +424,7 @@ const RELATED_CASE_SOURCE_LABELS = {
   social: "社群案例"
 };
 
-function RelatedCasesPanel({ rhir }) {
-  const { Icon } = window.RU;
+function useEvidenceRetrievalContext(rhir) {
   const [state, setState] = useStateD("loading");
   const [context, setContext] = useStateD(null);
   const [error, setError] = useStateD("");
@@ -466,6 +465,17 @@ function RelatedCasesPanel({ rhir }) {
     return () => { cancelled = true; };
   }, [rhir, reloadToken]);
 
+  return {
+    state,
+    context,
+    error,
+    reload: () => setReloadToken(value => value + 1)
+  };
+}
+
+function RelatedCasesPanel({ retrieval }) {
+  const { Icon } = window.RU;
+  const { state, context, error, reload } = retrieval;
   const findings = context?.findings || [];
   const planner = context?.planner;
   const uniqueCaseCount = context?.stats?.uniqueCaseCount || 0;
@@ -492,7 +502,7 @@ function RelatedCasesPanel({ rhir }) {
           <div>
             <strong>案例查詢失敗</strong>
             <div className="related-cases-error">{error}</div>
-            <button className="btn btn-sm" onClick={() => setReloadToken(value => value + 1)}>重新查詢</button>
+            <button className="btn btn-sm" onClick={reload}>重新查詢</button>
           </div>
         </div>
       )}
@@ -503,7 +513,7 @@ function RelatedCasesPanel({ rhir }) {
           <div className="t-meta">
             這不是「沒有風險」，而是目前 mapping 詞典尚無完全相符的三鍵組合；系統不會自動猜測近似案例。
           </div>
-          <button className="btn btn-sm" onClick={() => setReloadToken(value => value + 1)}>重新查詢</button>
+          <button className="btn btn-sm" onClick={reload}>重新查詢</button>
         </div>
       )}
 
@@ -515,7 +525,7 @@ function RelatedCasesPanel({ rhir }) {
               {" "}<span className="mono">{planner?.totalQueryCount || 0}</span> 組可追溯查詢，
               目前顯示 <span className="mono">{findings.length}</span> 組。
             </div>
-            <button className="btn btn-sm" onClick={() => setReloadToken(value => value + 1)}>重新查詢</button>
+            <button className="btn btn-sm" onClick={reload}>重新查詢</button>
           </div>
 
           <div className="related-findings">
@@ -606,6 +616,7 @@ function ReportView({ report, version, rhir }) {
   const { Icon } = window.RU;
   const [insightState, setInsightState] = useStateD("idle"); // "idle" | "loading" | "done" | "stub" | "error"
   const [insightResult, setInsightResult] = useStateD(null);
+  const evidenceRetrieval = useEvidenceRetrievalContext(rhir);
 
   // Chat consultant state
   const [chatMessages, setChatMessages] = useStateD([]); // [{role:"user"|"assistant", content, error?}]
@@ -647,7 +658,12 @@ function ReportView({ report, version, rhir }) {
 
   async function handleSendChat() {
     const text = chatInput.trim();
-    if (!text || chatLoading) return;
+    if (
+      !text ||
+      chatLoading ||
+      evidenceRetrieval.state === "loading" ||
+      evidenceRetrieval.state === "error"
+    ) return;
     const nextMessages = [...chatMessages, { role: "user", content: text }];
     setChatMessages(nextMessages);
     setChatInput("");
@@ -658,7 +674,15 @@ function ReportView({ report, version, rhir }) {
       const history = chatMessages
         .filter(m => !m.error)
         .map(m => ({ role: m.role, content: m.content }));
-      const result = await window.RU_INSIGHT.chatWithRri(conclusion, history, text);
+      if (evidenceRetrieval.state === "error") {
+        throw new Error(`案例 context 尚未就緒：${evidenceRetrieval.error}`);
+      }
+      const result = await window.RU_INSIGHT.chatWithRri(
+        conclusion,
+        history,
+        text,
+        evidenceRetrieval.context
+      );
       if (result.status === "ok") {
         setChatMessages([...nextMessages, { role: "assistant", content: result.content }]);
       } else {
@@ -679,9 +703,23 @@ function ReportView({ report, version, rhir }) {
   }
 
   async function handleGenerateInsight() {
+    if (evidenceRetrieval.state === "loading") return;
+    if (evidenceRetrieval.state === "error") {
+      setInsightResult({
+        status: "error",
+        message: `Related Cases 查詢失敗，AI Insight 未送出：${evidenceRetrieval.error}`
+      });
+      setInsightState("error");
+      return;
+    }
+
     setInsightState("loading");
     try {
-      const result = await window.RU_INSIGHT.generateInsight(conclusion);
+      const result = await window.RU_INSIGHT.generateInsight(
+        conclusion,
+        null,
+        evidenceRetrieval.context
+      );
       setInsightResult(result);
       if (result?.status === "not_implemented") setInsightState("stub");
       else if (result?.status === "error") setInsightState("error");
@@ -799,7 +837,7 @@ function ReportView({ report, version, rhir }) {
         </div>
       )}
 
-      <RelatedCasesPanel rhir={rhir}/>
+      <RelatedCasesPanel retrieval={evidenceRetrieval}/>
 
       {/* Layer 3 — AI Insight (gated; pure風險脈絡解讀，不重算分數) */}
       <div className="fg" style={{marginTop:18}}>
@@ -811,11 +849,22 @@ function ReportView({ report, version, rhir }) {
           <div style={{padding:"18px 16px"}}>
             <p style={{color:"#5a6573", margin:"0 0 12px", fontSize:13, lineHeight:1.6}}>
               RRI 分數與結論已由 rule engine 產生（上方），AI Insight 不重算分數，只解讀風險之間的關聯、
-              排出簽前最該問的問題，並把技術性欄位翻成生活情境。<strong>需要手動觸發以節省算力。</strong>
+              排出簽前最該問的問題，並使用上方 verified Related Cases 產生步驟、證據提醒與案例引用。
+              <strong>需要手動觸發以節省算力。</strong>
             </p>
-            <button className="btn btn-primary" onClick={handleGenerateInsight}>
-              <Icon name="sparkle" size={14}/> 生成 AI Insight
+            <button
+              className="btn btn-primary"
+              onClick={handleGenerateInsight}
+              disabled={evidenceRetrieval.state === "loading" || evidenceRetrieval.state === "error"}
+            >
+              <Icon name="sparkle" size={14}/>
+              {evidenceRetrieval.state === "loading" ? "等待案例查詢" : "生成 AI Insight"}
             </button>
+            {evidenceRetrieval.state === "error" && (
+              <div className="t-meta" style={{marginTop:8}}>
+                請先在 Related Cases 區塊重新查詢，成功後才能產生有證據依據的 Insight。
+              </div>
+            )}
           </div>
         )}
 
@@ -868,6 +917,39 @@ function ReportView({ report, version, rhir }) {
                 <ol style={{margin:0, paddingLeft:20, fontSize:13, lineHeight:1.8}}>
                   {insightResult.priorityQuestions.map((q, i) => <li key={i}>{q}</li>)}
                 </ol>
+              </div>
+            )}
+
+            {insightResult.recommendedSteps?.length > 0 && (
+              <div style={{margin:"14px 0"}}>
+                <div className="mono" style={{fontSize:10, color:"#8a93a0", letterSpacing:"0.06em", marginBottom:6}}>RECOMMENDED STEPS</div>
+                <ol style={{margin:0, paddingLeft:20, fontSize:13, lineHeight:1.8}}>
+                  {insightResult.recommendedSteps.map((step, i) => <li key={i}>{step}</li>)}
+                </ol>
+              </div>
+            )}
+
+            {insightResult.evidenceToKeep?.length > 0 && (
+              <div style={{margin:"14px 0"}}>
+                <div className="mono" style={{fontSize:10, color:"#8a93a0", letterSpacing:"0.06em", marginBottom:6}}>EVIDENCE TO KEEP</div>
+                <ul style={{margin:0, paddingLeft:20, fontSize:13, lineHeight:1.8}}>
+                  {insightResult.evidenceToKeep.map((item, i) => <li key={i}>{item}</li>)}
+                </ul>
+              </div>
+            )}
+
+            {insightResult.evidenceReferences?.length > 0 && (
+              <div className="insight-evidence-references">
+                <div className="mono insight-section-label">VERIFIED CASE REFERENCES</div>
+                {insightResult.evidenceReferences.map((reference, i) => (
+                  <div className="insight-evidence-reference" key={`${reference.caseId || "case"}-${i}`}>
+                    <div>
+                      <span className="mono">{reference.caseId || "—"}</span>
+                      {reference.title && <strong>{reference.title}</strong>}
+                    </div>
+                    {reference.relevance && <p>{reference.relevance}</p>}
+                  </div>
+                ))}
               </div>
             )}
 
@@ -985,7 +1067,11 @@ function ReportView({ report, version, rhir }) {
               onChange={(e) => setChatInput(e.target.value)}
               onKeyDown={handleChatKeyDown}
               placeholder="例如：禁止報稅對我會有什麼具體影響？／要不要簽約？"
-              disabled={chatLoading}
+              disabled={
+                chatLoading ||
+                evidenceRetrieval.state === "loading" ||
+                evidenceRetrieval.state === "error"
+              }
               rows={2}
               style={{
                 flex: 1,
@@ -1002,7 +1088,12 @@ function ReportView({ report, version, rhir }) {
             <button
               className="btn btn-primary"
               onClick={handleSendChat}
-              disabled={chatLoading || !chatInput.trim()}
+              disabled={
+                chatLoading ||
+                !chatInput.trim() ||
+                evidenceRetrieval.state === "loading" ||
+                evidenceRetrieval.state === "error"
+              }
               style={{whiteSpace:"nowrap"}}
             >
               <Icon name="sparkle" size={13}/> 送出
