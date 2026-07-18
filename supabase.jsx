@@ -37,6 +37,154 @@ function _client() {
   return _sb;
 }
 
+const EVIDENCE_CASE_RETRIEVAL_SELECT = [
+  "id",
+  "source_type",
+  "source_name",
+  "source_url",
+  "source_reference_url",
+  "title",
+  "year",
+  "keywords",
+  "rhir_fields",
+  "risk_types",
+  "summary",
+  "common_outcome",
+  "legal_basis",
+  "action_hints",
+  "evidence_to_keep",
+  "confidence",
+  "review_status",
+  "notes"
+].join(",");
+
+const EVIDENCE_SOURCE_RANK = {
+  gov: 0,
+  court: 1,
+  research: 2,
+  interview: 3,
+  social: 4
+};
+
+const EVIDENCE_CONFIDENCE_RANK = {
+  high: 0,
+  medium: 1,
+  low: 2
+};
+
+function normalizeEvidenceQuery(query, defaultLimit = 5) {
+  const normalized = {
+    rhirField: String(query?.rhirField || "").trim(),
+    disclosureStatus: String(query?.disclosureStatus || "").trim(),
+    riskType: String(query?.riskType || "").trim()
+  };
+  const missingKeys = Object.entries(normalized)
+    .filter(([, value]) => !value)
+    .map(([key]) => key);
+
+  if (missingKeys.length > 0) {
+    throw new Error(`案例查詢缺少必要欄位：${missingKeys.join(", ")}`);
+  }
+
+  const requestedLimit = Number(query?.limit ?? defaultLimit);
+  normalized.limit = Number.isFinite(requestedLimit)
+    ? Math.min(10, Math.max(1, Math.floor(requestedLimit)))
+    : defaultLimit;
+  return normalized;
+}
+
+function compareEvidenceCases(left, right) {
+  const sourceDifference =
+    (EVIDENCE_SOURCE_RANK[left.source_type] ?? 99) -
+    (EVIDENCE_SOURCE_RANK[right.source_type] ?? 99);
+  if (sourceDifference !== 0) return sourceDifference;
+
+  const confidenceDifference =
+    (EVIDENCE_CONFIDENCE_RANK[left.confidence] ?? 99) -
+    (EVIDENCE_CONFIDENCE_RANK[right.confidence] ?? 99);
+  if (confidenceDifference !== 0) return confidenceDifference;
+
+  const yearDifference = Number(right.year || 0) - Number(left.year || 0);
+  if (yearDifference !== 0) return yearDifference;
+  return String(left.id).localeCompare(String(right.id));
+}
+
+function toEvidenceRetrievalCase(caseRow, mappingRow) {
+  return {
+    id: caseRow.id,
+    title: caseRow.title,
+    year: caseRow.year,
+    sourceType: caseRow.source_type,
+    sourceName: caseRow.source_name,
+    sourceUrl: caseRow.source_url,
+    sourceReferenceUrl: caseRow.source_reference_url || null,
+    keywords: caseRow.keywords || [],
+    rhirFields: caseRow.rhir_fields || [],
+    riskTypes: caseRow.risk_types || [],
+    summary: caseRow.summary,
+    commonOutcome: caseRow.common_outcome,
+    legalBasis: caseRow.legal_basis || [],
+    actionHints: caseRow.action_hints || [],
+    evidenceToKeep: caseRow.evidence_to_keep || [],
+    confidence: caseRow.confidence,
+    notes: caseRow.notes || null,
+    matchedMapping: {
+      rhirField: mappingRow.rhir_field,
+      disclosureStatus: mappingRow.disclosure_status,
+      riskType: mappingRow.risk_type,
+      mappingNote: mappingRow.mapping_note || null
+    }
+  };
+}
+
+async function findEvidenceCases(query) {
+  const client = _client();
+  if (!client) throw new Error("請先在 supabase.jsx 填入你的 Project URL 和 Anon Key，然後重新整理頁面。");
+
+  const normalized = normalizeEvidenceQuery(query);
+  const { data: mappings, error: mappingError } = await client
+    .from("evidence_mappings")
+    .select("case_id, rhir_field, disclosure_status, risk_type, mapping_note")
+    .eq("rhir_field", normalized.rhirField)
+    .eq("disclosure_status", normalized.disclosureStatus)
+    .eq("risk_type", normalized.riskType)
+    .order("case_id", { ascending: true });
+
+  if (mappingError) throw mappingError;
+
+  const caseIds = [...new Set((mappings || []).map(mapping => mapping.case_id))];
+  if (caseIds.length === 0) {
+    return {
+      query: normalized,
+      retrievalMode: "exact-mapping",
+      fallbackUsed: false,
+      totalMatches: 0,
+      cases: []
+    };
+  }
+
+  const { data: cases, error: caseError } = await client
+    .from("evidence_cases")
+    .select(EVIDENCE_CASE_RETRIEVAL_SELECT)
+    .in("id", caseIds)
+    .eq("review_status", "verified");
+
+  if (caseError) throw caseError;
+
+  const mappingByCase = new Map((mappings || []).map(mapping => [mapping.case_id, mapping]));
+  const rankedCases = (cases || [])
+    .sort(compareEvidenceCases)
+    .map(caseRow => toEvidenceRetrievalCase(caseRow, mappingByCase.get(caseRow.id)));
+
+  return {
+    query: normalized,
+    retrievalMode: "exact-mapping",
+    fallbackUsed: false,
+    totalMatches: rankedCases.length,
+    cases: rankedCases.slice(0, normalized.limit)
+  };
+}
+
 window.RU_SUPABASE = {
   isConfigured: _isConfigured,
 
@@ -124,6 +272,52 @@ window.RU_SUPABASE = {
       ...item,
       evidence_mappings: mappingsByCase.get(item.id) || []
     }));
+  },
+
+  findEvidenceCases,
+
+  async buildEvidenceRetrievalContext(findings, options = {}) {
+    if (!Array.isArray(findings)) {
+      throw new Error("findings 必須是三欄位查詢物件的陣列。");
+    }
+
+    const limitPerFinding = Number(options.limitPerFinding ?? 5);
+    const results = await Promise.all(findings.map(finding =>
+      findEvidenceCases({ ...finding, limit: limitPerFinding })
+    ));
+    const uniqueCases = new Map();
+
+    for (const result of results) {
+      for (const evidenceCase of result.cases) {
+        const existing = uniqueCases.get(evidenceCase.id);
+        if (!existing) {
+          const { matchedMapping, ...caseData } = evidenceCase;
+          uniqueCases.set(evidenceCase.id, {
+            ...caseData,
+            matchedMappings: [matchedMapping]
+          });
+          continue;
+        }
+
+        const mappingKey = JSON.stringify(evidenceCase.matchedMapping);
+        const existingKeys = new Set(existing.matchedMappings.map(mapping => JSON.stringify(mapping)));
+        if (!existingKeys.has(mappingKey)) {
+          existing.matchedMappings.push(evidenceCase.matchedMapping);
+        }
+      }
+    }
+
+    return {
+      retrievalMode: "deterministic-exact-v1",
+      fallbackUsed: false,
+      findings: results,
+      uniqueCases: [...uniqueCases.values()],
+      stats: {
+        findingCount: findings.length,
+        matchedFindingCount: results.filter(result => result.totalMatches > 0).length,
+        uniqueCaseCount: uniqueCases.size
+      }
+    };
   },
 
   async updateEvidenceReview(id, changes) {

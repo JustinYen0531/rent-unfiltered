@@ -52,6 +52,45 @@ rhirField + disclosureStatus + riskType
 
 第一順位必須用資料庫原值精確查詢。只有沒有精確 mapping 時，才能依字典的 `relatedRiskTypes`、`relatedFields` 或 `knownRelationships` 擴大候選，而且必須記錄 fallback 原因。
 
+## 三鍵案例查詢函式
+
+前端 Supabase client 提供兩個 deterministic retrieval 入口：
+
+```js
+await window.RU_SUPABASE.findEvidenceCases({
+  rhirField: "cost.electricityRate",
+  disclosureStatus: "missing",
+  riskType: "electricity_overcharge",
+  limit: 5
+});
+```
+
+`findEvidenceCases` 只查三個資料庫原值完全一致的 `evidence_mappings`，再從
+`evidence_cases` 取出 `review_status = verified` 的案例。結果包含命中的 mapping、
+案例摘要、常見後果、行動建議、應保留證據與來源網址。沒有精確 mapping 時回傳
+空陣列，`fallbackUsed` 保持 `false`，不自行猜測近似值。
+
+多個 RRI finding 可以使用：
+
+```js
+await window.RU_SUPABASE.buildEvidenceRetrievalContext([
+  {
+    rhirField: "cost.electricityRate",
+    disclosureStatus: "missing",
+    riskType: "electricity_overcharge"
+  },
+  {
+    rhirField: "leaseTerms.depositRefundTerms",
+    disclosureStatus: "conflict",
+    riskType: "deposit_dispute"
+  }
+]);
+```
+
+此函式會逐組精確查詢、保留每組查詢結果，並將重複案例合併至 `uniqueCases`。
+輸出的 `deterministic-exact-v1` context 是後續 Related Cases 與類 RAG 系統的
+證據層；本階段尚未送入 AI Insight，也尚未啟用 related-field fallback。
+
 ## 不變性規則
 
 1. 不重新命名人工審核過的 `riskType`。
@@ -153,7 +192,10 @@ missing / disclosed / conflict / unknown
 partial / inferred / supplemented
 ```
 
-在實作三鍵查詢前，需要另行決定 mapping table 是否擴充這三個狀態。字典已保留全部七種狀態，但本次不修改資料庫 schema。
+三鍵查詢 v1 只會精確命中 mapping table 已接受的四種狀態。當 finding 使用
+`partial`、`inferred` 或 `supplemented` 時，目前會得到無精確 mapping 的空結果；
+不會擅自改寫成其他狀態。未來啟用 fallback 或擴充 mapping table 前，需另行審核
+這三種狀態的案例關係。字典仍保留全部七種狀態，本次不修改資料庫 schema。
 
 ## 驗證
 
