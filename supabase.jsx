@@ -26,6 +26,7 @@
 const SUPABASE_URL      = "https://ypjuewskrfmbhzgyjint.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_G8A-JLI_5r1kXrIf-UmKlg_3Ge-BwzK";
 const INSIGHT_OWNER_STORAGE_KEY = "ru_ai_insight_owner_token";
+const AI_INSIGHT_PROMPT_VERSION = "action-provenance-v2";
 
 const _isConfigured = () =>
   !SUPABASE_URL.includes("YOUR_PROJECT") && !SUPABASE_ANON_KEY.includes("YOUR_ANON");
@@ -522,7 +523,7 @@ window.RU_SUPABASE = {
         owner_token: _getInsightOwnerToken(),
         record_id: String(recordId),
         version_id: String(versionId),
-        prompt_version: "evidence-context-v1",
+        prompt_version: AI_INSIGHT_PROMPT_VERSION,
         rri_snapshot: rriSnapshot,
         evidence_context: evidenceContext,
         insight_result: insightResult,

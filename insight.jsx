@@ -23,9 +23,12 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
 1. 用白話解釋此物件最主要的風險組合。
 2. 找出欄位之間的關聯（例如費用不透明是否同時伴隨租客權益限制）。
 3. 選出簽約前最優先確認的 3–5 個問題。
-4. 根據 verified Related Cases 提出 2–5 個依序可執行的步驟。
+4. 提出 3–6 個依序可執行的 actionItems，並逐項標記來源模式：
+   - mixed：AI 對本物件的判斷與 verified 案例方向一致。
+   - evidence_backed：建議主要直接來自 verified 案例的 actionHints、commonOutcome 或 evidenceToKeep。
+   - ai_assessment：AI 根據本物件 RRI、欄位衝突或資訊缺口作出的綜合判讀，沒有直接案例支持。
 5. 整理使用者應保存的證據；只能使用 RRI 或案例中出現的項目。
-6. 若使用案例，列出實際使用的 caseId、title 與本案關聯，不得引用輸入以外的案例。
+6. mixed 與 evidence_backed 項目必須在該 actionItem 的 caseReferences 列出實際使用的 caseId、title 與本案關聯；不得引用輸入以外的案例。
 7. 若有使用者背景（userProfile），請說明哪些風險對此使用者特別重要。
 8. 用中性、謹慎語氣提醒：此分析是決策輔助，不是法律判定。
 
@@ -36,9 +39,11 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
 - 不得說房東惡意、違法或詐騙，除非輸入 evidence 明確寫出。
 - missing 不代表一定有問題，只能說「資訊不確定」「需要確認」。
 - evidenceContext 只包含 verified 案例；案例只能用來說明可能的爭議脈絡，不得把個案結果寫成普遍法律結論。
-- evidenceReferences 只能使用 evidenceContext 中實際存在的 caseId 與 title。
-- evidenceContext 有案例時，evidenceReferences 至少引用 1 筆實際使用的案例。
-- 如果 evidenceContext 沒有案例，evidenceReferences 必須是空陣列，並明確說目前沒有精確命中的 verified 案例。
+- caseReferences 只能使用 evidenceContext 中實際存在的 caseId 與 title。
+- mixed 與 evidence_backed 必須至少引用 1 筆實際案例；ai_assessment 的 caseReferences 必須是空陣列。
+- 有精確案例時，至少要有 1 個 mixed 或 evidence_backed actionItem；不得為了湊齊三種類型而捏造關聯。
+- 如果 evidenceContext 沒有案例，所有 actionItems 都必須是 ai_assessment，caseReferences 必須是空陣列，並明確說目前沒有精確命中的 verified 案例。
+- actionItems 的 priority 為同一來源模式內的順序，1 最高。系統會固定先顯示 mixed，再顯示 evidence_backed，最後顯示 ai_assessment。
 - 輸出要具體、可行動，不要使用恐嚇語氣，不要使用空泛形容詞。
 - 嚴格依照輸出 JSON 結構。`;
 
@@ -79,15 +84,18 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
       { title: "string — short pattern name", explanation: "string — why these signals combine into a pattern" },
     ],
     priorityQuestions: "string[] — 3–5 most important questions, more specific than the rule engine's generic ones",
-    recommendedSteps: "string[] — 2–5 ordered actions grounded in RRI and verified cases",
-    evidenceToKeep: "string[] — concrete records, messages, photos, bills or contract clauses to preserve",
-    evidenceReferences: [
-      {
+    actionItems: [{
+      title: "string — concise, actionable recommendation",
+      rationale: "string — why this matters for the current RHIR/RRI and, when applicable, the cited cases",
+      sourceMode: "mixed | evidence_backed | ai_assessment",
+      priority: "integer 1–5; 1 is highest within the same sourceMode",
+      caseReferences: [{
         caseId: "string — must exactly match an evidenceContext case id",
         title: "string — must exactly match that case title",
-        relevance: "string — cautious explanation of why this case is relevant",
-      },
-    ],
+        relevance: "string — cautious explanation of why this case supports this action",
+      }],
+    }],
+    evidenceToKeep: "string[] — concrete records, messages, photos, bills or contract clauses to preserve",
     beginnerExplanation: "string — same as insightSummary but for first-time renters, plain language",
     personalNote: "string? — only if userProfile provided; otherwise omit",
     cautionNote: "string — fixed disclaimer about decision aid, not legal judgment",
@@ -235,45 +243,126 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
     };
   }
 
+  const ACTION_SOURCE_ORDER = {
+    mixed: 0,
+    evidence_backed: 1,
+    ai_assessment: 2,
+  };
+
+  function sortActionItems(actionItems) {
+    return (Array.isArray(actionItems) ? actionItems : [])
+      .map((item, index) => ({ item, index }))
+      .sort((left, right) => {
+        const sourceDifference =
+          (ACTION_SOURCE_ORDER[left.item.sourceMode] ?? 99) -
+          (ACTION_SOURCE_ORDER[right.item.sourceMode] ?? 99);
+        if (sourceDifference !== 0) return sourceDifference;
+
+        const priorityDifference =
+          Number(left.item.priority || 99) - Number(right.item.priority || 99);
+        return priorityDifference || left.index - right.index;
+      })
+      .map(entry => entry.item);
+  }
+
   function validateEvidenceReferences(output, evidenceContext) {
     const compactContext = compactEvidenceContext(evidenceContext);
     const allowedCases = new Map();
     for (const finding of compactContext.findings) {
       for (const evidenceCase of finding.cases) {
-        allowedCases.set(evidenceCase.id, evidenceCase.title);
+        allowedCases.set(evidenceCase.id, evidenceCase);
       }
     }
 
-    const references = Array.isArray(output?.evidenceReferences)
-      ? output.evidenceReferences
-      : [];
+    function validateReferences(references, label) {
+      const seen = new Set();
+      const validated = [];
+      for (const reference of Array.isArray(references) ? references : []) {
+        const caseId = String(reference?.caseId || "").trim();
+        const title = String(reference?.title || "").trim();
+        const evidenceCase = allowedCases.get(caseId);
+        if (!caseId || !evidenceCase) {
+          throw new Error(`${label} 引用了 evidence context 以外的案例：${caseId || "缺少 caseId"}`);
+        }
+        if (title !== evidenceCase.title) {
+          throw new Error(`${label} 案例標題與 verified context 不一致：${caseId}`);
+        }
+        if (seen.has(caseId)) continue;
+        seen.add(caseId);
+        validated.push({
+          caseId,
+          title,
+          relevance: String(reference?.relevance || "").trim(),
+          sourceType: evidenceCase.sourceType || null,
+          sourceName: evidenceCase.sourceName || null,
+          sourceUrl: evidenceCase.sourceUrl || null,
+          year: evidenceCase.year || null,
+          confidence: evidenceCase.confidence || null,
+        });
+      }
+      return validated;
+    }
+
+    if (Array.isArray(output?.actionItems)) {
+      let evidenceSupportedCount = 0;
+      const validatedActions = output.actionItems.map((action, index) => {
+        const sourceMode = String(action?.sourceMode || "").trim();
+        if (!Object.prototype.hasOwnProperty.call(ACTION_SOURCE_ORDER, sourceMode)) {
+          throw new Error(`actionItems[${index}] 的 sourceMode 無效：${sourceMode || "缺少值"}`);
+        }
+
+        const title = String(action?.title || "").trim();
+        const rationale = String(action?.rationale || "").trim();
+        if (!title || !rationale) {
+          throw new Error(`actionItems[${index}] 缺少 title 或 rationale`);
+        }
+
+        const caseReferences = validateReferences(
+          action?.caseReferences,
+          `actionItems[${index}]`
+        );
+        if (sourceMode === "ai_assessment" && caseReferences.length > 0) {
+          throw new Error(`actionItems[${index}] 是 ai_assessment，不可附帶案例引用`);
+        }
+        if (sourceMode !== "ai_assessment" && caseReferences.length === 0) {
+          throw new Error(`actionItems[${index}] 是 ${sourceMode}，至少需要 1 筆案例引用`);
+        }
+        if (sourceMode !== "ai_assessment") evidenceSupportedCount += 1;
+
+        const parsedPriority = Number.parseInt(action?.priority, 10);
+        return {
+          title,
+          rationale,
+          sourceMode,
+          priority: Number.isFinite(parsedPriority)
+            ? Math.min(5, Math.max(1, parsedPriority))
+            : Math.min(5, index + 1),
+          caseReferences,
+        };
+      });
+
+      if (allowedCases.size > 0 && evidenceSupportedCount === 0) {
+        throw new Error("evidence context 有 verified 案例，但 actionItems 沒有 mixed 或 evidence_backed 項目");
+      }
+      if (allowedCases.size === 0 && evidenceSupportedCount > 0) {
+        throw new Error("沒有 verified 案例時，actionItems 只能使用 ai_assessment");
+      }
+
+      return {
+        ...output,
+        actionItems: sortActionItems(validatedActions),
+        evidenceReferences: [],
+      };
+    }
+
+    // Backward compatibility for Insight records saved before actionItems existed.
+    const references = validateReferences(output?.evidenceReferences, "evidenceReferences");
     if (allowedCases.size > 0 && references.length === 0) {
       throw new Error("evidence context 有 verified 案例，但 AI 沒有提供案例引用");
     }
-    const seen = new Set();
-    const validated = [];
-
-    for (const reference of references) {
-      const caseId = String(reference?.caseId || "").trim();
-      const title = String(reference?.title || "").trim();
-      if (!caseId || !allowedCases.has(caseId)) {
-        throw new Error(`AI 引用了 evidence context 以外的案例：${caseId || "缺少 caseId"}`);
-      }
-      if (title !== allowedCases.get(caseId)) {
-        throw new Error(`AI 案例標題與 verified context 不一致：${caseId}`);
-      }
-      if (seen.has(caseId)) continue;
-      seen.add(caseId);
-      validated.push({
-        caseId,
-        title,
-        relevance: String(reference?.relevance || "").trim()
-      });
-    }
-
     return {
       ...output,
-      evidenceReferences: validated
+      evidenceReferences: references
     };
   }
 

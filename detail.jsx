@@ -612,6 +612,111 @@ function RelatedCasesPanel({ retrieval }) {
   );
 }
 
+const INSIGHT_ACTION_SOURCE = {
+  mixed: {
+    label: "AI × 案例一致",
+    shortLabel: "一致",
+    description: "AI 判斷與過去案例方向一致",
+  },
+  evidence_backed: {
+    label: "案例支持",
+    shortLabel: "案例",
+    description: "建議可直接回溯到 verified 案例",
+  },
+  ai_assessment: {
+    label: "AI 綜合判讀",
+    shortLabel: "AI",
+    description: "根據目前 RHIR 與 RRI 進行的判讀",
+  },
+};
+
+const INSIGHT_ACTION_SOURCE_ORDER = {
+  mixed: 0,
+  evidence_backed: 1,
+  ai_assessment: 2,
+};
+
+function sortInsightActionItems(items) {
+  return (Array.isArray(items) ? items : [])
+    .map((item, index) => ({ item, index }))
+    .sort((left, right) => {
+      const sourceDifference =
+        (INSIGHT_ACTION_SOURCE_ORDER[left.item?.sourceMode] ?? 99) -
+        (INSIGHT_ACTION_SOURCE_ORDER[right.item?.sourceMode] ?? 99);
+      if (sourceDifference !== 0) return sourceDifference;
+      return Number(left.item?.priority || 99) - Number(right.item?.priority || 99)
+        || left.index - right.index;
+    })
+    .map(entry => entry.item);
+}
+
+function InsightActionCard({ item, index }) {
+  const { Icon } = window.RU;
+  const [evidenceExpanded, setEvidenceExpanded] = useStateD(false);
+  const sourceMode = Object.prototype.hasOwnProperty.call(INSIGHT_ACTION_SOURCE, item.sourceMode)
+    ? item.sourceMode
+    : "ai_assessment";
+  const source = INSIGHT_ACTION_SOURCE[sourceMode];
+  const references = Array.isArray(item.caseReferences) ? item.caseReferences : [];
+
+  return (
+    <article className={`insight-action-card insight-action-${sourceMode}`}>
+      <div className="insight-action-rank mono">{String(index + 1).padStart(2, "0")}</div>
+      <div className="insight-action-content">
+        <div className="insight-action-head">
+          <span className="insight-action-source">{source.label}</span>
+          {references.length > 0 && (
+            <span className="insight-action-case-count mono">{references.length} CASE{references.length > 1 ? "S" : ""}</span>
+          )}
+        </div>
+        <h4>{item.title}</h4>
+        <p>{item.rationale}</p>
+
+        {references.length > 0 && (
+          <div className="insight-action-evidence">
+            <button
+              className="insight-evidence-toggle"
+              onClick={() => setEvidenceExpanded(expanded => !expanded)}
+              aria-expanded={evidenceExpanded}
+            >
+              <span style={{
+                display:"inline-flex",
+                transform: evidenceExpanded ? "rotate(180deg)" : "none",
+                transition:"transform 0.15s ease"
+              }}>
+                <Icon name="chevronDown" size={12}/>
+              </span>
+              {evidenceExpanded ? "收合案例依據" : "查看案例依據"}
+            </button>
+
+            {evidenceExpanded && (
+              <div className="insight-evidence-box">
+                {references.map((reference, referenceIndex) => (
+                  <div className="insight-evidence-case" key={`${reference.caseId}-${referenceIndex}`}>
+                    <div className="insight-evidence-case-head">
+                      <div>
+                        <span className="mono">{reference.caseId}</span>
+                        <strong>{reference.title}</strong>
+                      </div>
+                      {reference.sourceUrl && (
+                        <a href={reference.sourceUrl} target="_blank" rel="noreferrer">查看來源 ↗</a>
+                      )}
+                    </div>
+                    <div className="t-meta">
+                      {[reference.sourceName, reference.year, reference.confidence].filter(Boolean).join(" · ")}
+                    </div>
+                    {reference.relevance && <p>{reference.relevance}</p>}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </article>
+  );
+}
+
 function ReportView({ report, version, rhir, recordId }) {
   const { Icon } = window.RU;
   const [insightState, setInsightState] = useStateD("idle"); // "idle" | "loading" | "done" | "stub" | "error"
@@ -694,6 +799,7 @@ function ReportView({ report, version, rhir, recordId }) {
   const pillType  = maxScore >= 61 ? "high" : maxScore >= 41 ? "mid" : "low";
 
   const dimEntries = Object.entries(rri.dimensions).map(([id, d]) => ({ id, name: d.label, min: d.min, max: d.max }));
+  const insightActions = sortInsightActionItems(insightResult?.actionItems);
 
   async function handleSendChat() {
     const text = chatInput.trim();
@@ -1036,9 +1142,36 @@ function ReportView({ report, version, rhir, recordId }) {
               </div>
             )}
 
-            {insightResult.recommendedSteps?.length > 0 && (
+            {insightActions.length > 0 && (
+              <section className="insight-action-section">
+                <div className="insight-action-section-head">
+                  <div>
+                    <div className="mono insight-section-label">PRIORITIZED ACTIONS</div>
+                    <strong>重要行動</strong>
+                  </div>
+                  <div className="insight-action-legend" aria-label="建議來源顏色說明">
+                    {Object.entries(INSIGHT_ACTION_SOURCE).map(([mode, source]) => (
+                      <span className={`insight-legend-${mode}`} key={mode} title={source.description}>
+                        <i></i>{source.shortLabel}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div className="insight-action-list">
+                  {insightActions.map((item, index) => (
+                    <InsightActionCard
+                      item={item}
+                      index={index}
+                      key={`${item.sourceMode}-${item.title}-${index}`}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {insightActions.length === 0 && insightResult.recommendedSteps?.length > 0 && (
               <div style={{margin:"14px 0"}}>
-                <div className="mono" style={{fontSize:10, color:"#8a93a0", letterSpacing:"0.06em", marginBottom:6}}>RECOMMENDED STEPS</div>
+                <div className="mono" style={{fontSize:10, color:"#8a93a0", letterSpacing:"0.06em", marginBottom:6}}>RECOMMENDED STEPS · LEGACY</div>
                 <ol style={{margin:0, paddingLeft:20, fontSize:13, lineHeight:1.8}}>
                   {insightResult.recommendedSteps.map((step, i) => <li key={i}>{step}</li>)}
                 </ol>
@@ -1054,7 +1187,7 @@ function ReportView({ report, version, rhir, recordId }) {
               </div>
             )}
 
-            {insightResult.evidenceReferences?.length > 0 && (
+            {insightActions.length === 0 && insightResult.evidenceReferences?.length > 0 && (
               <div className="insight-evidence-references">
                 <div className="mono insight-section-label">VERIFIED CASE REFERENCES</div>
                 {insightResult.evidenceReferences.map((reference, i) => (

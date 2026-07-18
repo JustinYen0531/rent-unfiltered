@@ -117,20 +117,30 @@ query planner 先讀 RHIR leaf 的完整欄位路徑與真實 `disclosureStatus`
 - 畫面實際顯示的 verified 案例
 - 案例 ID、標題、來源、摘要、常見後果、行動、應保存證據與命中 mapping
 
-UI 用的 `planner`、`uniqueCases` 等重複資料不送入模型。AI 輸出新增：
+UI 用的 `planner`、`uniqueCases` 等重複資料不送入模型。AI 的行動建議改為逐項保存來源：
 
 ```text
-recommendedSteps
+actionItems[{
+  title,
+  rationale,
+  sourceMode: mixed | evidence_backed | ai_assessment,
+  priority,
+  caseReferences[{ caseId, title, relevance }]
+}]
 evidenceToKeep
-evidenceReferences[{ caseId, title, relevance }]
 ```
 
-`evidenceReferences` 的 ID 與標題必須和 context 完全一致。Related Cases 查詢失敗時，
+顯示順序固定為 `mixed`、`evidence_backed`、`ai_assessment`，同一類型再依
+`priority` 排序。`mixed` 表示 AI 對本物件的判斷與案例方向一致；
+`evidence_backed` 表示建議主要直接來自案例；`ai_assessment` 表示只有目前
+RHIR / RRI 的綜合判讀。前兩種必須引用至少一筆真實案例，第三種禁止附帶案例引用。
+
+`caseReferences` 的 ID 與標題必須和 context 完全一致。Related Cases 查詢失敗時，
 AI Insight 與 AI 顧問會停用，不會在沒有證據 context 的情況下默默產生結果。沒有
 精確案例但查詢本身成功時，允許模型依 RRI 回答，但必須回傳空的案例引用並明確說明
 目前沒有精確命中的 verified 案例。AI Insight 回傳後還會由程式逐筆驗證
 `caseId + title`；若模型引用不存在的案例或改寫標題，整次結果會標記失敗，不顯示
-該引用。
+該引用。案例依據在每一張行動卡內預設收合，避免案例資訊占滿報告。
 
 ## 不變性規則
 

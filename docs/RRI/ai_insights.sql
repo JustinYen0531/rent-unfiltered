@@ -7,7 +7,7 @@ create table if not exists public.ai_insights (
   owner_token uuid not null,
   record_id text not null,
   version_id text not null,
-  prompt_version text not null default 'evidence-context-v1',
+  prompt_version text not null default 'action-provenance-v2',
   rri_snapshot jsonb not null check (jsonb_typeof(rri_snapshot) = 'object'),
   evidence_context jsonb not null check (jsonb_typeof(evidence_context) = 'object'),
   insight_result jsonb not null check (jsonb_typeof(insight_result) = 'object'),
