@@ -250,6 +250,8 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
 .evidence-sop-step { display: grid; grid-template-columns: 34px 1fr; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--hairline); font-size: 12px; color: var(--ink-2); }
 .evidence-sop-step:last-child { border-bottom: 0; }
 .evidence-sop-number { color: var(--accent); font-family: "IBM Plex Mono", monospace; font-size: 11px; }
+.evidence-row-actions { display: flex; flex-wrap: wrap; gap: 6px; min-width: 156px; }
+.evidence-row-actions .btn { white-space: nowrap; }
 
 /* ---------- Buttons ---------- */
 .btn {
@@ -873,6 +875,20 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
 .modal-head h3 { margin: 0; font-size: 16px; }
 .modal-body { padding: 18px 20px; }
 .modal-foot { padding: 12px 20px; border-top: 1px solid var(--hairline); display: flex; justify-content: flex-end; gap: 8px; }
+.evidence-json-modal { width: min(900px, calc(100vw - 32px)); }
+.evidence-json-body { max-height: 70vh; overflow: auto; }
+.evidence-json-view {
+  margin: 0;
+  padding: 16px;
+  border-radius: 6px;
+  overflow: auto;
+  background: #0f1720;
+  color: #dce6f3;
+  font-size: 12px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
 
 .settings-summary {
   display: flex;

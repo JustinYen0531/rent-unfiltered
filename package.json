@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "serve . --listen tcp://127.0.0.1:5500",
     "start": "serve . --listen tcp://127.0.0.1:5500",
-    "evidence:sync:moi": "node scripts/sync-moi-rental-cases.mjs"
+    "evidence:sync:moi": "node scripts/sync-moi-rental-cases.mjs",
+    "evidence:dictionary:validate": "node scripts/validate-rhir-risk-dictionary.mjs"
   },
   "devDependencies": {
     "serve": "^14.2.4"

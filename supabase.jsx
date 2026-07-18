@@ -99,7 +99,7 @@ window.RU_SUPABASE = {
 
     const { data, error } = await client
       .from("evidence_cases")
-      .select("id, source_type, source_name, source_url, source_reference_url, title, year, keywords, rhir_fields, risk_types, summary, common_outcome, action_hints, evidence_to_keep, confidence, review_status, review_notes, reviewed_at, reviewed_by, mapping_notes, notes, updated_at")
+      .select("id, source_type, source_name, source_url, source_reference_url, title, year, keywords, rhir_fields, risk_types, summary, common_outcome, legal_basis, action_hints, evidence_to_keep, confidence, review_status, review_notes, reviewed_at, reviewed_by, mapping_notes, notes, case_record, created_at, updated_at")
       .order("updated_at", { ascending: false });
 
     if (error) throw error;

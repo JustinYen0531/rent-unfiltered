@@ -1,0 +1,1371 @@
+{
+  "dictionaryId": "rent-unfiltered-rhir-risk-dictionary",
+  "version": "1.0.0",
+  "language": "zh-TW",
+  "generatedFrom": {
+    "source": "Supabase public.evidence_cases",
+    "snapshotDate": "2026-07-18",
+    "totalCases": 94,
+    "verifiedCases": 91,
+    "rejectedCases": 3,
+    "reviewedRhirFieldCount": 19,
+    "reviewedRiskTypeCount": 28
+  },
+  "immutabilityPolicy": {
+    "preserveReviewedCaseValues": true,
+    "rewriteCaseRhirFields": false,
+    "rewriteCaseRiskTypes": false,
+    "description": "本字典只解釋與對齊人工審核後的原始值，不回寫、合併或重新命名 evidence_cases 內的 rhir_fields 與 risk_types。"
+  },
+  "retrievalContract": {
+    "requiredKeys": [
+      "rhirField",
+      "disclosureStatus",
+      "riskType"
+    ],
+    "caseEligibility": {
+      "reviewStatus": "verified"
+    },
+    "matchingOrder": [
+      "先以三個原始值做精確查詢",
+      "沒有精確 mapping 時，只能使用字典明載的 relatedRiskTypes 或 relatedFields 擴大候選",
+      "擴大候選仍必須保留原始查詢值並標示 fallback 原因",
+      "不得用 label、中文翻譯或 phraseAliases 直接取代資料庫 key"
+    ],
+    "resultLimitPerFinding": 5
+  },
+  "disclosureStatuses": {
+    "disclosed": {
+      "labelZh": "已明確揭露",
+      "definitionForAI": "來源已提供足以理解與核對的具體資訊；仍需檢查不同來源是否一致。"
+    },
+    "partial": {
+      "labelZh": "部分揭露",
+      "definitionForAI": "來源有提到此事項，但缺少金額、期限、責任範圍或例外條件等關鍵內容。"
+    },
+    "missing": {
+      "labelZh": "未揭露",
+      "definitionForAI": "此資訊對租屋決策重要，但目前來源沒有提供；不得把未揭露直接解讀為不存在或違法。"
+    },
+    "inferred": {
+      "labelZh": "系統推估",
+      "definitionForAI": "此值是依其他資訊推估而來，尚未由房東、仲介、契約或正式來源直接確認。"
+    },
+    "supplemented": {
+      "labelZh": "外部資料補足",
+      "definitionForAI": "此值由政府或其他公開資料補充，應保留來源並確認是否適用於目前物件。"
+    },
+    "conflict": {
+      "labelZh": "來源衝突",
+      "definitionForAI": "刊登、對話、契約或其他來源對同一事項提供不一致內容；應指出衝突並要求簽約前統一。"
+    },
+    "unknown": {
+      "labelZh": "無法判斷",
+      "definitionForAI": "現有資料不足以可靠分類；應提出查核問題，不自行補完事實。"
+    }
+  },
+  "rhirFields": {
+    "leaseTerms.depositRefundTerms": {
+      "labelZh": "押金／定金返還條件",
+      "definitionForAI": "記錄押金、定金或其他預付款的性質、返還時間、扣款項目、計算方式與不返還條件。",
+      "dictionaryStatus": "stable",
+      "observedVerifiedCases": 47,
+      "phraseAliases": [
+        "押金退還",
+        "押金返還",
+        "定金退還",
+        "退租扣款",
+        "押租金返還"
+      ],
+      "relatedRiskTypes": [
+        "deposit_dispute",
+        "deposit_withholding",
+        "early_termination_dispute",
+        "contract_formation_dispute",
+        "noise_disclosure_dispute",
+        "pet_policy_conflict",
+        "restoration_dispute"
+      ],
+      "questionsForAI": [
+        "這筆款項是押金、定金、租金還是其他費用？",
+        "何時返還，哪些項目可以扣除，是否需要共同點交確認？"
+      ],
+      "doNotAssume": "有付款或退款結果，不代表案件主風險一定是押金爭議。"
+    },
+    "leaseTerms.earlyTerminationClause": {
+      "labelZh": "提前終止與違約條件",
+      "definitionForAI": "記錄租客或出租方提前終止租約的通知期限、違約金、例外事由與處理程序。",
+      "dictionaryStatus": "stable",
+      "observedVerifiedCases": 18,
+      "phraseAliases": [
+        "提前解約",
+        "終止租約",
+        "違約金",
+        "解約條款"
+      ],
+      "relatedRiskTypes": [
+        "early_termination_dispute",
+        "noise_disclosure_dispute",
+        "sublease_restriction_dispute",
+        "handover_delay",
+        "contract_review_dispute"
+      ],
+      "questionsForAI": [
+        "提前終止需要提前多久通知？",
+        "哪些情況可以免付違約金或要求返還押金？"
+      ],
+      "doNotAssume": "案例最後解除契約，不代表所有相似情況都能無條件解約。"
+    },
+    "leaseTerms.repairResponsibility": {
+      "labelZh": "修繕責任",
+      "definitionForAI": "記錄房東與租客對設備故障、自然損耗、漏水、緊急修繕與費用負擔的分工。",
+      "dictionaryStatus": "stable",
+      "observedVerifiedCases": 16,
+      "phraseAliases": [
+        "維修責任",
+        "房東修繕",
+        "設備故障",
+        "修繕費用"
+      ],
+      "relatedRiskTypes": [
+        "repair_responsibility_dispute",
+        "repair_cost_dispute",
+        "repair_delay",
+        "repair_dispute",
+        "property_condition_nondisclosure"
+      ],
+      "questionsForAI": [
+        "自然損耗、設備故障與人為損壞分別由誰負責？",
+        "報修後的處理期限與緊急修繕程序是什麼？"
+      ],
+      "doNotAssume": "出現漏水或設備問題時，應同時檢查屋況證據與契約責任，不能只依風險名稱判責。"
+    },
+    "leaseTerms.notes": {
+      "labelZh": "其他契約與交易備註",
+      "definitionForAI": "保存目前沒有專用 RHIR 欄位，但對契約成立、資訊揭露、交屋、轉租或其他租屋決策重要的條件。",
+      "dictionaryStatus": "stable-fallback",
+      "observedVerifiedCases": 14,
+      "phraseAliases": [
+        "其他條款",
+        "契約備註",
+        "特殊約定"
+      ],
+      "relatedRiskTypes": [
+        "important_information_nondisclosure",
+        "contract_formation_dispute",
+        "handover_delay",
+        "sublease_authority_dispute",
+        "sublease_restriction_dispute"
+      ],
+      "questionsForAI": [
+        "這項資訊是否反覆出現在多個案例，值得建立專用欄位？",
+        "契約、對話或附件是否有可定位的原文？"
+      ],
+      "doNotAssume": "此欄位是暫存與補充用途；不得因方便而取代已存在的專用欄位。"
+    },
+    "leaseTerms.hasWrittenContract": {
+      "labelZh": "是否有書面契約",
+      "definitionForAI": "記錄雙方是否會簽署可保存、可審閱且可追溯版本的書面租賃契約。",
+      "dictionaryStatus": "stable",
+      "observedVerifiedCases": 9,
+      "phraseAliases": [
+        "正式租約",
+        "書面租約",
+        "口頭約定"
+      ],
+      "relatedRiskTypes": [
+        "contract_formation_dispute",
+        "failure_to_deliver",
+        "sublease_authority_dispute",
+        "rental_subsidy_dispute"
+      ],
+      "questionsForAI": [
+        "是否能在付款前取得完整契約草稿？",
+        "簽約人是否有出租權限，雙方承諾是否寫入契約？"
+      ],
+      "doNotAssume": "有書面文件不代表所有重要條件都已清楚或一致。"
+    },
+    "safety.waterLeak": {
+      "labelZh": "漏水與潮濕屋況",
+      "definitionForAI": "記錄目前或歷史漏水、壁癌、潮濕、滲水位置、處理紀錄與是否反覆發生。",
+      "dictionaryStatus": "stable",
+      "observedVerifiedCases": 9,
+      "phraseAliases": [
+        "漏水",
+        "滲水",
+        "壁癌",
+        "潮濕"
+      ],
+      "relatedRiskTypes": [
+        "repair_responsibility_dispute",
+        "property_condition_nondisclosure"
+      ],
+      "questionsForAI": [
+        "漏水位置、原因與修繕紀錄是否有照片或文件？",
+        "契約是否寫明修繕期限與無法居住時的處理方式？"
+      ],
+      "doNotAssume": "看到修繕完成的說法時，仍需確認是否有反覆發生與實際修繕證據。"
+    },
+    "cost.eligibleForSubsidy": {
+      "labelZh": "租金補貼資格／配合情況",
+      "definitionForAI": "記錄物件條件與出租方是否配合租金補貼申請，以及是否存在用途、地址或文件障礙。",
+      "dictionaryStatus": "stable",
+      "observedVerifiedCases": 5,
+      "phraseAliases": [
+        "租屋補助",
+        "租金補貼",
+        "租補"
+      ],
+      "relatedRiskTypes": [
+        "rental_subsidy_dispute",
+        "rent_subsidy_dispute"
+      ],
+      "questionsForAI": [
+        "房屋用途、租賃地址與出租人資料是否符合申請文件？",
+        "房東是否以文字確認配合申請？"
+      ],
+      "doNotAssume": "房東口頭表示可以申請，不等於物件與文件一定符合資格。"
+    },
+    "cost.electricityRate": {
+      "labelZh": "電費計價方式",
+      "definitionForAI": "記錄每度電價、電表型態、當期平均電價、公共電費與其他分攤方式。",
+      "dictionaryStatus": "stable",
+      "observedVerifiedCases": 4,
+      "phraseAliases": [
+        "每度電費",
+        "電價",
+        "台電帳單",
+        "電費分攤"
+      ],
+      "relatedRiskTypes": [
+        "electricity_overcharge",
+        "lease_information_mismatch",
+        "utility_dispute"
+      ],
+      "questionsForAI": [
+        "是否依當期電費單與實際用電計算？",
+        "公共設施電費或其他費用是否另外計收？"
+      ],
+      "doNotAssume": "只看到每度單價時，仍需確認電表、帳單、公共用電與計算期間。"
+    },
+    "leaseTerms.householdRegistrationAllowed": {
+      "labelZh": "戶籍遷入",
+      "definitionForAI": "記錄出租方是否允許遷入戶籍，以及相關文件、條件或限制。",
+      "dictionaryStatus": "stable",
+      "observedVerifiedCases": 3,
+      "phraseAliases": [
+        "遷戶籍",
+        "設籍",
+        "戶籍登記"
+      ],
+      "relatedRiskTypes": [
+        "household_registration_dispute"
+      ],
+      "questionsForAI": [
+        "房東是否以文字或契約確認可遷入戶籍？",
+        "申請時需要哪些房屋與出租人文件？"
+      ],
+      "doNotAssume": "不得把戶籍限制與租金補貼、報稅限制自動視為同一件事。"
+    },
+    "leaseTerms.petsAllowed": {
+      "labelZh": "寵物約定",
+      "definitionForAI": "記錄可否飼養寵物、種類與數量限制、清潔或損害責任及違反時的處理。",
+      "dictionaryStatus": "stable",
+      "observedVerifiedCases": 3,
+      "phraseAliases": [
+        "可養寵物",
+        "寵物條款",
+        "寵物友善"
+      ],
+      "relatedRiskTypes": [
+        "pet_policy_conflict"
+      ],
+      "questionsForAI": [
+        "房東與仲介是否都以文字確認可飼養寵物？",
+        "契約是否寫明種類、數量、清潔與違反後果？"
+      ],
+      "doNotAssume": "仲介或刊登說可養寵物，不等於房東與契約已同意。"
+    },
+    "leaseTerms.brokerServiceFeeTerms": {
+      "labelZh": "仲介服務費條件",
+      "definitionForAI": "記錄仲介服務費的金額、付款時點、服務範圍、退費與契約未成立時的處理。",
+      "dictionaryStatus": "reviewed-extension",
+      "observedVerifiedCases": 1,
+      "phraseAliases": [
+        "仲介費",
+        "服務報酬",
+        "服務費退還"
+      ],
+      "relatedRiskTypes": [
+        "broker_fee_dispute"
+      ],
+      "questionsForAI": [
+        "服務費對應哪些服務，何時付款？",
+        "租約未成立或提前終止時能否退費？"
+      ],
+      "doNotAssume": "服務費、押金與定金是不同款項，不得只因結果包含退款就合併。"
+    },
+    "leaseTerms.reviewPeriod": {
+      "labelZh": "契約審閱期",
+      "definitionForAI": "記錄使用者是否能在簽約前取得完整契約並保有合理時間閱讀、比較與詢問。",
+      "dictionaryStatus": "stable",
+      "observedVerifiedCases": 1,
+      "phraseAliases": [
+        "審閱期",
+        "帶回看合約",
+        "簽約前閱讀"
+      ],
+      "relatedRiskTypes": [
+        "contract_review_dispute"
+      ],
+      "questionsForAI": [
+        "能否在付款與簽署前取得完整契約？",
+        "是否有足夠時間檢查附件、空白欄位與修改內容？"
+      ],
+      "doNotAssume": "取得契約不等於已完成審閱；需確認版本與修改紀錄。"
+    },
+    "leaseTerms.utilityCharges": {
+      "labelZh": "水電與公共費用約定",
+      "definitionForAI": "記錄電費、水費、瓦斯、公共設施用電及其他公用費用的負擔與結算方式。",
+      "dictionaryStatus": "reviewed-extension",
+      "observedVerifiedCases": 1,
+      "phraseAliases": [
+        "水電費",
+        "公共電費",
+        "公用費用"
+      ],
+      "relatedRiskTypes": [
+        "utility_dispute",
+        "rent_subsidy_dispute",
+        "repair_dispute"
+      ],
+      "questionsForAI": [
+        "契約是否列出所有公用費用與計算方式？",
+        "公共設施電費是否包含在租金或另行分攤？"
+      ],
+      "doNotAssume": "此欄位比 cost.electricityRate 更廣；若爭點只有每度電價，優先使用 cost.electricityRate。"
+    },
+    "leaseTerms.viewingPaymentRequirement": {
+      "labelZh": "看屋前付款要求",
+      "definitionForAI": "記錄尚未看屋、確認出租人身分或簽約前，對方是否要求支付預約金、押金、定金或其他款項。",
+      "dictionaryStatus": "reviewed-extension",
+      "observedVerifiedCases": 1,
+      "phraseAliases": [
+        "看屋前匯款",
+        "預約金",
+        "先付押金",
+        "訂房費"
+      ],
+      "relatedRiskTypes": [
+        "viewing_payment_scam"
+      ],
+      "questionsForAI": [
+        "是否已實際看屋並確認出租人身分與出租權限？",
+        "付款名稱、用途、退費條件與收款人是否清楚？"
+      ],
+      "doNotAssume": "不得映射成普通 cost.deposit；它描述的是付款時點與詐騙風險。"
+    },
+    "property.area": {
+      "labelZh": "租賃面積",
+      "definitionForAI": "記錄契約、刊登與實際可使用面積，以及坪數是否包含公共空間或不可使用範圍。",
+      "dictionaryStatus": "reviewed-extension",
+      "observedVerifiedCases": 1,
+      "phraseAliases": [
+        "坪數",
+        "使用面積",
+        "租賃範圍"
+      ],
+      "relatedFields": [
+        "property.areaPing"
+      ],
+      "relatedRiskTypes": [
+        "area_misrepresentation"
+      ],
+      "questionsForAI": [
+        "刊登、契約與實際使用面積是否一致？",
+        "坪數是否包含公設、陽台或不可使用空間？"
+      ],
+      "doNotAssume": "與既有 property.areaPing 語意接近，但本字典不自動改名或合併。"
+    },
+    "propertyCondition.disclosure": {
+      "labelZh": "重要屋況揭露",
+      "definitionForAI": "記錄出租方是否揭露會影響居住或交易決策的重要屋況、事故、限制或瑕疵。",
+      "dictionaryStatus": "reviewed-extension",
+      "observedVerifiedCases": 1,
+      "phraseAliases": [
+        "重要屋況",
+        "瑕疵揭露",
+        "重大資訊"
+      ],
+      "relatedFields": [
+        "leaseTerms.notes",
+        "safety.waterLeak",
+        "safety.illegalPartition"
+      ],
+      "relatedRiskTypes": [
+        "重要資訊未揭露",
+        "important_information_nondisclosure",
+        "property_condition_nondisclosure"
+      ],
+      "questionsForAI": [
+        "哪些屋況在簽約前未被告知？",
+        "是否有刊登、對話、照片、契約或查核紀錄可比較？"
+      ],
+      "doNotAssume": "這是人工審核後的擴充欄位；不得因 namespace 不同而改寫成 leaseTerms.notes。"
+    },
+    "repairsAndMaintenance.repairResponsibility": {
+      "labelZh": "修繕與維護責任",
+      "definitionForAI": "記錄修繕通知、處理期限、自行修繕、費用扣抵與證明文件等較完整的維護責任。",
+      "dictionaryStatus": "reviewed-extension",
+      "observedVerifiedCases": 1,
+      "phraseAliases": [
+        "修繕義務",
+        "自行修繕",
+        "修繕費扣抵"
+      ],
+      "relatedFields": [
+        "leaseTerms.repairResponsibility"
+      ],
+      "relatedRiskTypes": [
+        "repair_dispute",
+        "rent_subsidy_dispute",
+        "utility_dispute"
+      ],
+      "questionsForAI": [
+        "是否已以可證明方式通知房東並給予合理處理期限？",
+        "自行修繕與費用扣抵是否保留正式憑證原本？"
+      ],
+      "doNotAssume": "與 leaseTerms.repairResponsibility 相關但不自動合併；原值必須保留。"
+    },
+    "repairsAndMaintenance.restorationObligation": {
+      "labelZh": "退租回復原狀責任",
+      "definitionForAI": "記錄退租點交、自然耗損、損壞責任、回復原狀範圍與押金扣款證明。",
+      "dictionaryStatus": "reviewed-extension",
+      "observedVerifiedCases": 1,
+      "phraseAliases": [
+        "回復原狀",
+        "退租點交",
+        "自然耗損",
+        "損壞扣款"
+      ],
+      "relatedFields": [
+        "leaseTerms.depositRefundTerms",
+        "leaseTerms.repairResponsibility"
+      ],
+      "relatedRiskTypes": [
+        "restoration_dispute",
+        "deposit_withholding"
+      ],
+      "questionsForAI": [
+        "入住與退租時是否有共同點交、照片或影片？",
+        "扣款項目是否能區分自然耗損與租客造成的損壞？"
+      ],
+      "doNotAssume": "押金被扣不等於租客必然負有回復原狀責任，需回到點交與舉證。"
+    },
+    "safety.illegalPartition": {
+      "labelZh": "疑似違規隔間",
+      "definitionForAI": "記錄房屋是否有疑似違規隔間、逃生或消防疑慮，以及來源是否已正式確認。",
+      "dictionaryStatus": "stable",
+      "observedVerifiedCases": 1,
+      "phraseAliases": [
+        "違法隔間",
+        "非法隔間",
+        "分租隔間"
+      ],
+      "relatedRiskTypes": [
+        "important_information_nondisclosure"
+      ],
+      "questionsForAI": [
+        "隔間、用途與消防逃生狀況是否有可核對資料？",
+        "刊登或房東是否在簽約前揭露相關限制？"
+      ],
+      "doNotAssume": "系統不得只依照片或文字直接宣稱違法，應標示疑慮與查核需求。"
+    }
+  },
+  "riskTypes": {
+    "deposit_dispute": {
+      "labelZh": "押金／定金返還爭議",
+      "definitionForAI": "付款性質、返還條件、扣款或解約後退款發生爭議。",
+      "parentRisk": "deposit_and_prepayment",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 25,
+      "primaryRhirFields": [
+        "leaseTerms.depositRefundTerms"
+      ],
+      "phraseAliases": [
+        "押金爭議",
+        "定金返還",
+        "退押金"
+      ],
+      "ask": [
+        "款項性質、返還期限與可扣項目是什麼？"
+      ],
+      "actions": [
+        "要求付款與返還條件寫入契約或收據",
+        "退租時共同點交並確認扣款"
+      ],
+      "evidenceToKeep": [
+        "租賃契約",
+        "付款收據或轉帳紀錄",
+        "入住與退租照片",
+        "退款或扣款對話"
+      ],
+      "caution": "不得因案例結果包含退款，就把其他主風險一律改成 deposit_dispute。"
+    },
+    "repair_responsibility_dispute": {
+      "labelZh": "修繕責任分配爭議",
+      "definitionForAI": "房東與租客對誰應修繕、何時處理及費用由誰負擔產生爭議。",
+      "parentRisk": "repair_and_condition",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 12,
+      "primaryRhirFields": [
+        "leaseTerms.repairResponsibility",
+        "safety.waterLeak"
+      ],
+      "phraseAliases": [
+        "修繕責任",
+        "房東不修",
+        "設備維修"
+      ],
+      "ask": [
+        "修繕責任、處理期限與緊急修繕方式是否寫明？"
+      ],
+      "actions": [
+        "入住前記錄屋況",
+        "以文字報修並保存處理時間線"
+      ],
+      "evidenceToKeep": [
+        "入住前屋況照片",
+        "報修對話",
+        "修繕估價或收據",
+        "契約修繕條款"
+      ],
+      "caution": "不得僅依損壞結果判定責任歸屬。"
+    },
+    "early_termination_dispute": {
+      "labelZh": "提前終止與違約金爭議",
+      "definitionForAI": "租期未滿前終止租約時，對通知、違約金、押金與搬離條件產生爭議。",
+      "parentRisk": "termination_and_handover",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 7,
+      "primaryRhirFields": [
+        "leaseTerms.earlyTerminationClause"
+      ],
+      "phraseAliases": [
+        "提前解約",
+        "終止租約",
+        "違約金"
+      ],
+      "ask": [
+        "提前終止的通知期限、違約金與例外事由是什麼？"
+      ],
+      "actions": [
+        "簽約前確認終止條件",
+        "以書面留下終止通知與協議"
+      ],
+      "evidenceToKeep": [
+        "提前終止條款",
+        "書面通知",
+        "雙方協議紀錄"
+      ],
+      "caution": "個案協調解除不等於相同情況必然無條件解約。"
+    },
+    "contract_formation_dispute": {
+      "labelZh": "租約成立爭議",
+      "definitionForAI": "雙方對租約是否已成立、付款後是否必須簽約或承諾內容產生爭議。",
+      "parentRisk": "contract_process",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 5,
+      "primaryRhirFields": [
+        "leaseTerms.hasWrittenContract",
+        "leaseTerms.depositRefundTerms"
+      ],
+      "phraseAliases": [
+        "契約是否成立",
+        "簽約爭議",
+        "付款後反悔"
+      ],
+      "ask": [
+        "付款前雙方已同意哪些必要條件，何時視為契約成立？"
+      ],
+      "actions": [
+        "付款前取得完整條件與收據",
+        "確認簽約人身分與出租權限"
+      ],
+      "evidenceToKeep": [
+        "租賃契約草稿",
+        "付款紀錄",
+        "雙方承諾對話"
+      ],
+      "caution": "AI 不得自行判定契約法律上是否成立。"
+    },
+    "rental_subsidy_dispute": {
+      "labelZh": "租金補貼配合爭議",
+      "definitionForAI": "物件資格、房東配合、地址用途或文件問題導致租金補貼申請爭議。",
+      "parentRisk": "subsidy_and_registration",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 5,
+      "primaryRhirFields": [
+        "cost.eligibleForSubsidy"
+      ],
+      "relatedRiskTypes": [
+        "rent_subsidy_dispute"
+      ],
+      "phraseAliases": [
+        "租屋補助",
+        "租金補貼",
+        "房東不給租補"
+      ],
+      "ask": [
+        "物件用途、地址與房東文件是否符合補貼申請？"
+      ],
+      "actions": [
+        "簽約前取得房東書面確認",
+        "核對契約地址與申請資料"
+      ],
+      "evidenceToKeep": [
+        "租賃契約",
+        "房東文字回覆",
+        "補貼申請與退件資料"
+      ],
+      "caution": "此原值與 rent_subsidy_dispute 都保留，不自動合併。"
+    },
+    "broker_fee_dispute": {
+      "labelZh": "仲介服務費爭議",
+      "definitionForAI": "仲介服務費的收取、服務內容、租約未成立或解除後退費產生爭議。",
+      "parentRisk": "brokerage",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 3,
+      "primaryRhirFields": [
+        "leaseTerms.brokerServiceFeeTerms"
+      ],
+      "phraseAliases": [
+        "仲介費",
+        "服務報酬",
+        "仲介退費"
+      ],
+      "ask": [
+        "服務費何時成立、包含哪些服務、何時可退？"
+      ],
+      "actions": [
+        "要求服務內容與退費條件書面化"
+      ],
+      "evidenceToKeep": [
+        "仲介委託或服務契約",
+        "服務費收據",
+        "仲介對話"
+      ],
+      "caution": "不得把仲介服務費與押金或定金混為同一款項。"
+    },
+    "electricity_overcharge": {
+      "labelZh": "電費超收／計價爭議",
+      "definitionForAI": "每度單價、電表、當期平均電價或公共用電計算可能造成超收爭議。",
+      "parentRisk": "utilities",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 3,
+      "primaryRhirFields": [
+        "cost.electricityRate"
+      ],
+      "phraseAliases": [
+        "電費超收",
+        "每度電太高",
+        "電價爭議"
+      ],
+      "ask": [
+        "電費是否依當期帳單、實際用電與約定方式計算？"
+      ],
+      "actions": [
+        "要求契約寫明計價方式",
+        "定期保存電表與帳單"
+      ],
+      "evidenceToKeep": [
+        "電費單",
+        "電表照片",
+        "房東收費明細",
+        "契約電費條款"
+      ],
+      "caution": "不能只憑單價判定違法或超收。"
+    },
+    "household_registration_dispute": {
+      "labelZh": "戶籍遷入爭議",
+      "definitionForAI": "租客遷入戶籍的權利、房東配合或因此衍生的解約與押金爭議。",
+      "parentRisk": "subsidy_and_registration",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 3,
+      "primaryRhirFields": [
+        "leaseTerms.householdRegistrationAllowed"
+      ],
+      "phraseAliases": [
+        "不給遷戶籍",
+        "設籍爭議"
+      ],
+      "ask": [
+        "房東是否同意設籍，契約與文件是否一致？"
+      ],
+      "actions": [
+        "簽約前取得書面確認"
+      ],
+      "evidenceToKeep": [
+        "租賃契約",
+        "房東文字回覆",
+        "戶籍申請資料"
+      ],
+      "caution": "戶籍、報稅與租補是相關但不同的事項。"
+    },
+    "important_information_nondisclosure": {
+      "labelZh": "重要資訊未揭露",
+      "definitionForAI": "出租方或仲介未在決策前揭露會實質影響租屋選擇的重要資訊。",
+      "parentRisk": "information_disclosure",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 3,
+      "primaryRhirFields": [
+        "leaseTerms.notes"
+      ],
+      "relatedRiskTypes": [
+        "重要資訊未揭露",
+        "property_condition_nondisclosure"
+      ],
+      "phraseAliases": [
+        "隱瞞重要資訊",
+        "資訊未告知"
+      ],
+      "ask": [
+        "哪些資訊在付款或簽約前沒有被揭露？"
+      ],
+      "actions": [
+        "保存刊登、對話與契約版本",
+        "要求重要條件書面確認"
+      ],
+      "evidenceToKeep": [
+        "刊登截圖",
+        "房東或仲介對話",
+        "租賃契約",
+        "現場照片"
+      ],
+      "caution": "資料缺漏不等於對方故意隱瞞，需有來源差異或案例事實支持。"
+    },
+    "noise_disclosure_dispute": {
+      "labelZh": "噪音揭露與解約爭議",
+      "definitionForAI": "入住後發現持續噪音，並對事前揭露、提前終止與押金返還產生爭議。",
+      "parentRisk": "information_disclosure",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 3,
+      "primaryRhirFields": [
+        "leaseTerms.earlyTerminationClause",
+        "leaseTerms.depositRefundTerms"
+      ],
+      "phraseAliases": [
+        "噪音未告知",
+        "吵雜解約"
+      ],
+      "ask": [
+        "不同時段是否有固定噪音，房東是否事前說明？"
+      ],
+      "actions": [
+        "在不同時段看屋",
+        "記錄噪音時間與來源"
+      ],
+      "evidenceToKeep": [
+        "影音紀錄",
+        "報修或反映對話",
+        "提前終止條款"
+      ],
+      "caution": "噪音感受與法律效果需依實際強度、持續性與證據判斷。"
+    },
+    "pet_policy_conflict": {
+      "labelZh": "寵物約定衝突",
+      "definitionForAI": "刊登、仲介、房東與契約對可否飼養寵物的說法不一致。",
+      "parentRisk": "contract_terms",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 3,
+      "primaryRhirFields": [
+        "leaseTerms.petsAllowed"
+      ],
+      "phraseAliases": [
+        "寵物條款衝突",
+        "說可以養但契約禁止"
+      ],
+      "ask": [
+        "房東本人與契約是否都確認可養寵物？"
+      ],
+      "actions": [
+        "將種類、數量與違反後果寫入契約"
+      ],
+      "evidenceToKeep": [
+        "房東或仲介文字確認",
+        "契約寵物條款"
+      ],
+      "caution": "不能只依刊登的寵物友善標籤作結論。"
+    },
+    "property_condition_nondisclosure": {
+      "labelZh": "屋況瑕疵未揭露",
+      "definitionForAI": "漏水、瑕疵、環境或其他重要屋況在簽約前未被充分揭露。",
+      "parentRisk": "repair_and_condition",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 3,
+      "primaryRhirFields": [
+        "safety.waterLeak",
+        "leaseTerms.repairResponsibility"
+      ],
+      "relatedRiskTypes": [
+        "important_information_nondisclosure",
+        "重要資訊未揭露"
+      ],
+      "phraseAliases": [
+        "隱瞞屋況",
+        "瑕疵未告知"
+      ],
+      "ask": [
+        "屋況問題何時出現，簽約前是否可被發現或曾被告知？"
+      ],
+      "actions": [
+        "入住前拍攝完整屋況",
+        "要求已知瑕疵與修繕承諾書面化"
+      ],
+      "evidenceToKeep": [
+        "看屋與入住照片",
+        "刊登截圖",
+        "報修對話",
+        "修繕紀錄"
+      ],
+      "caution": "不得在沒有來源證據時宣稱對方故意隱瞞。"
+    },
+    "failure_to_deliver": {
+      "labelZh": "未依約交付",
+      "definitionForAI": "付款或簽約後，出租方未依約提供房屋、契約或入住條件。",
+      "parentRisk": "termination_and_handover",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 2,
+      "primaryRhirFields": [
+        "leaseTerms.hasWrittenContract",
+        "leaseTerms.notes"
+      ],
+      "phraseAliases": [
+        "無法入住",
+        "房東不交屋",
+        "未交付"
+      ],
+      "ask": [
+        "交付日期、房屋狀態與未交付時的退款責任是什麼？"
+      ],
+      "actions": [
+        "將交付日期與條件寫入契約"
+      ],
+      "evidenceToKeep": [
+        "租賃契約",
+        "付款紀錄",
+        "交付約定與通知"
+      ],
+      "caution": "需區分未交付、延遲交付與契約未成立。"
+    },
+    "repair_cost_dispute": {
+      "labelZh": "修繕費用負擔爭議",
+      "definitionForAI": "雙方對修繕費金額、必要性、責任或能否扣抵租金產生爭議。",
+      "parentRisk": "repair_and_condition",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 2,
+      "primaryRhirFields": [
+        "leaseTerms.repairResponsibility"
+      ],
+      "phraseAliases": [
+        "維修費",
+        "修繕費誰付"
+      ],
+      "ask": [
+        "修繕原因、責任、估價與付款方式是否清楚？"
+      ],
+      "actions": [
+        "修繕前通知並保存估價與正式憑證"
+      ],
+      "evidenceToKeep": [
+        "報修通知",
+        "估價單",
+        "收據或發票",
+        "修繕前後照片"
+      ],
+      "caution": "不能只依誰先付款就判定最終責任。"
+    },
+    "area_misrepresentation": {
+      "labelZh": "坪數／租賃面積不實",
+      "definitionForAI": "刊登、契約與實際可使用面積不一致，影響租屋判斷。",
+      "parentRisk": "information_disclosure",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 1,
+      "primaryRhirFields": [
+        "property.area"
+      ],
+      "phraseAliases": [
+        "坪數不足",
+        "面積灌水"
+      ],
+      "ask": [
+        "標示面積是否為實際專用面積，包含哪些空間？"
+      ],
+      "actions": [
+        "要求契約明列租賃範圍與面積"
+      ],
+      "evidenceToKeep": [
+        "刊登頁面",
+        "租賃契約",
+        "平面圖或測量資料"
+      ],
+      "caution": "坪數表示方式可能不同，需先確認定義與範圍。"
+    },
+    "contract_review_dispute": {
+      "labelZh": "契約審閱爭議",
+      "definitionForAI": "使用者未能在簽約前完整取得、閱讀或確認契約內容而發生爭議。",
+      "parentRisk": "contract_process",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 1,
+      "primaryRhirFields": [
+        "leaseTerms.reviewPeriod"
+      ],
+      "phraseAliases": [
+        "沒有審閱期",
+        "當場逼簽"
+      ],
+      "ask": [
+        "簽約與付款前是否取得完整契約及附件？"
+      ],
+      "actions": [
+        "保留契約草稿並標記修改版本"
+      ],
+      "evidenceToKeep": [
+        "契約草稿",
+        "版本紀錄",
+        "簽約安排對話"
+      ],
+      "caution": "AI 只提醒審閱風險，不判定契約效力。"
+    },
+    "deposit_withholding": {
+      "labelZh": "房東扣留押金",
+      "definitionForAI": "退租後房東以損壞、清潔、欠費或其他理由扣留全部或部分押金。",
+      "parentRisk": "deposit_and_prepayment",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 1,
+      "primaryRhirFields": [
+        "leaseTerms.depositRefundTerms",
+        "repairsAndMaintenance.restorationObligation"
+      ],
+      "relatedRiskTypes": [
+        "deposit_dispute",
+        "restoration_dispute"
+      ],
+      "phraseAliases": [
+        "扣押金",
+        "不退押金"
+      ],
+      "ask": [
+        "扣款項目、金額與租客責任的證明是什麼？"
+      ],
+      "actions": [
+        "退租時共同點交並書面確認扣款"
+      ],
+      "evidenceToKeep": [
+        "入住與退租照片",
+        "點交確認單",
+        "押金收據",
+        "扣款對話"
+      ],
+      "caution": "此原值保留，不自動改成 deposit_dispute。"
+    },
+    "handover_delay": {
+      "labelZh": "交屋／入住延遲",
+      "definitionForAI": "出租方未在約定時間完成交屋、提供鑰匙或使房屋達到可入住狀態。",
+      "parentRisk": "termination_and_handover",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 1,
+      "primaryRhirFields": [
+        "leaseTerms.notes",
+        "leaseTerms.earlyTerminationClause"
+      ],
+      "phraseAliases": [
+        "延遲交屋",
+        "無法按時入住"
+      ],
+      "ask": [
+        "交屋日期、可入住標準與延遲責任是否寫明？"
+      ],
+      "actions": [
+        "保存交屋約定並確認延遲時的退款或替代安排"
+      ],
+      "evidenceToKeep": [
+        "契約交屋條款",
+        "付款紀錄",
+        "延遲通知與對話"
+      ],
+      "caution": "需與 failure_to_deliver 區分；延遲不一定等於最終未交付。"
+    },
+    "lease_information_mismatch": {
+      "labelZh": "租約資訊不一致",
+      "definitionForAI": "刊登、對話與租約對費用、地址或其他重要條件記載不一致。",
+      "parentRisk": "information_disclosure",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 1,
+      "primaryRhirFields": [
+        "leaseTerms.notes",
+        "cost.electricityRate"
+      ],
+      "phraseAliases": [
+        "租約內容不一致",
+        "廣告與合約不同"
+      ],
+      "ask": [
+        "哪一個欄位在刊登、對話與契約之間不一致？"
+      ],
+      "actions": [
+        "簽約前逐欄比較並要求修正契約"
+      ],
+      "evidenceToKeep": [
+        "刊登截圖",
+        "對話紀錄",
+        "契約版本"
+      ],
+      "caution": "應指出具體衝突欄位，不只給籠統標籤。"
+    },
+    "rent_subsidy_dispute": {
+      "labelZh": "租補與複合契約爭議",
+      "definitionForAI": "人工審核案例使用的原始風險值，涉及租金補貼並同時包含費用、修繕或押金等複合爭點。",
+      "parentRisk": "subsidy_and_registration",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 1,
+      "primaryRhirFields": [
+        "leaseTerms.utilityCharges",
+        "repairsAndMaintenance.repairResponsibility",
+        "leaseTerms.depositRefundTerms"
+      ],
+      "relatedRiskTypes": [
+        "rental_subsidy_dispute"
+      ],
+      "phraseAliases": [
+        "租金補貼爭議",
+        "租補損害"
+      ],
+      "ask": [
+        "案例中的租補問題與費用、修繕或押金爭點如何相互影響？"
+      ],
+      "actions": [
+        "分別保存補貼、費用與修繕的文件"
+      ],
+      "evidenceToKeep": [
+        "租賃契約",
+        "補貼申請資料",
+        "費用帳單",
+        "修繕通知與憑證"
+      ],
+      "caution": "此原值與 rental_subsidy_dispute 不合併，查詢時保留精確 key。"
+    },
+    "repair_delay": {
+      "labelZh": "修繕延遲",
+      "definitionForAI": "出租方在收到修繕通知後遲未處理，造成居住或費用影響。",
+      "parentRisk": "repair_and_condition",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 1,
+      "primaryRhirFields": [
+        "leaseTerms.repairResponsibility"
+      ],
+      "relatedRiskTypes": [
+        "repair_responsibility_dispute"
+      ],
+      "phraseAliases": [
+        "房東拖延維修",
+        "報修未處理"
+      ],
+      "ask": [
+        "何時通知、承諾何時處理、延遲造成什麼影響？"
+      ],
+      "actions": [
+        "以可證明方式催告並保存時間線"
+      ],
+      "evidenceToKeep": [
+        "報修對話",
+        "催告紀錄",
+        "問題照片或影片"
+      ],
+      "caution": "此原值不改成 repair_responsibility_dispute。"
+    },
+    "repair_dispute": {
+      "labelZh": "綜合修繕爭議",
+      "definitionForAI": "人工審核案例使用的原始風險值，包含修繕責任、費用憑證、通知或扣抵等複合問題。",
+      "parentRisk": "repair_and_condition",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 1,
+      "primaryRhirFields": [
+        "repairsAndMaintenance.repairResponsibility"
+      ],
+      "relatedRiskTypes": [
+        "repair_responsibility_dispute",
+        "repair_cost_dispute",
+        "repair_delay"
+      ],
+      "phraseAliases": [
+        "修繕糾紛",
+        "維修爭議"
+      ],
+      "ask": [
+        "爭點是責任、延遲、費用還是證明文件？"
+      ],
+      "actions": [
+        "拆開責任、通知、費用與憑證逐項查核"
+      ],
+      "evidenceToKeep": [
+        "報修通知",
+        "修繕前後照片",
+        "估價、收據或發票原本"
+      ],
+      "caution": "保留此綜合型原值，不強制拆分或改名。"
+    },
+    "restoration_dispute": {
+      "labelZh": "回復原狀爭議",
+      "definitionForAI": "退租時對房屋損壞、自然耗損、修復範圍與費用產生爭議。",
+      "parentRisk": "deposit_and_prepayment",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 1,
+      "primaryRhirFields": [
+        "repairsAndMaintenance.restorationObligation",
+        "leaseTerms.depositRefundTerms"
+      ],
+      "relatedRiskTypes": [
+        "deposit_withholding"
+      ],
+      "phraseAliases": [
+        "回復原狀",
+        "退租損壞"
+      ],
+      "ask": [
+        "哪些項目屬自然耗損，哪些有證據顯示由租客造成？"
+      ],
+      "actions": [
+        "入住與退租均拍攝完整影像",
+        "共同點交並書面確認"
+      ],
+      "evidenceToKeep": [
+        "入住與退租照片",
+        "點交單",
+        "修繕估價與扣款明細"
+      ],
+      "caution": "不得假設所有耗損都應由租客負擔。"
+    },
+    "sublease_authority_dispute": {
+      "labelZh": "轉租／出租權限爭議",
+      "definitionForAI": "簽約者是否有權出租或轉租、真正屋主是否同意等權限產生爭議。",
+      "parentRisk": "sublease_and_authority",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 1,
+      "primaryRhirFields": [
+        "leaseTerms.hasWrittenContract",
+        "leaseTerms.notes"
+      ],
+      "phraseAliases": [
+        "二房東",
+        "無權出租",
+        "轉租權限"
+      ],
+      "ask": [
+        "簽約人是屋主、代理人或轉租人，能否提出權限證明？"
+      ],
+      "actions": [
+        "付款前確認身分與出租權限"
+      ],
+      "evidenceToKeep": [
+        "身分與權限文件",
+        "租賃契約",
+        "付款紀錄"
+      ],
+      "caution": "AI 不直接判定權利是否合法，只提示查核文件。"
+    },
+    "sublease_restriction_dispute": {
+      "labelZh": "轉租限制爭議",
+      "definitionForAI": "租客能否轉租、分租或讓他人使用，以及違反限制後的終止責任產生爭議。",
+      "parentRisk": "sublease_and_authority",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 1,
+      "primaryRhirFields": [
+        "leaseTerms.earlyTerminationClause",
+        "leaseTerms.notes"
+      ],
+      "phraseAliases": [
+        "禁止轉租",
+        "分租限制"
+      ],
+      "ask": [
+        "契約對轉租、分租與共同居住如何規定？"
+      ],
+      "actions": [
+        "在安排轉租或分租前取得書面同意"
+      ],
+      "evidenceToKeep": [
+        "租賃契約",
+        "房東同意紀錄",
+        "終止通知"
+      ],
+      "caution": "需與出租人本身是否有轉租權限區分。"
+    },
+    "utility_dispute": {
+      "labelZh": "公用費用綜合爭議",
+      "definitionForAI": "水電、公共設施費或其他公用費用的負擔、計算、帳單與扣抵產生複合爭議。",
+      "parentRisk": "utilities",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 1,
+      "primaryRhirFields": [
+        "leaseTerms.utilityCharges"
+      ],
+      "relatedRiskTypes": [
+        "electricity_overcharge"
+      ],
+      "phraseAliases": [
+        "水電費爭議",
+        "公共電費"
+      ],
+      "ask": [
+        "各項公用費用由誰負擔、如何計算、依據哪張帳單？"
+      ],
+      "actions": [
+        "要求契約列明費用項目與結算方式"
+      ],
+      "evidenceToKeep": [
+        "電費與水費帳單",
+        "房東收費明細",
+        "租賃契約"
+      ],
+      "caution": "若爭點只限每度電價，可優先使用 electricity_overcharge，但不改寫原案例。"
+    },
+    "viewing_payment_scam": {
+      "labelZh": "看屋前付款詐騙風險",
+      "definitionForAI": "尚未看屋或確認出租人身分前，對方要求先付款並可能中斷聯繫或拒絕退款。",
+      "parentRisk": "fraud_and_identity",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 1,
+      "primaryRhirFields": [
+        "leaseTerms.viewingPaymentRequirement"
+      ],
+      "phraseAliases": [
+        "看屋前匯款",
+        "假房東",
+        "預約金詐騙"
+      ],
+      "ask": [
+        "是否已看屋、確認出租人身分與出租權限？"
+      ],
+      "actions": [
+        "看屋與確認權限前不支付名稱不明款項",
+        "透過平台正式管道聯繫與檢舉"
+      ],
+      "evidenceToKeep": [
+        "刊登截圖",
+        "對方帳號與電話",
+        "對話紀錄",
+        "匯款紀錄"
+      ],
+      "caution": "只有輸入證據支持時才能使用詐騙措辭。"
+    },
+    "重要資訊未揭露": {
+      "labelZh": "重要資訊未揭露（人工原值）",
+      "definitionForAI": "人工審核案例保留的中文 riskType，表示重要屋況或交易資訊在決策前沒有被揭露。",
+      "parentRisk": "information_disclosure",
+      "dictionaryStatus": "reviewed",
+      "observedVerifiedCases": 1,
+      "primaryRhirFields": [
+        "propertyCondition.disclosure"
+      ],
+      "relatedRiskTypes": [
+        "important_information_nondisclosure",
+        "property_condition_nondisclosure"
+      ],
+      "phraseAliases": [
+        "重要資訊沒說",
+        "重大屋況未告知"
+      ],
+      "ask": [
+        "未揭露的是哪項具體資訊，哪個來源可以證明？"
+      ],
+      "actions": [
+        "比較刊登、對話、契約與現場資料"
+      ],
+      "evidenceToKeep": [
+        "刊登截圖",
+        "對話紀錄",
+        "契約",
+        "現場照片或正式查核資料"
+      ],
+      "caution": "保留中文原始 key，不翻譯成英文 key、不回寫案例。"
+    }
+  },
+  "knownRelationships": [
+    {
+      "type": "related-not-equivalent",
+      "values": [
+        "rental_subsidy_dispute",
+        "rent_subsidy_dispute"
+      ],
+      "rule": "語意相關，但兩者都是人工審核原值；查詢與顯示均保留原 key。"
+    },
+    {
+      "type": "related-not-equivalent",
+      "values": [
+        "repair_responsibility_dispute",
+        "repair_dispute",
+        "repair_delay",
+        "repair_cost_dispute"
+      ],
+      "rule": "同屬修繕父類，但分別強調責任、綜合爭點、延遲與費用。"
+    },
+    {
+      "type": "related-not-equivalent",
+      "values": [
+        "deposit_dispute",
+        "deposit_withholding",
+        "restoration_dispute"
+      ],
+      "rule": "同屬押金與退租脈絡，但不得因可能同時發生就互相改名。"
+    },
+    {
+      "type": "related-not-equivalent",
+      "values": [
+        "important_information_nondisclosure",
+        "property_condition_nondisclosure",
+        "重要資訊未揭露"
+      ],
+      "rule": "都涉及揭露，但範圍與人工命名來源不同；只作相關候選。"
+    },
+    {
+      "type": "related-not-equivalent",
+      "values": [
+        "property.area",
+        "property.areaPing"
+      ],
+      "rule": "語意接近；前者是人工審核案例原值，後者是既有產品欄位，不自動合併。"
+    },
+    {
+      "type": "related-not-equivalent",
+      "values": [
+        "repairsAndMaintenance.repairResponsibility",
+        "leaseTerms.repairResponsibility"
+      ],
+      "rule": "兩者都保留；前者偏修繕流程與憑證，後者偏契約責任分工。"
+    }
+  ],
+  "unreviewedSourceValueRelationships": [
+    {
+      "sourceValue": "leaseTerms.petPolicy",
+      "valueType": "rhirField",
+      "sourceStatus": "automatic-candidate",
+      "relatedReviewedValue": "leaseTerms.petsAllowed",
+      "rule": "自動候選檔使用的舊說法；只建立關係，不改寫候選檔或人工審核資料。"
+    },
+    {
+      "sourceValue": "rights.rentalSubsidyAllowed",
+      "valueType": "rhirField",
+      "sourceStatus": "automatic-candidate",
+      "relatedReviewedValue": "cost.eligibleForSubsidy",
+      "rule": "自動候選檔使用的權利面向說法；審核資料目前使用費用／資格面向欄位，兩者不自動視為等價。"
+    },
+    {
+      "sourceValue": "rental_subsidy_restriction",
+      "valueType": "riskType",
+      "sourceStatus": "automatic-candidate",
+      "relatedReviewedValue": "rental_subsidy_dispute",
+      "rule": "自動規則產生的候選 riskType；人工審核值原樣保留，查詢不得直接替換。"
+    }
+  ]
+}

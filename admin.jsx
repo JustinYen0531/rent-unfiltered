@@ -167,6 +167,8 @@ function EvidenceReviewList({ cases, onReviewed }) {
   const [query, setQuery] = useStateAD("");
   const [riskFilter, setRiskFilter] = useStateAD("all");
   const [viewingCase, setViewingCase] = useStateAD(null);
+  const [viewingJsonCase, setViewingJsonCase] = useStateAD(null);
+  const [jsonCopyMessage, setJsonCopyMessage] = useStateAD("");
   const [reviewNote, setReviewNote] = useStateAD("");
   const [riskTypeInput, setRiskTypeInput] = useStateAD("");
   const [rhirInput, setRhirInput] = useStateAD("");
@@ -191,6 +193,58 @@ function EvidenceReviewList({ cases, onReviewed }) {
     setMappingNote(item.mapping_notes || "");
     setSourceReferenceUrl(item.source_reference_url || "");
     setReviewMessage(null);
+  }
+
+  function buildMachineReadableCase(item) {
+    const originalRecord = item.case_record && typeof item.case_record === "object"
+      ? item.case_record
+      : {};
+
+    return {
+      ...originalRecord,
+      id: item.id,
+      sourceType: item.source_type,
+      sourceName: item.source_name,
+      sourceUrl: item.source_url,
+      sourceReferenceUrl: item.source_reference_url || null,
+      title: item.title,
+      year: item.year,
+      keywords: item.keywords || [],
+      rhirFields: item.rhir_fields || [],
+      riskTypes: item.risk_types || [],
+      summary: item.summary,
+      commonOutcome: item.common_outcome,
+      legalBasis: item.legal_basis || [],
+      actionHints: item.action_hints || [],
+      evidenceToKeep: item.evidence_to_keep || [],
+      confidence: item.confidence,
+      review: {
+        status: item.review_status,
+        notes: item.review_notes || null,
+        reviewedAt: item.reviewed_at || null,
+        reviewedBy: item.reviewed_by || null,
+        mappingNotes: item.mapping_notes || null
+      },
+      notes: item.notes || null,
+      createdAt: item.created_at || null,
+      updatedAt: item.updated_at || null
+    };
+  }
+
+  function openJsonCase(item) {
+    setViewingJsonCase(item);
+    setJsonCopyMessage("");
+  }
+
+  async function copyCaseJson() {
+    if (!viewingJsonCase) return;
+    try {
+      const content = JSON.stringify(buildMachineReadableCase(viewingJsonCase), null, 2);
+      await navigator.clipboard.writeText(content);
+      setJsonCopyMessage("已複製 JSON");
+    } catch (error) {
+      setJsonCopyMessage(`複製失敗：${error?.message || error}`);
+    }
   }
 
   async function handleReview(decision) {
@@ -227,7 +281,7 @@ function EvidenceReviewList({ cases, onReviewed }) {
         <div>
           <h2 style={{ margin: 0, fontSize: 18 }}>案例檢查</h2>
           <p className="page-sub" style={{ margin: "4px 0 0" }}>
-            先查看自動整理結果；目前全部是 draft，尚未作為正式建議引用。
+            分別檢查案例內容與結構資料；只有已驗證案例能作為正式建議引用。
           </p>
         </div>
         <span className="mono" style={{ fontSize: 12, color: "var(--ink-3)" }}>{filtered.length} / {cases.length} 筆</span>
@@ -250,7 +304,7 @@ function EvidenceReviewList({ cases, onReviewed }) {
       <div className="tablewrap">
         <table className="table">
           <thead>
-            <tr><th>案例</th><th>年份 / 地區</th><th>Risk Type</th><th>RHIR 欄位</th><th>狀態</th><th></th></tr>
+            <tr><th>案例</th><th>年份 / 地區</th><th>Risk Type</th><th>RHIR 欄位</th><th>狀態</th><th>內容</th></tr>
           </thead>
           <tbody>
             {filtered.map(item => (
@@ -263,7 +317,12 @@ function EvidenceReviewList({ cases, onReviewed }) {
                 <td><span className="mono" style={{ fontSize: 11 }}>{(item.risk_types || []).join(", ") || "待配對"}</span><div className="t-meta">{item.mapping_notes || "可填暫定對應，之後再審核"}</div></td>
                 <td><span className="mono" style={{ fontSize: 11 }}>{(item.rhir_fields || []).join(", ") || "待配對"}</span><div className="t-meta">{item.mapping_notes || "可填暫定對應，之後再審核"}</div></td>
                 <td><ReviewStatusBadge status={item.review_status} /></td>
-                <td><button className="btn btn-ghost btn-sm" onClick={() => openCase(item)}>查看</button></td>
+                <td>
+                  <div className="evidence-row-actions">
+                    <button className="btn btn-ghost btn-sm" onClick={() => openCase(item)}>案例審查</button>
+                    <button className="btn btn-ghost btn-sm" onClick={() => openJsonCase(item)}>結構資料</button>
+                  </div>
+                </td>
               </tr>
             ))}
             {filtered.length === 0 && <tr><td colSpan={6} style={{ textAlign: "center", padding: 32, color: "var(--ink-4)" }}>找不到符合的案例</td></tr>}
@@ -322,6 +381,32 @@ function EvidenceReviewList({ cases, onReviewed }) {
                 <button className="btn btn-danger" disabled={savingReview} onClick={() => handleReview("rejected")}>排除</button>
               </div>
               <button className="btn" onClick={() => setViewingCase(null)}>關閉</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {viewingJsonCase && (
+        <div className="modal-back" onClick={() => setViewingJsonCase(null)}>
+          <div className="modal evidence-json-modal" onClick={event => event.stopPropagation()}>
+            <div className="modal-head">
+              <div>
+                <h3 style={{ marginBottom: 4 }}>{viewingJsonCase.title}</h3>
+                <div className="t-meta mono">STRUCTURED CASE DATA · {viewingJsonCase.id}</div>
+              </div>
+            </div>
+            <div className="modal-body evidence-json-body">
+              <div className="callout" style={{ marginBottom: 12 }}>
+                此處以人工審核後的 RHIR 欄位、Risk Type 與審核狀態覆蓋原始自動整理值；只供複製與系統串接，不會修改資料庫。
+              </div>
+              <pre className="evidence-json-view">
+                {JSON.stringify(buildMachineReadableCase(viewingJsonCase), null, 2)}
+              </pre>
+              {jsonCopyMessage && <div className="t-meta" style={{ marginTop: 8 }}>{jsonCopyMessage}</div>}
+            </div>
+            <div className="modal-foot" style={{ justifyContent: "space-between" }}>
+              <button className="btn btn-primary" onClick={copyCaseJson}>複製 JSON</button>
+              <button className="btn" onClick={() => setViewingJsonCase(null)}>關閉</button>
             </div>
           </div>
         </div>
