@@ -97,13 +97,33 @@ window.RU_SUPABASE = {
     const client = _client();
     if (!client) throw new Error("請先在 supabase.jsx 填入你的 Project URL 和 Anon Key，然後重新整理頁面。");
 
-    const { data, error } = await client
-      .from("evidence_cases")
-      .select("id, source_type, source_name, source_url, source_reference_url, title, year, keywords, rhir_fields, risk_types, summary, common_outcome, legal_basis, action_hints, evidence_to_keep, confidence, review_status, review_notes, reviewed_at, reviewed_by, mapping_notes, notes, case_record, created_at, updated_at")
-      .order("updated_at", { ascending: false });
+    const [casesResult, mappingsResult] = await Promise.all([
+      client
+        .from("evidence_cases")
+        .select("id, source_type, source_name, source_url, source_reference_url, title, year, keywords, rhir_fields, risk_types, summary, common_outcome, legal_basis, action_hints, evidence_to_keep, confidence, review_status, review_notes, reviewed_at, reviewed_by, mapping_notes, notes, case_record, created_at, updated_at")
+        .order("updated_at", { ascending: false }),
+      client
+        .from("evidence_mappings")
+        .select("case_id, rhir_field, disclosure_status, risk_type, mapping_note")
+        .order("rhir_field", { ascending: true })
+        .order("disclosure_status", { ascending: true })
+        .order("risk_type", { ascending: true })
+    ]);
 
-    if (error) throw error;
-    return data || [];
+    if (casesResult.error) throw casesResult.error;
+    if (mappingsResult.error) throw mappingsResult.error;
+
+    const mappingsByCase = new Map();
+    for (const mapping of mappingsResult.data || []) {
+      const caseMappings = mappingsByCase.get(mapping.case_id) || [];
+      caseMappings.push(mapping);
+      mappingsByCase.set(mapping.case_id, caseMappings);
+    }
+
+    return (casesResult.data || []).map(item => ({
+      ...item,
+      evidence_mappings: mappingsByCase.get(item.id) || []
+    }));
   },
 
   async updateEvidenceReview(id, changes) {

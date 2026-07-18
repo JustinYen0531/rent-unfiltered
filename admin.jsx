@@ -218,6 +218,12 @@ function EvidenceReviewList({ cases, onReviewed }) {
       actionHints: item.action_hints || [],
       evidenceToKeep: item.evidence_to_keep || [],
       confidence: item.confidence,
+      mappings: (item.evidence_mappings || []).map(mapping => ({
+        rhirField: mapping.rhir_field,
+        disclosureStatus: mapping.disclosure_status,
+        riskType: mapping.risk_type,
+        mappingNote: mapping.mapping_note || null
+      })),
       review: {
         status: item.review_status,
         notes: item.review_notes || null,
@@ -397,7 +403,7 @@ function EvidenceReviewList({ cases, onReviewed }) {
             </div>
             <div className="modal-body evidence-json-body">
               <div className="callout" style={{ marginBottom: 12 }}>
-                此處以人工審核後的 RHIR 欄位、Risk Type 與審核狀態覆蓋原始自動整理值；只供複製與系統串接，不會修改資料庫。
+                此處整合案例內容、人工審核後的 RHIR 欄位、Risk Type、審核狀態與案例 mappings；只供複製與系統串接，不會修改資料庫。
               </div>
               <pre className="evidence-json-view">
                 {JSON.stringify(buildMachineReadableCase(viewingJsonCase), null, 2)}
