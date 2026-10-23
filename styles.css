@@ -64,6 +64,18 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
 
 .mono { font-family: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace; }
 
+.network-status {
+  padding: 7px 20px;
+  border-bottom: 1px solid var(--hairline);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 12px;
+}
+.network-status.is-offline {
+  background: var(--s-partial-bg);
+  color: var(--s-partial-ink);
+}
+
 /* ---------- Top chrome ---------- */
 .gov-strip {
   height: 6px;

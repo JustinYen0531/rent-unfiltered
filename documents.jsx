@@ -16,6 +16,7 @@
   const PAID_OCR_ENGINE = "mistral-ocr";
   const FREE_PDF_ENGINE = "cloudflare-ai";
   const DEFAULT_PROXY_URL = "/api/openrouter";
+  const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
   const DEFAULT_MODEL = "google/gemini-2.5-flash";
   const MIN_USEFUL_TEXT_LENGTH = 120;
 
@@ -283,10 +284,29 @@
       }];
     }
 
-    const response = await fetchImpl(proxyUrl, {
+    const isDesktop = global.location?.protocol === "rent-unfiltered:";
+    const apiKey = global.RU?.getStoredApiKey?.() || "";
+    if (isDesktop && !apiKey) {
+      return {
+        status: "error",
+        engine,
+        message: "桌面版契約辨識需要網路，請先到設定儲存 OpenRouter API Key。"
+      };
+    }
+
+    const outgoingBody = { ...requestBody };
+    delete outgoingBody.explicitPaidConsent;
+    const response = await fetchImpl(isDesktop ? OPENROUTER_URL : proxyUrl, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestBody)
+      headers: {
+        "Content-Type": "application/json",
+        ...(isDesktop ? {
+          "Authorization": `Bearer ${apiKey}`,
+          "HTTP-Referer": "https://rent-unfiltered.local",
+          "X-Title": "Rent Unfiltered"
+        } : {})
+      },
+      body: JSON.stringify(outgoingBody)
     });
     const payload = await response.json();
     const annotations = extractAnnotations(payload);

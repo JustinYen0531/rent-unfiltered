@@ -2,9 +2,17 @@
   "name": "rent-unfiltered",
   "private": true,
   "version": "0.1.0",
+  "main": "electron/main.cjs",
   "scripts": {
+    "postinstall": "node node_modules/electron/install.js",
+    "predev": "npm run desktop:vendor",
     "dev": "serve . --listen tcp://127.0.0.1:5500",
+    "prestart": "npm run desktop:vendor",
     "start": "serve . --listen tcp://127.0.0.1:5500",
+    "desktop:vendor": "node scripts/build-desktop-vendor.mjs",
+    "desktop:prepare": "node node_modules/electron/install.js && npm run desktop:vendor",
+    "desktop": "npm run desktop:prepare && electron .",
+    "desktop:pack": "npm run desktop:prepare && node scripts/package-desktop.mjs",
     "evidence:sync:moi": "node scripts/sync-moi-rental-cases.mjs",
     "evidence:dictionary:validate": "node scripts/validate-rhir-risk-dictionary.mjs",
     "evidence:mappings:generate": "node scripts/generate-evidence-mappings.mjs --write",
@@ -18,6 +26,14 @@
     "documents:test": "node scripts/test-document-extraction-contract.mjs"
   },
   "devDependencies": {
+    "@supabase/supabase-js": "^2.118.0",
+    "electron": "^44.9.0",
+    "esbuild": "^0.28.2",
     "serve": "^14.2.4"
+  },
+  "dependencies": {
+    "@babel/standalone": "^7.29.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   }
 }
