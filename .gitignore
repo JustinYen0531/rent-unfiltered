@@ -1,2 +1,5 @@
 node_modules/
 .claude/worktrees/
+desktop-dist/
+vendor/supabase.js
+vendor/supabase.js.LEGAL.txt

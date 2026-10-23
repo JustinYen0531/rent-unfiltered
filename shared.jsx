@@ -201,7 +201,7 @@ function SettingsModal({ onClose }) {
       return;
     }
     setSavedMask(maskApiKey(nextValue));
-    setStatus(nextValue ? "API Key 已儲存在這個瀏覽器。" : "API Key 已清除。");
+    setStatus(nextValue ? "API Key 已儲存在這個裝置。" : "API Key 已清除。");
   };
 
   const handleClear = () => {
@@ -249,7 +249,7 @@ function SettingsModal({ onClose }) {
               className="mono settings-secret"
             />
             <div className="hint">
-              只會儲存在你目前這台裝置的瀏覽器，不會自動寫進 repo，也不會跟著 commit。
+              只會儲存在你目前這台裝置，不會自動寫進專案檔，也不會跟著上傳。
             </div>
           </div>
 

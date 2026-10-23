@@ -207,6 +207,10 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
 
   async function callOpenRouter(body, title) {
     const apiKey = getOpenRouterApiKey();
+    const isDesktop = window.location.protocol === "rent-unfiltered:";
+    if (isDesktop && !apiKey) {
+      throw new Error("桌面版 AI 功能需要網路，請先到設定儲存 OpenRouter API Key。");
+    }
     const useBrowserKey = Boolean(apiKey);
     const response = await fetch(useBrowserKey ? OPENROUTER_URL : OPENROUTER_PROXY_URL, {
       method: "POST",
@@ -214,7 +218,7 @@ RRI 分數、風險等級與欄位判斷已由 rule engine 完成，請以輸入
         ...(useBrowserKey ? { "Authorization": `Bearer ${apiKey}` } : {}),
         "Content-Type": "application/json",
         ...(useBrowserKey ? {
-          "HTTP-Referer": window.location.origin || "https://rent-unfiltered.local",
+          "HTTP-Referer": isDesktop ? "https://rent-unfiltered.local" : (window.location.origin || "https://rent-unfiltered.local"),
           "X-Title": title,
         } : {}),
       },

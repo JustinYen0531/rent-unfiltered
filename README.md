@@ -54,6 +54,23 @@ npm run dev
 http://127.0.0.1:5500
 ```
 
+## Windows 桌面版
+
+先安裝專案套件，再用下面的指令開啟獨立桌面視窗；不需要手動打開 Chrome：
+
+```bash
+npm install
+npm run desktop
+```
+
+要產生可在本機雙擊的 Windows 版本：
+
+```bash
+npm run desktop:pack
+```
+
+完成後，開啟 `desktop-dist/Rent Unfiltered-win32-x64/Rent Unfiltered.exe`。請保留旁邊的整個 `Rent Unfiltered-win32-x64` 資料夾，不能只複製 exe。第一次安裝需要網路下載 Electron 執行環境。AI 分析、契約辨識和 Supabase 雲端資料需要網路；桌面版的 OpenRouter 功能還需要先在設定貼上自己的 API Key。網站版與桌面版的本機資料分開保存，不會自動搬移。
+
 ## AI Insight 設定
 
 正式部署站的 AI Insight 會優先使用 Vercel 環境變數 `OPENROUTER_API_KEY`。這樣評審或訪客不需要在瀏覽器貼 API Key，也能按下「生成 AI Insight」測試報告。
