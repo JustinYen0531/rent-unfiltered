@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rent Unfiltered 透明租屋｜隊友快速通關講義</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --primary: #38bdf8;
+      --primary-light: #bae6fd;
+      --accent: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --highlight: #fef08a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.65;
+      padding: 24px 16px 80px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+      padding: 24px;
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--primary);
+      background-color: rgba(56, 189, 248, 0.12);
+      border-radius: 9999px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 8px;
+      letter-spacing: -0.025em;
+    }
+
+    .subtitle {
+      color: var(--text-sub);
+      font-size: 1rem;
+    }
+
+    .nav-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin: 20px 0;
+      position: sticky;
+      top: 12px;
+      z-index: 100;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(8px);
+      padding: 8px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+    }
+
+    .nav-btn {
+      color: var(--primary-light);
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover {
+      background: var(--primary);
+      color: #0f172a;
+      font-weight: 600;
+    }
+
+    .step-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+    }
+
+    .step-num {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary);
+      color: #0f172a;
+      font-weight: 800;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .step-title-box h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .step-title-box .doc-link {
+      font-size: 0.85rem;
+      color: var(--primary);
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .step-title-box .doc-link:hover {
+      text-decoration: underline;
+    }
+
+    .tag-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .tag-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    .tag-item strong {
+      display: block;
+      color: var(--primary-light);
+      margin-bottom: 4px;
+      font-size: 0.95rem;
+    }
+
+    .tag-item span {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+    }
+
+    .notice-box {
+      border-left: 4px solid var(--accent);
+      background: rgba(245, 158, 11, 0.1);
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+      margin: 14px 0;
+      font-size: 0.9rem;
+      color: #fef3c7;
+    }
+
+    .notice-box.danger {
+      border-left-color: var(--danger);
+      background: rgba(239, 68, 68, 0.1);
+      color: #fecaca;
+    }
+
+    .notice-box strong {
+      color: #ffffff;
+    }
+
+    ul {
+      padding-left: 20px;
+      margin: 10px 0;
+    }
+
+    li {
+      margin-bottom: 6px;
+      color: #e2e8f0;
+      font-size: 0.95rem;
+    }
+
+    li strong {
+      color: #ffffff;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 640px) {
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .check-list {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .check-list li {
+      position: relative;
+      padding-left: 24px;
+      margin-bottom: 8px;
+    }
+
+    .check-list li::before {
+      content: "✔";
+      position: absolute;
+      left: 0;
+      color: var(--success);
+      font-weight: bold;
+    }
+
+    .cross-list {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .cross-list li {
+      position: relative;
+      padding-left: 24px;
+      margin-bottom: 8px;
+    }
+
+    .cross-list li::before {
+      content: "✖";
+      position: absolute;
+      left: 0;
+      color: var(--danger);
+      font-weight: bold;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: var(--text-sub);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="badge">政大 AI 跨域永續創新競賽｜專案快速上手</div>
+      <h1>Rent Unfiltered 透明租屋</h1>
+      <p class="subtitle">給夥伴的極速通關講義：掌握核心定位、功能現況與重要界線</p>
+    </header>
+
+    <div class="nav-bar">
+      <a href="#step-1" class="nav-btn">1. 簡版介紹</a>
+      <a href="#step-2" class="nav-btn">2. README 功能</a>
+      <a href="#step-3" class="nav-btn">3. 計畫書重點</a>
+      <a href="#step-4" class="nav-btn">4. MVP 現況補充</a>
+      <a href="#step-5" class="nav-btn">5. 創作理念與目標</a>
+    </div>
+
+    <!-- 步驟 1 -->
+    <section id="step-1" class="step-card">
+      <div class="step-header">
+        <div class="step-num">1</div>
+        <div class="step-title-box">
+          <h2>先讀簡版介紹：掌握作品想解決的問題與定位</h2>
+          <a class="doc-link" href="docs/官方文件-簡版介紹.md">docs/官方文件-簡版介紹.md</a>
+        </div>
+      </div>
+
+      <div class="notice-box">
+        <strong>核心一句話：</strong>我們不是下一個 591，也不是主觀評論網。我們是協助學生與初次租屋者的<strong>「租屋資訊整理與風險判讀工具」</strong>。
+      </div>
+
+      <ul>
+        <li><strong>核心痛點：</strong>租屋資訊極度散落（刊登頁、房東LINE口頭說法、紙本合約條款、看房筆記），且資訊嚴重不對稱，新手常看不到致命風險。</li>
+        <li><strong>主要對象：</strong>學生、社會新鮮人、第一次租屋者。</li>
+        <li><strong>兩大核心架構：</strong>
+          <ul>
+            <li><strong>RHIR（租屋資訊交換格式）：</strong>把雜亂資訊整理成統一欄位，明確標記「已揭露、未揭露、來源」。</li>
+            <li><strong>RRI（租屋風險指數）：</strong>用固定規則算出五個面向的風險參考，指出缺漏與疑點。</li>
+          </ul>
+        </li>
+      </ul>
+
+      <div class="notice-box danger">
+        <strong>重要界限：</strong>本系統「提供判讀參考與待追問清單」，<strong>絕不替使用者決定要不要租</strong>，也<strong>不提供法律保證或安全背書</strong>。
+      </div>
+    </section>
+
+    <!-- 步驟 2 -->
+    <section id="step-2" class="step-card">
+      <div class="step-header">
+        <div class="step-num">2</div>
+        <div class="step-title-box">
+          <h2>再讀 README：認識目前功能與外部依賴</h2>
+          <a class="doc-link" href="README.md">README.md</a>
+        </div>
+      </div>
+
+      <p style="color: var(--text-sub); margin-bottom: 12px;">程式碼已經寫好很多路徑，但展示時請務必分清楚<strong>「本機可跑」</strong>與<strong>「需要聯網/外部服務」</strong>：</p>
+
+      <div class="summary-grid">
+        <div class="tag-item">
+          <strong>✅ 本機獨立流程（瀏覽器即可驗證）</strong>
+          <ul class="check-list" style="margin-top: 8px;">
+            <li>租屋表單輸入與欄位完整度即時檢核</li>
+            <li>RHIR JSON 結構化預覽、複製與下載</li>
+            <li>RRI 固定規則五面向計算與區間顯示</li>
+            <li>本機物件紀錄與版本歷史（localStorage）</li>
+            <li>白話風險報告與待追問清單產出</li>
+          </ul>
+        </div>
+        <div class="tag-item">
+          <strong>⚠️ 外部依賴流程（需網路與 API Key / 雲端）</strong>
+          <ul class="cross-list" style="margin-top: 8px;">
+            <li><strong>AI Insight / 個人策略顧問：</strong>需 OpenRouter 金鑰與聯網</li>
+            <li><strong>案例庫檢索：</strong>需 Supabase 資料庫連線與可用數據</li>
+            <li><strong>契約上傳與 OCR 解析：</strong>需雲端儲存與解析服務</li>
+            <li><strong>Chrome 擴充插件：</strong>需手動載入未封裝擴充功能</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="notice-box" style="margin-top: 14px;">
+        <strong>快速本機跑起來：</strong><code>npm install</code> ➔ <code>npm run dev</code> ➔ 瀏覽器開 <code>http://127.0.0.1:5500</code> 即可操作。
+      </div>
+    </section>
+
+    <!-- 步驟 3 -->
+    <section id="step-3" class="step-card">
+      <div class="step-header">
+        <div class="step-num">3</div>
+        <div class="step-title-box">
+          <h2>讀計畫書重點段落：專案摘要、技術可行性與成果</h2>
+          <a class="doc-link" href="專案計畫書.md">專案計畫書.md</a>
+        </div>
+      </div>
+
+      <div class="tag-grid">
+        <div class="tag-item">
+          <strong>1. 專案摘要 (第 48-66 行)</strong>
+          <span>以 RHIR 整理資料、以 RRI 計算風險，透過 AI 產生白話報告與「待追問清單」，讓簽約前能更早看見問題，降低不對稱。</span>
+        </div>
+        <div class="tag-item">
+          <strong>2. 解決方案 (第 230-379 行)</strong>
+          <span>打造單一物件的風險評級，將不確定性量化。資訊不足時不隱瞞，直接以「風險區間」標示不確定性。</span>
+        </div>
+        <div class="tag-item">
+          <strong>3. 技術可行性 (第 384-403 行)</strong>
+          <span>採前端 MVP 先行，不碰龐大的平台媒合與房源爬取，先把「單一物件能不能看懂」做深做紮實。最小展示路徑：表單 ➔ RHIR ➔ RRI ➔ 報告。</span>
+        </div>
+        <div class="tag-item">
+          <strong>4. 目前成果與未來 (第 562-591 行)</strong>
+          <span>已具備多頁面流程、RHIR 產生器、RRI 計算與桌面版指令。未來規劃為收斂決賽展示、驗證數據真實性，公開資料大串接保留為長期願景。</span>
+        </div>
+      </div>
+
+      <div class="notice-box">
+        <strong>永續指標連結：</strong>主要呼應 <strong>SDG 11.1</strong>（安全、適足且可負擔住宅），讓安全與權益成為決策維度，而非只看價格。
+      </div>
+    </section>
+
+    <!-- 步驟 4 -->
+    <section id="step-4" class="step-card">
+      <div class="step-header">
+        <div class="step-num">4</div>
+        <div class="step-title-box">
+          <h2>看 MVP 規格現況：五大風險面向與驗收提醒</h2>
+          <a class="doc-link" href="docs/Rent-Unfiltered-MVP版本規格.md">docs/Rent-Unfiltered-MVP版本規格.md</a>
+        </div>
+      </div>
+
+      <p style="color: var(--text-sub); margin-bottom: 10px;">目前 RRI 規則引擎專注於以下五個核心面向：</p>
+      <div class="tag-grid">
+        <div class="tag-item">
+          <strong>1. 契約透明度</strong>
+          <span>合約審閱期、修繕責任切分、提前解約違約金、自然折舊責任。</span>
+        </div>
+        <div class="tag-item">
+          <strong>2. 費用透明度</strong>
+          <span>電費計價是否符合台電規範、公共電費分攤、水費、管理費明細。</span>
+        </div>
+        <div class="tag-item">
+          <strong>3. 居住安全</strong>
+          <span>頂樓加蓋/違建、滅火器、火災警報器、熱水器通風環境、逃生動線。</span>
+        </div>
+        <div class="tag-item">
+          <strong>4. 租客權益</strong>
+          <span>能不能報稅（租金扣除額）、能不能遷戶籍、能否申請租屋補助。</span>
+        </div>
+        <div class="tag-item">
+          <strong>5. 生活適配度</strong>
+          <span>隔音、採光通風、寵物約定、生活機能與個人生活習慣相容性。</span>
+        </div>
+      </div>
+
+      <div class="notice-box danger">
+        <strong>⚠️ 關鍵提醒（千萬別在評審面前講錯）：</strong><br>
+        「<strong>程式碼寫好 ≠ 現場已完成驗收</strong>」！我們系統內放的租屋物件是「示範模擬資料」，絕不能宣稱為真實訪談或市場普查統計；若展示時遇到網路異常，請果斷切回本機核心路徑（表單 ➔ RHIR ➔ RRI）。
+      </div>
+    </section>
+
+    <!-- 步驟 5 -->
+    <section id="step-5" class="step-card">
+      <div class="step-header">
+        <div class="step-num">5</div>
+        <div class="step-title-box">
+          <h2>最後閱讀兩份背景：創作理念 vs 決賽版本目標</h2>
+          <span style="font-size: 0.85rem; color: var(--text-sub);">
+            <a class="doc-link" href="docs/創作理念與動機.md">docs/創作理念與動機.md</a> · 
+            <a class="doc-link" href="docs/Rent-Unfiltered-決賽版本規格.md">docs/Rent-Unfiltered-決賽版本規格.md</a>
+          </span>
+        </div>
+      </div>
+
+      <div class="summary-grid">
+        <div class="tag-item">
+          <strong>📖 為什麼做這件事？（創作理念）</strong>
+          <p style="font-size: 0.85rem; color: var(--text-sub); margin-top: 6px;">
+            在經濟學上，租屋是在消費「居住服務」。自住者有餘裕做大量調查，但學生、新鮮人承擔能力弱、搜尋成本高，常淪為資訊弱勢。<br><br>
+            <strong>"Unfiltered"</strong> 的意義：<strong>不被廣告、流量、房東話術與平台權力所過濾</strong>，將真正攸關安全的條件攤在陽光下。
+          </p>
+        </div>
+        <div class="tag-item">
+          <strong>🎯 決賽版本規格的正確理解方式</strong>
+          <p style="font-size: 0.85rem; color: var(--text-sub); margin-top: 6px;">
+            文件中的「最終版本樣貌」（如多 Agent 深度協作、全自動跨平台比價、大規模政府資料即時對接）是<strong>長期的產品願景</strong>。<br><br>
+            <strong>切記：</strong>不要把願景當成「現在已經做完的功能」！跟評審交流時要明確切分「現有 MVP 成果」與「未來藍圖」。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>Rent Unfiltered 透明租屋 · 隊伍：不動業火笙聲生不熄 · 祝報告順利！</p>
+    </footer>
+  </div>
+</body>
+</html>
